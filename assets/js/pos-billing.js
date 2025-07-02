@@ -1,6 +1,5 @@
-// Funcionalidad del botón de facturación - VERSIÓN FINAL COMPLETA SIN ERRORES
+// Funcionalidad del botón de facturación - VERSIÓN FINAL CON INTEGRACIÓN REAL
 document.addEventListener("DOMContentLoaded", function () {
-  // Buscar el botón de facturación
   const billingBtn = document.getElementById("pos-billing-btn");
 
   if (billingBtn) {
@@ -8,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
       abrirModuloFacturacion();
     });
 
-    // Efecto hover
     billingBtn.addEventListener("mouseover", function () {
       this.style.transform = "translateY(-2px)";
       this.style.boxShadow = "0 6px 20px rgba(102, 126, 234, 0.4)";
@@ -29,7 +27,6 @@ function abrirModuloFacturacion() {
   );
 
   if (popup) {
-    // Crear el documento paso a paso para evitar errores
     popup.document.open();
     popup.document.write('<!DOCTYPE html>');
     popup.document.write('<html>');
@@ -37,7 +34,7 @@ function abrirModuloFacturacion() {
     popup.document.write('<title>Sistema de Facturación CFDI 4.0</title>');
     popup.document.write('<meta charset="UTF-8">');
     
-    // CSS
+    // CSS (mantenemos el mismo)
     popup.document.write('<style>');
     popup.document.write('body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; line-height: 1.6; }');
     popup.document.write('.container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 1100px; margin: 0 auto; }');
@@ -89,7 +86,7 @@ function abrirModuloFacturacion() {
     popup.document.write('</head>');
     popup.document.write('<body>');
     
-    // HTML del formulario
+    // HTML del formulario (mantenemos el mismo)
     popup.document.write('<div class="container">');
     popup.document.write('<div class="header">');
     popup.document.write('<h1>📄 Sistema de Facturación CFDI 4.0</h1>');
@@ -374,30 +371,22 @@ function abrirModuloFacturacion() {
     popup.document.write('</form>');
     popup.document.write('</div>');
     
-    // JAVASCRIPT
+    // JAVASCRIPT - AQUÍ ESTÁ LA MEJORA PRINCIPAL
     popup.document.write('<script>');
     popup.document.write('let isProcessing = false;');
     
     // Función calcular totales
     popup.document.write('function calcularTotales() {');
-    popup.document.write('  console.log("🔢 Calculando totales...");');
     popup.document.write('  let subtotal = 0;');
     popup.document.write('  let totalDescuentos = 0;');
     popup.document.write('  const conceptos = document.querySelectorAll(".producto-row");');
-    popup.document.write('  console.log("📋 Conceptos encontrados:", conceptos.length);');
-    popup.document.write('  conceptos.forEach(function(concepto, index) {');
-    popup.document.write('    console.log("📦 Procesando concepto " + (index + 1) + ":");');
+    popup.document.write('  conceptos.forEach(function(concepto) {');
     popup.document.write('    const cantidad = parseFloat(concepto.querySelector(".cantidad").value) || 0;');
     popup.document.write('    const precio = parseFloat(concepto.querySelector(".precioUnitario").value) || 0;');
     popup.document.write('    const filaSecundaria = concepto.nextElementSibling;');
     popup.document.write('    const descuento = filaSecundaria ? parseFloat(filaSecundaria.querySelector(".descuento").value) || 0 : 0;');
-    popup.document.write('    console.log("  - Cantidad: " + cantidad);');
-    popup.document.write('    console.log("  - Precio: " + precio);');
-    popup.document.write('    console.log("  - Descuento: " + descuento);');
     popup.document.write('    const importeConcepto = cantidad * precio;');
     popup.document.write('    const totalConcepto = importeConcepto - descuento;');
-    popup.document.write('    console.log("  - Importe: " + importeConcepto);');
-    popup.document.write('    console.log("  - Total concepto: " + totalConcepto);');
     popup.document.write('    const campoTotal = concepto.querySelector(".totalConcepto");');
     popup.document.write('    if (campoTotal) { campoTotal.value = totalConcepto.toFixed(6); }');
     popup.document.write('    subtotal += importeConcepto;');
@@ -406,40 +395,10 @@ function abrirModuloFacturacion() {
     popup.document.write('  const subtotalFinal = subtotal - totalDescuentos;');
     popup.document.write('  const iva = subtotalFinal * 0.16;');
     popup.document.write('  const total = subtotalFinal + iva;');
-    popup.document.write('  console.log("💰 Totales finales:");');
-    popup.document.write('  console.log("  - Subtotal: " + subtotal);');
-    popup.document.write('  console.log("  - Descuentos: " + totalDescuentos);');
-    popup.document.write('  console.log("  - Subtotal final: " + subtotalFinal);');
-    popup.document.write('  console.log("  - IVA: " + iva);');
-    popup.document.write('  console.log("  - Total: " + total);');
-    popup.document.write('  const elementoSubtotal = document.getElementById("subtotal");');
-    popup.document.write('  const elementoDescuentos = document.getElementById("totalDescuentos");');
-    popup.document.write('  const elementoIva = document.getElementById("iva");');
-    popup.document.write('  const elementoTotal = document.getElementById("total");');
-    popup.document.write('  if (elementoSubtotal) {');
-    popup.document.write('    elementoSubtotal.textContent = "$" + subtotal.toFixed(2);');
-    popup.document.write('    console.log("✅ Subtotal actualizado");');
-    popup.document.write('  } else {');
-    popup.document.write('    console.error("❌ No se encontró elemento subtotal");');
-    popup.document.write('  }');
-    popup.document.write('  if (elementoDescuentos) {');
-    popup.document.write('    elementoDescuentos.textContent = "$" + totalDescuentos.toFixed(2);');
-    popup.document.write('    console.log("✅ Descuentos actualizado");');
-    popup.document.write('  } else {');
-    popup.document.write('    console.error("❌ No se encontró elemento totalDescuentos");');
-    popup.document.write('  }');
-    popup.document.write('  if (elementoIva) {');
-    popup.document.write('    elementoIva.textContent = "$" + iva.toFixed(2);');
-    popup.document.write('    console.log("✅ IVA actualizado");');
-    popup.document.write('  } else {');
-    popup.document.write('    console.error("❌ No se encontró elemento iva");');
-    popup.document.write('  }');
-    popup.document.write('  if (elementoTotal) {');
-    popup.document.write('    elementoTotal.textContent = "$" + total.toFixed(2);');
-    popup.document.write('    console.log("✅ Total actualizado");');
-    popup.document.write('  } else {');
-    popup.document.write('    console.error("❌ No se encontró elemento total");');
-    popup.document.write('  }');
+    popup.document.write('  document.getElementById("subtotal").textContent = "$" + subtotal.toFixed(2);');
+    popup.document.write('  document.getElementById("totalDescuentos").textContent = "$" + totalDescuentos.toFixed(2);');
+    popup.document.write('  document.getElementById("iva").textContent = "$" + iva.toFixed(2);');
+    popup.document.write('  document.getElementById("total").textContent = "$" + total.toFixed(2);');
     popup.document.write('}');
     
     // Función agregar concepto
@@ -478,36 +437,12 @@ function abrirModuloFacturacion() {
     popup.document.write('  calcularTotales();');
     popup.document.write('}');
     
-    // Función recalcular desde total
-    popup.document.write('function recalcularDesdeTotal(input) {');
-    popup.document.write('  const fila = input.closest(".producto-row");');
-    popup.document.write('  const cantidad = parseFloat(fila.querySelector(".cantidad").value) || 0;');
-    popup.document.write('  const total = parseFloat(input.value) || 0;');
-    popup.document.write('  if (cantidad > 0) {');
-    popup.document.write('    const nuevoPrecio = total / cantidad;');
-    popup.document.write('    fila.querySelector(".precioUnitario").value = nuevoPrecio.toFixed(6);');
-    popup.document.write('  }');
-    popup.document.write('  calcularTotales();');
-    popup.document.write('}');
-    
     // Función agregar event listeners
     popup.document.write('function agregarEventListeners(elemento) {');
-    popup.document.write('  const inputs = elemento.querySelectorAll(".cantidad, .precioUnitario, .descuento, .totalConcepto");');
+    popup.document.write('  const inputs = elemento.querySelectorAll(".cantidad, .precioUnitario, .descuento");');
     popup.document.write('  inputs.forEach(function(input) {');
-    popup.document.write('    input.addEventListener("input", function() {');
-    popup.document.write('      if (input.classList.contains("totalConcepto")) {');
-    popup.document.write('        recalcularDesdeTotal(input);');
-    popup.document.write('      } else {');
-    popup.document.write('        calcularTotales();');
-    popup.document.write('      }');
-    popup.document.write('    });');
-    popup.document.write('    input.addEventListener("change", function() {');
-    popup.document.write('      if (input.classList.contains("totalConcepto")) {');
-    popup.document.write('        recalcularDesdeTotal(input);');
-    popup.document.write('      } else {');
-    popup.document.write('        calcularTotales();');
-    popup.document.write('      }');
-    popup.document.write('    });');
+    popup.document.write('    input.addEventListener("input", calcularTotales);');
+    popup.document.write('    input.addEventListener("change", calcularTotales);');
     popup.document.write('  });');
     popup.document.write('  const claveUnidad = elemento.querySelector(".claveUnidad");');
     popup.document.write('  if (claveUnidad) {');
@@ -530,26 +465,130 @@ function abrirModuloFacturacion() {
     popup.document.write('  }');
     popup.document.write('}');
     
-    // Función de testing
-    popup.document.write('function testCalcularTotales() {');
-    popup.document.write('  console.log("🧪 Test manual de calcularTotales");');
-    popup.document.write('  const primerConcepto = document.querySelector(".producto-row");');
-    popup.document.write('  if (primerConcepto) {');
-    popup.document.write('    const cantidad = primerConcepto.querySelector(".cantidad");');
-    popup.document.write('    const precio = primerConcepto.querySelector(".precioUnitario");');
-    popup.document.write('    if (cantidad) cantidad.value = "2";');
-    popup.document.write('    if (precio) precio.value = "100";');
-    popup.document.write('    console.log("📝 Datos de prueba agregados: 2 x $100");');
-    popup.document.write('    calcularTotales();');
-    popup.document.write('  } else {');
-    popup.document.write('    console.error("❌ No se encontró el primer concepto");');
-    popup.document.write('  }');
+    // FUNCIÓN PRINCIPAL PARA ENVIAR CFDI - AQUÍ ESTÁ LA INTEGRACIÓN REAL
+    popup.document.write('function enviarCFDI(datos) {');
+    popup.document.write('  if (isProcessing) return;');
+    popup.document.write('  isProcessing = true;');
+    popup.document.write('  ');
+    popup.document.write('  console.log("📤 Enviando CFDI a WordPress:", datos);');
+    popup.document.write('  ');
+    popup.document.write('  // Mostrar loading');
+    popup.document.write('  document.getElementById("loading").style.display = "block";');
+    popup.document.write('  document.getElementById("submitBtn").disabled = true;');
+    popup.document.write('  document.getElementById("result-container").style.display = "none";');
+    popup.document.write('  ');
+    popup.document.write('  // Obtener configuración de WordPress desde la ventana padre');
+    popup.document.write('  const ajaxUrl = window.parent.pos_billing_ajax?.ajax_url || "/wp-admin/admin-ajax.php";');
+    popup.document.write('  const nonce = window.parent.pos_billing_ajax?.nonce || "";');
+    popup.document.write('  ');
+    popup.document.write('  // Preparar datos para WordPress');
+    popup.document.write('  const formData = new FormData();');
+    popup.document.write('  formData.append("action", "pos_billing_create_cfdi");');
+    popup.document.write('  formData.append("nonce", nonce);');
+    popup.document.write('  formData.append("cfdi_data", JSON.stringify(datos));');
+    popup.document.write('  ');
+    popup.document.write('  // Enviar petición a WordPress');
+    popup.document.write('  fetch(ajaxUrl, {');
+    popup.document.write('    method: "POST",');
+    popup.document.write('    body: formData');
+    popup.document.write('  })');
+    popup.document.write('  .then(response => {');
+    popup.document.write('    console.log("📡 Respuesta recibida:", response);');
+    popup.document.write('    return response.json();');
+    popup.document.write('  })');
+    popup.document.write('  .then(data => {');
+    popup.document.write('    console.log("📋 Datos procesados:", data);');
+    popup.document.write('    ');
+    popup.document.write('    // Ocultar loading');
+    popup.document.write('    document.getElementById("loading").style.display = "none";');
+    popup.document.write('    document.getElementById("submitBtn").disabled = false;');
+    popup.document.write('    ');
+    popup.document.write('    if (data.success) {');
+    popup.document.write('      mostrarResultadoExitoso(data.data);');
+    popup.document.write('    } else {');
+    popup.document.write('      mostrarResultadoError(data.data || data.message || "Error desconocido");');
+    popup.document.write('    }');
+    popup.document.write('  })');
+    popup.document.write('  .catch(error => {');
+    popup.document.write('    console.error("❌ Error en la petición:", error);');
+    popup.document.write('    ');
+    popup.document.write('    // Ocultar loading');
+    popup.document.write('    document.getElementById("loading").style.display = "none";');
+    popup.document.write('    document.getElementById("submitBtn").disabled = false;');
+    popup.document.write('    ');
+    popup.document.write('    mostrarResultadoError("Error de conexión: " + error.message);');
+    popup.document.write('  })');
+    popup.document.write('  .finally(() => {');
+    popup.document.write('    isProcessing = false;');
+    popup.document.write('  });');
     popup.document.write('}');
     
-    // Función para envío CFDI (simplificada para evitar errores)
-    popup.document.write('function enviarCFDI(datos) {');
-    popup.document.write('  console.log("📤 Enviando CFDI:", datos);');
-    popup.document.write('  alert("✅ Función enviarCFDI preparada. Integración con WordPress próxima.");');
+    // Función para mostrar resultado exitoso
+    popup.document.write('function mostrarResultadoExitoso(data) {');
+    popup.document.write('  const container = document.getElementById("result-container");');
+    popup.document.write('  const content = document.getElementById("result-content");');
+    popup.document.write('  ');
+    popup.document.write('  container.className = "result-container result-success";');
+    popup.document.write('  content.innerHTML = ');
+    popup.document.write('    "<div class=\\"result-title\\">✅ CFDI Generado Exitosamente</div>" +');
+    popup.document.write('    "<div class=\\"result-data\\">" +');
+    popup.document.write('    "<dl>" +');
+    popup.document.write('    "<dt>🆔 UUID:</dt><dd>" + (data.uuid || "N/A") + "</dd>" +');
+    popup.document.write('    "<dt>📄 Folio:</dt><dd>" + (data.folio || "N/A") + "</dd>" +');
+    popup.document.write('    "<dt>📅 Fecha de Timbrado:</dt><dd>" + (data.fecha_timbrado || "N/A") + "</dd>" +');
+    popup.document.write('    "<dt>💰 Total:</dt><dd>$" + (data.total || "0.00") + "</dd>" +');
+    popup.document.write('    "</dl>" +');
+    popup.document.write('    "</div>" +');
+    popup.document.write('    "<div style=\\"margin-top: 20px; text-align: center;\\">" +');
+    popup.document.write('    "<button onclick=\\"generarOtroComprobante()\\" class=\\"btn\\">📄 Generar Otro Comprobante</button>" +');
+    popup.document.write('    "<button onclick=\\"window.close()\\" class=\\"btn btn-cancel\\">❌ Cerrar</button>" +');
+    popup.document.write('    "</div>";');
+    popup.document.write('  ');
+    popup.document.write('  container.style.display = "block";');
+    popup.document.write('  container.scrollIntoView({ behavior: "smooth" });');
+    popup.document.write('}');
+    
+    // Función para mostrar resultado de error
+    popup.document.write('function mostrarResultadoError(errorData) {');
+    popup.document.write('  const container = document.getElementById("result-container");');
+    popup.document.write('  const content = document.getElementById("result-content");');
+    popup.document.write('  ');
+    popup.document.write('  let errorMessage = "Error desconocido";');
+    popup.document.write('  let errorDetail = "";');
+    popup.document.write('  ');
+    popup.document.write('  if (typeof errorData === "string") {');
+    popup.document.write('    errorMessage = errorData;');
+    popup.document.write('  } else if (errorData && typeof errorData === "object") {');
+    popup.document.write('    errorMessage = errorData.message || errorData.error || "Error en la API";');
+    popup.document.write('    errorDetail = errorData.detail || errorData.messageDetail || "";');
+    popup.document.write('  }');
+    popup.document.write('  ');
+    popup.document.write('  container.className = "result-container result-error";');
+    popup.document.write('  content.innerHTML = ');
+    popup.document.write('    "<div class=\\"result-title\\">❌ Error al Generar CFDI</div>" +');
+    popup.document.write('    "<div class=\\"alert alert-danger\\">" +');
+    popup.document.write('    "<strong>Error:</strong> " + errorMessage +');
+    popup.document.write('    (errorDetail ? "<br><small>" + errorDetail + "</small>" : "") +');
+    popup.document.write('    "</div>" +');
+    popup.document.write('    "<div style=\\"margin-top: 20px; text-align: center;\\">" +');
+    popup.document.write('    "<button onclick=\\"document.getElementById(\\\\"result-container\\\\").style.display=\\\\"none\\\\"\\" class=\\"btn\\">🔄 Intentar de Nuevo</button>" +');
+    popup.document.write('    "<button onclick=\\"window.close()\\" class=\\"btn btn-cancel\\">❌ Cerrar</button>" +');
+    popup.document.write('    "</div>";');
+    popup.document.write('  ');
+    popup.document.write('  container.style.display = "block";');
+    popup.document.write('  container.scrollIntoView({ behavior: "smooth" });');
+    popup.document.write('}');
+    
+    // Función para generar otro comprobante
+    popup.document.write('function generarOtroComprobante() {');
+    popup.document.write('  document.getElementById("result-container").style.display = "none";');
+    popup.document.write('  document.getElementById("cfdiformulario").reset();');
+    popup.document.write('  // Generar nuevo número de orden');
+    popup.document.write('  const timestamp = Date.now();');
+    popup.document.write('  const random = Math.floor(Math.random() * 1000);');
+    popup.document.write('  document.getElementById("numOrder").value = "ORD-" + timestamp + "-" + random;');
+    popup.document.write('  calcularTotales();');
+    popup.document.write('  document.querySelector(".container").scrollIntoView({ behavior: "smooth" });');
     popup.document.write('}');
     
     // Función para validar datos
@@ -562,34 +601,75 @@ function abrirModuloFacturacion() {
     popup.document.write('    alert("❌ Debe agregar al menos un concepto");');
     popup.document.write('    return false;');
     popup.document.write('  }');
+    popup.document.write('  if (!datos.Serie) {');
+    popup.document.write('    alert("❌ La serie es obligatoria");');
+    popup.document.write('    return false;');
+    popup.document.write('  }');
+    popup.document.write('  // Validar que todos los conceptos tengan los campos requeridos');
+    popup.document.write('  for (let i = 0; i < datos.Conceptos.length; i++) {');
+    popup.document.write('    const concepto = datos.Conceptos[i];');
+    popup.document.write('    if (!concepto.ClaveProdServ || !concepto.Descripcion || !concepto.ClaveUnidad) {');
+    popup.document.write('      alert("❌ Todos los conceptos deben tener Clave de Producto/Servicio, Descripción y Clave de Unidad");');
+    popup.document.write('      return false;');
+    popup.document.write('    }');
+    popup.document.write('  }');
     popup.document.write('  return true;');
     popup.document.write('}');
     
-    // Función para recopilar datos
+    // Función para recopilar datos del formulario
     popup.document.write('function recopilarDatosFormulario() {');
     popup.document.write('  const receptor = {');
     popup.document.write('    UID: document.getElementById("receptorUID").value,');
     popup.document.write('    ResidenciaFiscal: document.getElementById("residenciaFiscal").value || ""');
     popup.document.write('  };');
+    popup.document.write('  ');
     popup.document.write('  const conceptos = [];');
     popup.document.write('  const filasConceptos = document.querySelectorAll(".producto-row");');
+    popup.document.write('  ');
     popup.document.write('  filasConceptos.forEach(function(fila) {');
     popup.document.write('    const filaSecundaria = fila.nextElementSibling;');
     popup.document.write('    const cantidad = parseFloat(fila.querySelector(".cantidad").value);');
     popup.document.write('    const precioUnitario = parseFloat(fila.querySelector(".precioUnitario").value);');
     popup.document.write('    const descuento = filaSecundaria ? parseFloat(filaSecundaria.querySelector(".descuento").value) || 0 : 0;');
+    popup.document.write('    const objetoImp = filaSecundaria ? filaSecundaria.querySelector(".objetoImp").value : "02";');
+    popup.document.write('    ');
+    popup.document.write('    const importe = cantidad * precioUnitario;');
+    popup.document.write('    ');
     popup.document.write('    const concepto = {');
     popup.document.write('      ClaveProdServ: fila.querySelector(".claveProdServ").value,');
+    popup.document.write('      NoIdentificacion: filaSecundaria ? filaSecundaria.querySelector(".noIdentificacion").value || "" : "",');
     popup.document.write('      Cantidad: cantidad.toFixed(6),');
-    popup.document.write('      Descripcion: fila.querySelector(".descripcion").value,');
-    popup.document.write('      ValorUnitario: precioUnitario.toFixed(6),');
     popup.document.write('      ClaveUnidad: filaSecundaria ? filaSecundaria.querySelector(".claveUnidad").value : "E48",');
     popup.document.write('      Unidad: filaSecundaria ? filaSecundaria.querySelector(".unidad").value : "Unidad de servicio",');
-    popup.document.write('      ObjetoImp: filaSecundaria ? filaSecundaria.querySelector(".objetoImp").value : "02"');
+    popup.document.write('      Descripcion: fila.querySelector(".descripcion").value,');
+    popup.document.write('      ValorUnitario: precioUnitario.toFixed(6),');
+    popup.document.write('      Importe: importe.toFixed(6),');
+    popup.document.write('      Descuento: descuento.toFixed(6),');
+    popup.document.write('      ObjetoImp: objetoImp');
     popup.document.write('    };');
+    popup.document.write('    ');
+    popup.document.write('    // Agregar impuestos si el objeto es gravado');
+    popup.document.write('    if (objetoImp === "02") {');
+    popup.document.write('      const baseGravable = importe - descuento;');
+    popup.document.write('      const ivaImporte = baseGravable * 0.16;');
+    popup.document.write('      ');
+    popup.document.write('      concepto.Impuestos = {');
+    popup.document.write('        Traslados: [{');
+    popup.document.write('          Base: baseGravable.toFixed(6),');
+    popup.document.write('          Impuesto: "002",');
+    popup.document.write('          TipoFactor: "Tasa",');
+    popup.document.write('          TasaOCuota: "0.16",');
+    popup.document.write('          Importe: ivaImporte.toFixed(6)');
+    popup.document.write('        }],');
+    popup.document.write('        Retenidos: [],');
+    popup.document.write('        Locales: []');
+    popup.document.write('      };');
+    popup.document.write('    }');
+    popup.document.write('    ');
     popup.document.write('    conceptos.push(concepto);');
     popup.document.write('  });');
-    popup.document.write('  return {');
+    popup.document.write('  ');
+    popup.document.write('  const datos = {');
     popup.document.write('    Receptor: receptor,');
     popup.document.write('    TipoDocumento: document.getElementById("tipoDocumento").value,');
     popup.document.write('    Conceptos: conceptos,');
@@ -597,14 +677,56 @@ function abrirModuloFacturacion() {
     popup.document.write('    Serie: parseInt(document.getElementById("serie").value),');
     popup.document.write('    FormaPago: document.getElementById("formaPago").value,');
     popup.document.write('    MetodoPago: document.getElementById("metodoPago").value,');
-    popup.document.write('    Moneda: document.getElementById("moneda").value');
+    popup.document.write('    Moneda: document.getElementById("moneda").value,');
+    popup.document.write('    EnviarCorreo: document.getElementById("enviarCorreo").checked');
     popup.document.write('  };');
+    popup.document.write('  ');
+    popup.document.write('  // Campos opcionales');
+    popup.document.write('  const tipoCambio = document.getElementById("tipoCambio").value;');
+    popup.document.write('  if (tipoCambio && datos.Moneda !== "MXN") {');
+    popup.document.write('    datos.TipoCambio = tipoCambio;');
+    popup.document.write('  }');
+    popup.document.write('  ');
+    popup.document.write('  const numOrder = document.getElementById("numOrder").value;');
+    popup.document.write('  if (numOrder) {');
+    popup.document.write('    datos.NumOrder = numOrder;');
+    popup.document.write('  }');
+    popup.document.write('  ');
+    popup.document.write('  const lugarExpedicion = document.getElementById("lugarExpedicion").value;');
+    popup.document.write('  if (lugarExpedicion) {');
+    popup.document.write('    datos.LugarExpedicion = lugarExpedicion;');
+    popup.document.write('  }');
+    popup.document.write('  ');
+    popup.document.write('  const condicionesPago = document.getElementById("condicionesPago").value;');
+    popup.document.write('  if (condicionesPago) {');
+    popup.document.write('    datos.CondicionesDePago = condicionesPago;');
+    popup.document.write('  }');
+    popup.document.write('  ');
+    popup.document.write('  const comentarios = document.getElementById("comentarios").value;');
+    popup.document.write('  if (comentarios) {');
+    popup.document.write('    datos.Comentarios = comentarios;');
+    popup.document.write('  }');
+    popup.document.write('  ');
+    popup.document.write('  const borradorSiFalla = document.getElementById("borradorSiFalla").checked;');
+    popup.document.write('  if (borradorSiFalla) {');
+    popup.document.write('    datos.BorradorSiFalla = "1";');
+    popup.document.write('  }');
+    popup.document.write('  ');
+    popup.document.write('  return datos;');
     popup.document.write('}');
     
     // Manejo del formulario
     popup.document.write('document.getElementById("cfdiformulario").addEventListener("submit", function(e) {');
     popup.document.write('  e.preventDefault();');
+    popup.document.write('  ');
+    popup.document.write('  if (isProcessing) {');
+    popup.document.write('    alert("⏳ Ya se está procesando una solicitud, por favor espere...");');
+    popup.document.write('    return;');
+    popup.document.write('  }');
+    popup.document.write('  ');
     popup.document.write('  const datos = recopilarDatosFormulario();');
+    popup.document.write('  console.log("📋 Datos recopilados:", datos);');
+    popup.document.write('  ');
     popup.document.write('  if (validarDatos(datos)) {');
     popup.document.write('    enviarCFDI(datos);');
     popup.document.write('  }');
@@ -626,26 +748,40 @@ function abrirModuloFacturacion() {
     // Inicialización
     popup.document.write('window.addEventListener("load", function() {');
     popup.document.write('  console.log("🚀 Popup cargado, iniciando...");');
+    popup.document.write('  ');
+    popup.document.write('  // Cargar configuraciones por defecto desde WordPress');
     popup.document.write('  const wpSettings = window.parent.pos_billing_ajax?.settings?.defaults || {};');
     popup.document.write('  if (wpSettings.serie) document.getElementById("serie").value = wpSettings.serie;');
     popup.document.write('  if (wpSettings.forma_pago) document.getElementById("formaPago").value = wpSettings.forma_pago;');
     popup.document.write('  if (wpSettings.metodo_pago) document.getElementById("metodoPago").value = wpSettings.metodo_pago;');
     popup.document.write('  if (wpSettings.uso_cfdi) document.getElementById("usoCFDI").value = wpSettings.uso_cfdi;');
     popup.document.write('  if (wpSettings.lugar_expedicion) document.getElementById("lugarExpedicion").value = wpSettings.lugar_expedicion;');
+    popup.document.write('  ');
+    popup.document.write('  // Generar número de orden único si no existe');
     popup.document.write('  if (!document.getElementById("numOrder").value) {');
     popup.document.write('    const timestamp = Date.now();');
     popup.document.write('    const random = Math.floor(Math.random() * 1000);');
     popup.document.write('    document.getElementById("numOrder").value = "ORD-" + timestamp + "-" + random;');
     popup.document.write('  }');
+    popup.document.write('  ');
+    popup.document.write('  // Configurar valores por defecto');
+    popup.document.write('  document.getElementById("tipoDocumento").value = "factura";');
+    popup.document.write('  document.getElementById("moneda").value = "MXN";');
+    popup.document.write('  ');
+    popup.document.write('  // Agregar event listeners a los elementos iniciales');
     popup.document.write('  const conceptoInicial = document.querySelector(".producto-row");');
     popup.document.write('  const conceptoSecundario = document.querySelector(".producto-row-secondary");');
     popup.document.write('  if (conceptoInicial) agregarEventListeners(conceptoInicial);');
     popup.document.write('  if (conceptoSecundario) agregarEventListeners(conceptoSecundario);');
+    popup.document.write('  ');
+    popup.document.write('  // Event listener para agregar conceptos');
     popup.document.write('  document.getElementById("agregarConcepto").addEventListener("click", agregarConcepto);');
+    popup.document.write('  ');
+    popup.document.write('  // Calcular totales inicial');
     popup.document.write('  setTimeout(function() {');
-    popup.document.write('    console.log("⏰ Ejecutando calcularTotales inicial...");');
     popup.document.write('    calcularTotales();');
     popup.document.write('  }, 500);');
+    popup.document.write('  ');
     popup.document.write('  console.log("✅ Inicialización completada");');
     popup.document.write('});');
     
