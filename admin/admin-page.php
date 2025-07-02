@@ -3,7 +3,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Agregar página al menú de administración
 add_action('admin_menu', 'pos_billing_admin_menu');
 
 function pos_billing_admin_menu() {
