@@ -1,50 +1,3 @@
-// ✅ FUNCIÓN PARA MOSTRAR AYUDA DETALLADA
-        function mostrarAyudaDetallada() {
-            const helpWindow = window.open('', 'ayuda_detallada', 'width=800,height=600,scrollbars=yes,resizable=yes');
-            
-            const helpContent = '<!DOCTYPE html>' +
-                '<html><head><title>Ayuda - Error "No puedes facturar 2"</title>' +
-                '<style>' +
-                'body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }' +
-                '.container { max-width: 700px; margin: 0 auto; }' +
-                '.step { background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 5px; border-left: 4px solid #007cba; }' +
-                '.warning { background: #fff3cd; padding: 10px; border-radius: 5px; color: #856404; }' +
-                '.success { background: #d4edda; padding: 10px; border-radius: 5px; color: #155724; }' +
-                '</style></head><body>' +
-                '<div class="container">' +
-                '<h1>🆘 Solución para "No puedes facturar 2"</h1>' +
-                '<div class="warning">' +
-                '<strong>⚠️ Este error indica que tu cuenta de Factura.com no está completamente configurada.</strong>' +
-                '</div>' +
-                '<div class="step">' +
-                '<h3>1️⃣ Verificar Certificados SAT</h3>' +
-                '<p>Ve a <a href="https://sandbox.factura.com" target="_blank">Factura.com</a> → Configuración → Certificados</p>' +
-                '<ul><li>Debe aparecer tu certificado .cer</li><li>Debe aparecer tu llave .key</li><li>Estado: "Válido"</li></ul>' +
-                '</div>' +
-                '<div class="step">' +
-                '<h3>2️⃣ Verificar Series</h3>' +
-                '<p>Ve a Configuración → Series</p>' +
-                '<ul><li>Debe existir la serie ID: 1212</li><li>Estado: "Activa"</li><li>Tipo: "Factura"</li></ul>' +
-                '</div>' +
-                '<div class="step">' +
-                '<h3>3️⃣ Verificar Receptor</h3>' +
-                '<p>Ve a Receptores → Buscar</p>' +
-                '<ul><li>Busca UID: 67a93f71cdddb</li><li>Debe existir y estar activo</li></ul>' +
-                '</div>' +
-                '<div class="success">' +
-                '<strong>✅ Si todo está configurado y sigue fallando:</strong><br>' +
-                'Contacta al soporte de Factura.com con esta información específica.' +
-                '</div>' +
-                '<p style="text-align: center; margin-top: 30px;">' +
-                '<button onclick="window.close()" style="background: #007cba; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Cerrar</button>' +
-                '</p>' +
-                '</div></body></html>';
-            
-            helpWindow.document.write(helpContent);
-            helpWindow.document.close();
-            helpWindow.focus();
-        }
-                                // Funcionalidad del botón de facturación - VERSIÓN SIMPLIFICADA QUE FUNCIONA
 document.addEventListener("DOMContentLoaded", function () {
   const billingBtn = document.getElementById("pos-billing-btn");
 
@@ -218,6 +171,18 @@ function abrirModuloFacturacion() {
             <!-- CONCEPTOS -->
             <div class="section">
                 <h3>🛍️ Conceptos/Productos</h3>
+                
+                <!-- Buscador de productos WooCommerce -->
+                <div class="form-group" style="background: #e7f3ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <label style="color: #0066cc;">🔍 Buscar Producto de WooCommerce (Opcional)</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="product-search" placeholder="Buscar por nombre, SKU o descripción..." style="flex: 1;">
+                        <button type="button" id="search-products-btn" class="btn" style="background: #0066cc;">Buscar</button>
+                    </div>
+                    <div id="product-results" style="margin-top: 10px; display: none;"></div>
+                    <div class="help-text">Si tu producto está en WooCommerce, búscalo aquí para auto-completar los datos de facturación</div>
+                </div>
+                
                 <div id="conceptos">
                     <!-- Concepto inicial -->
                     <div class="producto-row">
@@ -239,7 +204,7 @@ function abrirModuloFacturacion() {
                         </div>
                         <div class="form-group">
                             <label>Total</label>
-                            <input type="number" class="totalConcepto" readonly class="readonly-field">
+                            <input type="number" class="totalConcepto readonly-field" readonly>
                         </div>
                         <div></div>
                     </div>
@@ -423,7 +388,7 @@ function abrirModuloFacturacion() {
                 </div>
                 <div class="form-group">
                     <label>Total</label>
-                    <input type="number" class="totalConcepto" readonly class="readonly-field">
+                    <input type="number" class="totalConcepto readonly-field" readonly>
                 </div>
                 <button type="button" onclick="eliminarConcepto(this)" class="btn-remove">✕</button>
             \`;
@@ -522,7 +487,7 @@ function abrirModuloFacturacion() {
                 conceptos.push(concepto);
             });
             
-            return {
+            const datos = {
                 Receptor: {
                     UID: document.getElementById('receptorUID').value,
                     ResidenciaFiscal: document.getElementById('residenciaFiscal').value || ''
@@ -538,6 +503,8 @@ function abrirModuloFacturacion() {
                 EnviarCorreo: document.getElementById('enviarCorreo').checked,
                 Comentarios: document.getElementById('comentarios').value
             };
+            
+            return datos;
         }
         
         // ✅ ENVIAR CFDI
@@ -675,6 +642,249 @@ function abrirModuloFacturacion() {
             return true;
         }
         
+        // ✅ FUNCIONES DE BÚSQUEDA DE PRODUCTOS WOOCOMMERCE
+        function buscarProductos() {
+            const searchTerm = document.getElementById('product-search').value.trim();
+            const searchBtn = document.getElementById('search-products-btn');
+            const resultsDiv = document.getElementById('product-results');
+            
+            if (searchTerm.length < 2) {
+                alert('Ingresa al menos 2 caracteres para buscar');
+                return;
+            }
+            
+            searchBtn.disabled = true;
+            searchBtn.textContent = '🔄 Buscando...';
+            resultsDiv.style.display = 'none';
+            
+            const ajaxUrl = window.parent.pos_billing_ajax?.ajax_url || 
+                           window.opener?.pos_billing_ajax?.ajax_url || '/wp-admin/admin-ajax.php';
+            const nonce = window.parent.pos_billing_ajax?.nonce || 
+                         window.opener?.pos_billing_ajax?.nonce || '';
+            
+            const formData = new FormData();
+            formData.append('action', 'pos_billing_search_products');
+            formData.append('nonce', nonce);
+            formData.append('search', searchTerm);
+            
+            fetch(ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data.length > 0) {
+                    mostrarResultadosProductos(data.data);
+                } else {
+                    resultsDiv.innerHTML = '<div style="background: #fff3cd; padding: 10px; border-radius: 5px; color: #856404;">No se encontraron productos con ese término</div>';
+                    resultsDiv.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error buscando productos:', error);
+                resultsDiv.innerHTML = '<div style="background: #f8d7da; padding: 10px; border-radius: 5px; color: #721c24;">Error en la búsqueda</div>';
+                resultsDiv.style.display = 'block';
+            })
+            .finally(() => {
+                searchBtn.disabled = false;
+                searchBtn.textContent = 'Buscar';
+            });
+        }
+        
+        function mostrarResultadosProductos(productos) {
+            const resultsDiv = document.getElementById('product-results');
+            
+            let html = '<div style="background: white; border: 1px solid #ddd; border-radius: 5px; max-height: 300px; overflow-y: auto;">';
+            html += '<h4 style="margin: 0; padding: 10px; background: #f8f9fa; border-bottom: 1px solid #ddd;">📦 Productos encontrados:</h4>';
+            
+            productos.forEach(function(producto) {
+                html += '<div style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s;" ' +
+                       'onclick="seleccionarProducto(' + producto.id + ')" ' +
+                       'onmouseover="this.style.background=\\'#f8f9fa\\'" ' +
+                       'onmouseout="this.style.background=\\'white\\'">';
+                html += '<div style="font-weight: bold;">' + producto.name + '</div>';
+                if (producto.sku) html += '<div style="font-size: 12px; color: #666;">SKU: ' + producto.sku + '</div>';
+                html += '<div style="font-size: 12px; color: #666;">Precio:  + parseFloat(producto.price).toFixed(2) + '</div>';
+                if (producto.description) html += '<div style="font-size: 11px; color: #888;">' + producto.description + '</div>';
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+            resultsDiv.style.display = 'block';
+        }
+        
+        function seleccionarProducto(productId) {
+            const ajaxUrl = window.parent.pos_billing_ajax?.ajax_url || 
+                           window.opener?.pos_billing_ajax?.ajax_url || '/wp-admin/admin-ajax.php';
+            const nonce = window.parent.pos_billing_ajax?.nonce || 
+                         window.opener?.pos_billing_ajax?.nonce || '';
+            
+            // Mostrar loading
+            document.getElementById('product-results').innerHTML = 
+                '<div style="text-align: center; padding: 20px;">🔄 Cargando datos del producto...</div>';
+            
+            const formData = new FormData();
+            formData.append('action', 'pos_billing_get_product_data');
+            formData.append('nonce', nonce);
+            formData.append('product_id', productId);
+            
+            fetch(ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    llenarDatosProducto(data.data);
+                    document.getElementById('product-results').style.display = 'none';
+                    document.getElementById('product-search').value = '';
+                } else {
+                    alert('Error obteniendo datos del producto: ' + data.data);
+                }
+            })
+            .catch(error => {
+                console.error('Error obteniendo producto:', error);
+                alert('Error de conexión al obtener el producto');
+            });
+        }
+        
+        function llenarDatosProducto(producto) {
+            console.log('📦 Datos del producto:', producto);
+            
+            // Llenar datos en el primer concepto disponible
+            const descripcionInput = document.querySelector('.descripcion');
+            const claveProdServInput = document.querySelector('.claveProdServ');
+            const cantidadInput = document.querySelector('.cantidad');
+            const precioInput = document.querySelector('.precioUnitario');
+            const claveUnidadSelect = document.querySelector('.claveUnidad');
+            const unidadInput = document.querySelector('.unidad');
+            const descuentoInput = document.querySelector('.descuento');
+            const objetoImpSelect = document.querySelector('.objetoImp');
+            
+            // Datos básicos
+            if (descripcionInput) descripcionInput.value = producto.description || producto.name;
+            if (precioInput) precioInput.value = producto.price || 0;
+            if (cantidadInput) cantidadInput.value = 1;
+            
+            // Datos de facturación desde atributos
+            if (claveProdServInput && producto.F_ClaveProdServ) {
+                claveProdServInput.value = producto.F_ClaveProdServ;
+            }
+            
+            if (claveUnidadSelect && producto.F_ClaveUnidad) {
+                claveUnidadSelect.value = producto.F_ClaveUnidad;
+                // Trigger el evento change para que se llene la unidad
+                claveUnidadSelect.dispatchEvent(new Event('change'));
+            }
+            
+            if (unidadInput && producto.F_Unidad) {
+                unidadInput.value = producto.F_Unidad;
+            }
+            
+            if (descuentoInput && producto.F_Descuento) {
+                descuentoInput.value = producto.F_Descuento;
+            }
+            
+            if (objetoImpSelect && producto.F_ObjetoImp) {
+                objetoImpSelect.value = producto.F_ObjetoImp;
+            }
+            
+            // Mostrar advertencias si faltan datos
+            if (!producto.facturacion_ready) {
+                const warningHtml = '<div style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-top: 10px; border-left: 4px solid #ffc107;">' +
+                    '<strong>⚠️ Atributos faltantes:</strong><br>' +
+                    'Este producto no tiene configurados todos los atributos de facturación:<br>' +
+                    '<ul style="margin: 5px 0; padding-left: 20px;">' +
+                    producto.missing_fields.map(field => '<li>' + field + '</li>').join('') +
+                    '</ul>' +
+                    '<small>Configura estos atributos en WooCommerce → Productos → Atributos</small>' +
+                    '</div>';
+                
+                document.getElementById('product-results').innerHTML = warningHtml;
+                document.getElementById('product-results').style.display = 'block';
+                
+                setTimeout(function() {
+                    document.getElementById('product-results').style.display = 'none';
+                }, 5000);
+            } else {
+                // Éxito
+                const successHtml = '<div style="background: #d4edda; padding: 10px; border-radius: 5px; color: #155724; border-left: 4px solid #28a745;">' +
+                    '✅ Producto cargado correctamente: <strong>' + producto.name + '</strong>' +
+                    '</div>';
+                
+                document.getElementById('product-results').innerHTML = successHtml;
+                document.getElementById('product-results').style.display = 'block';
+                
+                setTimeout(function() {
+                    document.getElementById('product-results').style.display = 'none';
+                }, 3000);
+            }
+            
+            // Recalcular totales
+            calcularTotales();
+        }
+        
+        // ✅ FUNCIÓN DE PRUEBA CON TUS DATOS REALES
+        function llenarDatosPrueba() {
+            // TUS datos reales del sandbox
+            document.getElementById('receptorUID').value = '67a93f71cdddb'; // ✅ Tu receptor
+            
+            // Tu serie real
+            document.getElementById('serie').value = '1212'; // ✅ Tu serie activa
+            
+            // Configuración estándar
+            document.getElementById('usoCFDI').value = 'G01';
+            document.getElementById('formaPago').value = '01';
+            document.getElementById('metodoPago').value = 'PUE';
+            document.getElementById('tipoDocumento').value = 'factura';
+            
+            // Concepto de prueba válido
+            document.querySelector('.descripcion').value = 'Servicio de consultoría en TI';
+            document.querySelector('.claveProdServ').value = '84111506'; // Clave SAT válida
+            document.querySelector('.cantidad').value = '1';
+            document.querySelector('.precioUnitario').value = '1000';
+            
+            // Unidad estándar
+            document.querySelector('.claveUnidad').value = 'E48';
+            document.querySelector('.unidad').value = 'Unidad de servicio';
+            
+            calcularTotales();
+            
+            alert('✅ Datos configurados con TU información real:\\n\\n' +
+                  '📋 Receptor UID: 67a93f71cdddb (tu cliente)\\n' +
+                  '📋 Serie: 1212 (tu serie activa)\\n' +
+                  '📋 Concepto: Servicio de consultoría\\n' +
+                  '📋 Total: $1,160.00\\n\\n' +
+                  '🚀 ¡Ahora SÍ debería funcionar!');
+        }
+        
+        // ✅ FUNCIÓN DE DEBUG AVANZADO
+        function debugearError() {
+            console.log('🚀 INICIANDO DEBUG AVANZADO');
+            console.log('===========================');
+            
+            // Verificar datos del formulario
+            const receptorUID = document.getElementById('receptorUID').value;
+            const serie = document.getElementById('serie').value;
+            
+            console.log('Receptor UID ingresado:', receptorUID);
+            console.log('Serie ingresada:', serie);
+            console.log('¿Coincide con tu cuenta?', receptorUID === '67a93f71cdddb' && serie === '1212');
+            
+            if (receptorUID !== '67a93f71cdddb') {
+                alert('❌ ERROR: UID incorrecto\\n\\nTu UID real es: 67a93f71cdddb\\nIngresaste: ' + receptorUID);
+                return;
+            }
+            
+            if (serie !== '1212') {
+                alert('❌ ERROR: Serie incorrecta\\n\\nTu serie real es: 1212\\nIngresaste: ' + serie);
+                return;
+            }
+            
+            alert('✅ Datos verificados correctamente\\n\\nSi el error persiste, revisa:\\n\\n1. Certificados SAT en Factura.com\\n2. Contraseña del CSD\\n3. API Key/Secret Key');
+        }
+        
         // ✅ INICIALIZACIÓN
         window.addEventListener('load', function() {
             console.log('🚀 Formulario cargado');
@@ -712,6 +922,23 @@ function abrirModuloFacturacion() {
             // Botón agregar concepto
             document.getElementById('agregarConcepto').addEventListener('click', agregarConcepto);
             
+            // Event listeners para búsqueda de productos
+            const searchBtn = document.getElementById('search-products-btn');
+            const searchInput = document.getElementById('product-search');
+            
+            if (searchBtn) {
+                searchBtn.addEventListener('click', buscarProductos);
+            }
+            
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        buscarProductos();
+                    }
+                });
+            }
+            
             // Submit del formulario
             document.getElementById('cfdiformulario').addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -732,63 +959,26 @@ function abrirModuloFacturacion() {
             // Calcular totales inicial
             setTimeout(calcularTotales, 100);
             
+            // Agregar botones de prueba
+            const pruebaBtn = document.createElement('button');
+            pruebaBtn.type = 'button';
+            pruebaBtn.textContent = '🎯 Usar Mis Datos Reales';
+            pruebaBtn.className = 'btn';
+            pruebaBtn.style.background = '#28a745';
+            pruebaBtn.onclick = llenarDatosPrueba;
+            
+            const debugBtn = document.createElement('button');
+            debugBtn.type = 'button';
+            debugBtn.textContent = '🔍 Debug Avanzado';
+            debugBtn.className = 'btn';
+            debugBtn.style.background = '#17a2b8';
+            debugBtn.onclick = debugearError;
+            
+            document.querySelector('.form-actions').appendChild(pruebaBtn);
+            document.querySelector('.form-actions').appendChild(debugBtn);
+            
             console.log('✅ Formulario configurado correctamente');
         });
-        
-        // ✅ FUNCIÓN PARA ABRIR PANEL DE FACTURA.COM
-        function abrirPanelFacturaCom() {
-            const esSandbox = window.parent.pos_billing_ajax?.settings?.sandbox_mode || 
-                             window.opener?.pos_billing_ajax?.settings?.sandbox_mode || true;
-            
-            const url = esSandbox ? 'https://sandbox.factura.com' : 'https://factura.com';
-            window.open(url, '_blank');
-        }
-        
-        // ✅ FUNCIÓN DE PRUEBA CON DATOS VÁLIDOS
-        function llenarDatosPrueba() {
-            // Usar configuraciones reales si están disponibles
-            const wpSettings = window.parent.pos_billing_ajax?.settings?.defaults || 
-                              window.opener?.pos_billing_ajax?.settings?.defaults || {};
-            
-            // Datos del receptor (debes cambiar este UID por uno real de tu cuenta)
-            document.getElementById('receptorUID').value = wpSettings.test_receptor_uid || '55c0fdc67593d';
-            
-            // Configuración del CFDI
-            document.getElementById('serie').value = wpSettings.serie || '1247';
-            document.getElementById('usoCFDI').value = wpSettings.uso_cfdi || 'G01';
-            document.getElementById('formaPago').value = wpSettings.forma_pago || '01';
-            document.getElementById('metodoPago').value = wpSettings.metodo_pago || 'PUE';
-            
-            // Concepto de prueba
-            document.querySelector('.descripcion').value = 'Servicio de consultoría en TI';
-            document.querySelector('.claveProdServ').value = '84111506'; // Código SAT para servicios de consultoría
-            document.querySelector('.cantidad').value = '1';
-            document.querySelector('.precioUnitario').value = '1000';
-            
-            calcularTotales();
-            
-            // Mostrar alerta con información importante
-            alert('✅ Datos de prueba cargados\\n\\n' +
-                  '⚠️ IMPORTANTE: Antes de generar el CFDI, verifica en tu panel de Factura.com:\\n\\n' +
-                  '1. 📋 Que tengas una serie creada (ID: ' + (wpSettings.serie || '1247') + ')\\n' +
-                  '2. 👤 Que el receptor con UID: ' + (wpSettings.test_receptor_uid || '55c0fdc67593d') + ' exista\\n' +
-                  '3. 🔐 Que tengas los certificados SAT configurados\\n' +
-                  '4. 💰 Total calculado: $1,160.00\\n\\n' +
-                  'Si no tienes estos datos configurados, el CFDI fallará.');
-        }
-        
-        // Agregar botón de prueba en desarrollo
-        setTimeout(function() {
-            if (window.location.hostname.includes('localhost') || window.location.hostname.includes('dev')) {
-                const pruebaBtn = document.createElement('button');
-                pruebaBtn.type = 'button';
-                pruebaBtn.textContent = '🧪 Datos Prueba';
-                pruebaBtn.className = 'btn';
-                pruebaBtn.style.background = '#6f42c1';
-                pruebaBtn.onclick = llenarDatosPrueba;
-                document.querySelector('.form-actions').appendChild(pruebaBtn);
-            }
-        }, 500);
         
     </script>
 </body>
