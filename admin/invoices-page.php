@@ -1,6 +1,6 @@
 <?php
 /**
- * Página para mostrar las facturas generadas
+ * Página para mostrar las facturas generadas - PERMISOS CORREGIDOS
  */
 
 if (!defined('ABSPATH')) {
@@ -15,13 +15,18 @@ function pos_billing_invoices_menu() {
         'pos-billing',
         'Facturas Generadas',
         'Facturas',
-        'manage_options',
+        'edit_posts', // Cambiado de 'manage_options' a 'edit_posts'
         'pos-billing-invoices',
         'pos_billing_invoices_page'
     );
 }
 
 function pos_billing_invoices_page() {
+    // Verificar permisos
+    if (!current_user_can('edit_posts')) {
+        wp_die(__('No tienes permisos suficientes para acceder a esta página.'));
+    }
+    
     // Manejar acciones
     if (isset($_GET['action']) && $_GET['action'] === 'view' && isset($_GET['id'])) {
         pos_billing_show_invoice_detail($_GET['id']);
@@ -33,12 +38,37 @@ function pos_billing_invoices_page() {
     $per_page = 20;
     $offset = ($page - 1) * $per_page;
     
-    $invoices = POS_Billing_Database::get_invoices($per_page, $offset);
-    $stats = POS_Billing_Database::get_invoice_stats();
+    // Verificar si la clase de base de datos existe
+    if (!class_exists('POS_Billing_Database')) {
+        echo '<div class="wrap"><h1>📄 Facturas Generadas</h1>';
+        echo '<div class="notice notice-error"><p>❌ Error: No se pudo cargar la clase de base de datos. Contacta al administrador.</p></div>';
+        echo '</div>';
+        return;
+    }
+    
+    try {
+        $invoices = POS_Billing_Database::get_invoices($per_page, $offset);
+        $stats = POS_Billing_Database::get_invoice_stats();
+    } catch (Exception $e) {
+        echo '<div class="wrap"><h1>📄 Facturas Generadas</h1>';
+        echo '<div class="notice notice-error"><p>❌ Error al cargar datos: ' . esc_html($e->getMessage()) . '</p></div>';
+        echo '</div>';
+        return;
+    }
     
     ?>
     <div class="wrap">
         <h1>📄 Facturas Generadas</h1>
+        
+        <div class="notice notice-info">
+            <p><strong>ℹ️ Estado del Usuario:</strong></p>
+            <ul>
+                <li>Usuario: <strong><?php echo wp_get_current_user()->display_name; ?></strong></li>
+                <li>Rol: <strong><?php echo implode(', ', wp_get_current_user()->roles); ?></strong></li>
+                <li>Puede ver facturas: <?php echo current_user_can('edit_posts') ? '✅ Sí' : '❌ No'; ?></li>
+                <li>Puede gestionar opciones: <?php echo current_user_can('manage_options') ? '✅ Sí' : '❌ No'; ?></li>
+            </ul>
+        </div>
         
         <!-- Estadísticas -->
         <div class="pos-billing-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
@@ -136,6 +166,28 @@ function pos_billing_invoices_page() {
             <?php endif; ?>
         </div>
         <?php endif; ?>
+        
+        <div class="card" style="margin-top: 30px;">
+            <h2>🚀 Empezar a Facturar</h2>
+            <p>¿No tienes facturas aún? ¡Es muy fácil empezar!</p>
+            <ol>
+                <li><strong>Configura la API:</strong> 
+                    <?php if (current_user_can('manage_options')): ?>
+                        <a href="<?php echo admin_url('admin.php?page=pos-billing-settings'); ?>">Ve a Configuración</a>
+                    <?php else: ?>
+                        Solicita al administrador configurar las credenciales
+                    <?php endif; ?>
+                </li>
+                <li><strong>Usa el shortcode:</strong> Agrega <code>[pos_billing_button]</code> en cualquier página</li>
+                <li><strong>Genera facturas:</strong> Haz clic en el botón y completa el formulario</li>
+            </ol>
+            <p>
+                <a href="<?php echo admin_url('admin.php?page=pos-billing'); ?>" class="button button-primary">📄 Ir al Panel Principal</a>
+                <?php if (current_user_can('manage_options')): ?>
+                    <a href="<?php echo admin_url('admin.php?page=pos-billing-settings'); ?>" class="button">⚙️ Configuración</a>
+                <?php endif; ?>
+            </p>
+        </div>
     </div>
     
     <style>
@@ -155,6 +207,11 @@ function pos_billing_invoices_page() {
 function pos_billing_show_invoice_detail($invoice_id) {
     global $wpdb;
     
+    // Verificar permisos
+    if (!current_user_can('edit_posts')) {
+        wp_die(__('No tienes permisos suficientes para acceder a esta página.'));
+    }
+    
     $table_name = $wpdb->prefix . 'pos_billing_invoices';
     $invoice = $wpdb->get_row($wpdb->prepare(
         "SELECT * FROM $table_name WHERE id = %d",
@@ -173,6 +230,11 @@ function pos_billing_show_invoice_detail($invoice_id) {
     <div class="wrap">
         <h1>📄 Detalle de Factura</h1>
         <p><a href="<?php echo admin_url('admin.php?page=pos-billing-invoices'); ?>">← Volver a Facturas</a></p>
+        
+        <div class="notice notice-info">
+            <p><strong>ℹ️ Usuario:</strong> <?php echo wp_get_current_user()->display_name; ?> | 
+               <strong>Permisos:</strong> <?php echo current_user_can('manage_options') ? 'Administrador' : 'Editor'; ?></p>
+        </div>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
             <!-- Información básica -->
@@ -296,10 +358,10 @@ function pos_billing_show_invoice_detail($invoice_id) {
         </div>
         <?php endif; ?>
         
-        <!-- Respuesta completa de la API (para debug) -->
+        <!-- Respuesta completa de la API (para debug) - Solo para administradores -->
         <?php if (current_user_can('administrator') && WP_DEBUG && $api_response): ?>
         <div class="card" style="margin-top: 30px; padding: 20px;">
-            <h2>Respuesta de la API (Debug)</h2>
+            <h2>Respuesta de la API (Debug - Solo Administradores)</h2>
             <textarea readonly rows="10" style="width: 100%; font-family: monospace; font-size: 11px;">
 <?php echo esc_textarea(json_encode($api_response, JSON_PRETTY_PRINT)); ?>
             </textarea>

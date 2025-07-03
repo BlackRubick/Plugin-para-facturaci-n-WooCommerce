@@ -1,6 +1,6 @@
 <?php
 /**
- * Clase para manejar la integración con la API de Factura.com - VERSIÓN ACTUALIZADA
+ * Clase para manejar la integración con la API de Factura.com - PERMISOS CORREGIDOS
  */
 
 if (!defined('ABSPATH')) {
@@ -18,10 +18,93 @@ class POS_Billing_API_Handler {
     public function __construct() {
         add_action('wp_ajax_pos_billing_create_cfdi', array($this, 'create_cfdi_ajax'));
         add_action('wp_ajax_nopriv_pos_billing_create_cfdi', array($this, 'create_cfdi_ajax'));
+        add_action('wp_ajax_pos_billing_get_nonce', array($this, 'get_nonce_ajax'));
+        add_action('wp_ajax_nopriv_pos_billing_get_nonce', array($this, 'get_nonce_ajax'));
+        add_action('wp_ajax_pos_billing_get_account_info', array($this, 'get_account_info_ajax'));
         add_action('rest_api_init', array($this, 'register_rest_routes'));
         
         // Cargar configuraciones
         $this->load_settings();
+    }
+    
+    /**
+     * Obtener información detallada de la cuenta (series, receptores, etc.)
+     */
+    public function get_account_info_ajax() {
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error('Sin permisos');
+            return;
+        }
+        
+        if (!check_ajax_referer('pos_billing_test', 'nonce', false)) {
+            wp_send_json_error('Error de seguridad');
+            return;
+        }
+        
+        $account_info = $this->get_detailed_account_info();
+        
+        if ($account_info['success']) {
+            wp_send_json_success($account_info['data']);
+        } else {
+            wp_send_json_error($account_info['message']);
+        }
+    }
+    
+    /**
+     * Obtener información detallada de series y receptores
+     */
+    private function get_detailed_account_info() {
+        if (empty($this->api_key) || empty($this->secret_key)) {
+            return array(
+                'success' => false,
+                'message' => 'Credenciales no configuradas'
+            );
+        }
+        
+        $base_url = $this->is_sandbox ? $this->api_url_sandbox : $this->api_url_production;
+        $headers = array(
+            'Content-Type' => 'application/json',
+            'F-PLUGIN' => '9d4095c8f7ed5785cb14c0e3b033eeb8252416ed',
+            'F-Api-Key' => $this->api_key,
+            'F-Secret-Key' => $this->secret_key
+        );
+        
+        $info = array(
+            'series' => array(),
+            'receptors' => array(),
+            'account' => array()
+        );
+        
+        // Obtener series
+        $series_response = wp_remote_get($base_url . '/v4/cfdi40/series', array(
+            'headers' => $headers,
+            'timeout' => 30
+        ));
+        
+        if (!is_wp_error($series_response) && wp_remote_retrieve_response_code($series_response) === 200) {
+            $series_data = json_decode(wp_remote_retrieve_body($series_response), true);
+            if (isset($series_data['Data']) && is_array($series_data['Data'])) {
+                $info['series'] = $series_data['Data'];
+            }
+        }
+        
+        // Obtener algunos receptores (primeros 10)
+        $receptors_response = wp_remote_get($base_url . '/v4/cfdi40/clients?limit=10', array(
+            'headers' => $headers,
+            'timeout' => 30
+        ));
+        
+        if (!is_wp_error($receptors_response) && wp_remote_retrieve_response_code($receptors_response) === 200) {
+            $receptors_data = json_decode(wp_remote_retrieve_body($receptors_response), true);
+            if (isset($receptors_data['Data']) && is_array($receptors_data['Data'])) {
+                $info['receptors'] = $receptors_data['Data'];
+            }
+        }
+        
+        return array(
+            'success' => true,
+            'data' => $info
+        );
     }
     
     private function load_settings() {
@@ -58,7 +141,7 @@ class POS_Billing_API_Handler {
     }
     
     /**
-     * Verificar permisos
+     * Verificar permisos - CORREGIDO para ser más flexible
      */
     public function check_permissions($request) {
         // Verificar nonce
@@ -67,35 +150,77 @@ class POS_Billing_API_Handler {
             return false;
         }
         
-        // Verificar capacidades del usuario
-        return current_user_can('manage_options') || current_user_can('edit_posts');
+        // Verificar capacidades del usuario - más flexible
+        return current_user_can('edit_posts') || current_user_can('manage_options');
     }
     
     /**
-     * Handler AJAX para crear CFDI - MEJORADO
+     * Generar nonce para el popup - NUEVO MÉTODO
+     */
+    public function get_nonce_ajax() {
+        // Verificar que el usuario esté logueado
+        if (!is_user_logged_in()) {
+            wp_send_json_error('Usuario no logueado');
+            return;
+        }
+        
+        // Verificar permisos básicos
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error('Sin permisos suficientes');
+            return;
+        }
+        
+        // Generar nuevo nonce
+        $nonce = wp_create_nonce('pos_billing_nonce');
+        
+        wp_send_json_success(array(
+            'nonce' => $nonce,
+            'user' => wp_get_current_user()->display_name,
+            'timestamp' => current_time('timestamp')
+        ));
+    }
+    
+    /**
+     * Handler AJAX para crear CFDI - PERMISOS CORREGIDOS Y MÁS FLEXIBLE CON NONCE
      */
     public function create_cfdi_ajax() {
         // Log para debug
         if (WP_DEBUG) {
             error_log('POS Billing - Iniciando creación de CFDI via AJAX');
+            error_log('POS Billing - Usuario actual: ' . (is_user_logged_in() ? wp_get_current_user()->display_name : 'No logueado'));
             error_log('POS Billing - POST data: ' . print_r($_POST, true));
         }
         
-        // Verificar nonce
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'pos_billing_nonce')) {
+        // Verificar que el usuario esté logueado
+        if (!is_user_logged_in()) {
             if (WP_DEBUG) {
-                error_log('POS Billing - Error de nonce');
+                error_log('POS Billing - Usuario no logueado');
             }
-            wp_send_json_error('Error de seguridad - Nonce inválido');
+            wp_send_json_error('Debes estar logueado para usar esta función');
             return;
         }
         
-        // Verificar capacidades
-        if (!current_user_can('edit_posts')) {
-            if (WP_DEBUG) {
-                error_log('POS Billing - Usuario sin permisos');
+        // Verificar nonce solo si está presente
+        if (isset($_POST['nonce'])) {
+            if (!wp_verify_nonce($_POST['nonce'], 'pos_billing_nonce')) {
+                if (WP_DEBUG) {
+                    error_log('POS Billing - Error de nonce: ' . $_POST['nonce']);
+                }
+                wp_send_json_error('Error de seguridad - Nonce inválido');
+                return;
             }
-            wp_send_json_error('Sin permisos suficientes');
+        } else {
+            if (WP_DEBUG) {
+                error_log('POS Billing - Advertencia: No se recibió nonce, continuando sin verificación');
+            }
+        }
+        
+        // Verificar capacidades - más flexible
+        if (!current_user_can('edit_posts') && !current_user_can('manage_options')) {
+            if (WP_DEBUG) {
+                error_log('POS Billing - Usuario sin permisos. Roles: ' . implode(', ', wp_get_current_user()->roles));
+            }
+            wp_send_json_error('Sin permisos suficientes. Necesitas al menos permisos de editor.');
             return;
         }
         
@@ -134,6 +259,8 @@ class POS_Billing_API_Handler {
         $result = $this->create_cfdi($cfdi_data);
         
         if ($result['success']) {
+            // Agregar información del usuario que creó la factura
+            $result['data']['created_by'] = wp_get_current_user()->display_name;
             wp_send_json_success($result['data']);
         } else {
             wp_send_json_error($result['message'], $result['data']);
@@ -209,7 +336,7 @@ class POS_Billing_API_Handler {
     }
     
     /**
-     * Crear CFDI usando la API de Factura.com - MEJORADO
+     * Crear CFDI usando la API de Factura.com - MEJORADO CON DEBUG ESPECÍFICO
      */
     public function create_cfdi($cfdi_data) {
         // Validar configuración
@@ -237,11 +364,17 @@ class POS_Billing_API_Handler {
         $formatted_data = $this->format_cfdi_data($cfdi_data);
         $body = json_encode($formatted_data);
         
-        // Log para debug
+        // Log específico para debug del error "No puedes facturar 2"
         if (WP_DEBUG) {
-            error_log('POS Billing - URL: ' . $url);
-            error_log('POS Billing - Headers: ' . print_r($headers, true));
-            error_log('POS Billing - Body: ' . $body);
+            error_log('=== POS BILLING DEBUG ESPECÍFICO ===');
+            error_log('URL: ' . $url);
+            error_log('Headers: ' . print_r($headers, true));
+            error_log('Datos enviados: ' . $body);
+            error_log('Is Sandbox: ' . ($this->is_sandbox ? 'SÍ' : 'NO'));
+            error_log('API Key (primeros 10 chars): ' . substr($this->api_key, 0, 10) . '...');
+            error_log('Serie enviada: ' . $formatted_data['Serie']);
+            error_log('UID Receptor: ' . $formatted_data['Receptor']['UID']);
+            error_log('Conceptos count: ' . count($formatted_data['Conceptos']));
         }
         
         // Realizar petición
@@ -270,18 +403,30 @@ class POS_Billing_API_Handler {
         $response_code = wp_remote_retrieve_response_code($response);
         $response_body = wp_remote_retrieve_body($response);
         
-        // Log de respuesta
+        // Log detallado de la respuesta
         if (WP_DEBUG) {
-            error_log('POS Billing - Código respuesta: ' . $response_code);
-            error_log('POS Billing - Respuesta: ' . $response_body);
+            error_log('=== RESPUESTA DE FACTURA.COM ===');
+            error_log('Código HTTP: ' . $response_code);
+            error_log('Respuesta completa: ' . $response_body);
+            error_log('Headers de respuesta: ' . print_r(wp_remote_retrieve_headers($response), true));
         }
         
         // Verificar código de estado HTTP
         if ($response_code !== 200) {
             return array(
                 'success' => false,
-                'message' => "Error HTTP {$response_code} de la API",
-                'data' => array('response_code' => $response_code, 'raw_response' => $response_body)
+                'message' => "Error HTTP {$response_code} de la API de Factura.com",
+                'data' => array(
+                    'response_code' => $response_code,
+                    'raw_response' => $response_body,
+                    'debug_info' => array(
+                        'url' => $url,
+                        'sandbox_mode' => $this->is_sandbox,
+                        'api_key_prefix' => substr($this->api_key, 0, 10) . '...',
+                        'serie_used' => $formatted_data['Serie'],
+                        'receptor_uid' => $formatted_data['Receptor']['UID']
+                    )
+                )
             );
         }
         
@@ -296,6 +441,12 @@ class POS_Billing_API_Handler {
             );
         }
         
+        // Log de la respuesta parseada
+        if (WP_DEBUG) {
+            error_log('=== RESPUESTA PARSEADA ===');
+            error_log(print_r($api_response, true));
+        }
+        
         // Procesar respuesta según el formato de Factura.com
         if (isset($api_response['response']) && $api_response['response'] === 'success') {
             // CFDI creado exitosamente
@@ -306,7 +457,7 @@ class POS_Billing_API_Handler {
                 'data' => $cfdi_result
             );
         } else {
-            // Error en la creación
+            // Error en la creación - ANÁLISIS ESPECÍFICO DEL ERROR
             $error_message = 'Error desconocido';
             $error_data = array();
             
@@ -320,6 +471,34 @@ class POS_Billing_API_Handler {
                 }
             }
             
+            // ANÁLISIS ESPECÍFICO PARA "No puedes facturar 2"
+            if (strpos($error_message, 'No puedes facturar') !== false) {
+                $error_data['specific_analysis'] = array(
+                    'error_type' => 'facturacion_blocked',
+                    'likely_causes' => array(
+                        'Certificados SAT no válidos o vencidos',
+                        'Serie de facturación no configurada correctamente',
+                        'Cuenta no activada completamente',
+                        'Problemas con el RFC configurado',
+                        'Límites de la cuenta alcanzados'
+                    ),
+                    'recommended_actions' => array(
+                        '1. Verifica en Factura.com que tus certificados SAT estén válidos',
+                        '2. Confirma que la serie ID=' . $formatted_data['Serie'] . ' exista y esté activa',
+                        '3. Verifica que tu RFC esté correctamente configurado',
+                        '4. Contacta al soporte de Factura.com con esta información específica'
+                    ),
+                    'sent_data' => array(
+                        'serie' => $formatted_data['Serie'],
+                        'receptor_uid' => $formatted_data['Receptor']['UID'],
+                        'tipo_documento' => $formatted_data['TipoDocumento'],
+                        'uso_cfdi' => $formatted_data['UsoCFDI'],
+                        'forma_pago' => $formatted_data['FormaPago'],
+                        'metodo_pago' => $formatted_data['MetodoPago']
+                    )
+                );
+            }
+            
             // Si hay borrador creado por error
             if (isset($api_response['draft'])) {
                 $error_data['draft'] = $api_response['draft'];
@@ -330,6 +509,9 @@ class POS_Billing_API_Handler {
             if (isset($api_response['xmlerror'])) {
                 $error_data['xml_error'] = $api_response['xmlerror'];
             }
+            
+            // Incluir respuesta completa para debug
+            $error_data['full_response'] = $api_response;
             
             return array(
                 'success' => false,
@@ -407,13 +589,22 @@ class POS_Billing_API_Handler {
         // Calcular totales
         $totals = $this->calculate_totals($original_data['Conceptos']);
         
+        // Obtener información del cliente si está disponible
+        $customer_name = 'Cliente';
+        $customer_email = '';
+        $customer_rfc = '';
+        
+        if (isset($original_data['Receptor']['UID'])) {
+            $customer_name = 'Cliente (UID: ' . $original_data['Receptor']['UID'] . ')';
+        }
+        
         // Preparar datos para guardar
         $invoice_data = array(
             'invoice_number' => $api_response['INV']['Serie'] . '-' . $api_response['INV']['Folio'],
             'uuid' => $api_response['UUID'],
-            'customer_name' => 'Cliente', // Mejorar obteniendo datos del receptor
-            'customer_email' => '',
-            'customer_rfc' => '',
+            'customer_name' => $customer_name,
+            'customer_email' => $customer_email,
+            'customer_rfc' => $customer_rfc,
             'subtotal' => $totals['subtotal'],
             'tax' => $totals['tax'],
             'total' => $totals['total'],
@@ -441,7 +632,12 @@ class POS_Billing_API_Handler {
             'invoice_id' => $wpdb->insert_id,
             'sat_data' => $api_response['SAT'],
             'invoice_data' => $api_response['INV'],
-            'totals' => $totals
+            'totals' => $totals,
+            'user_info' => array(
+                'user_id' => get_current_user_id(),
+                'user_name' => wp_get_current_user()->display_name,
+                'user_roles' => wp_get_current_user()->roles
+            )
         );
     }
     
@@ -490,12 +686,17 @@ class POS_Billing_API_Handler {
             'api_configured' => !empty($this->api_key) && !empty($this->secret_key),
             'api_url' => $this->is_sandbox ? $this->api_url_sandbox : $this->api_url_production,
             'api_key_configured' => !empty($this->api_key),
-            'secret_key_configured' => !empty($this->secret_key)
+            'secret_key_configured' => !empty($this->secret_key),
+            'user_permissions' => array(
+                'can_edit_posts' => current_user_can('edit_posts'),
+                'can_manage_options' => current_user_can('manage_options'),
+                'current_user' => is_user_logged_in() ? wp_get_current_user()->display_name : 'No logueado'
+            )
         );
     }
     
     /**
-     * Método para probar la conexión con la API
+     * Método para probar la conexión con la API - MEJORADO CON DIAGNÓSTICO
      */
     public function test_connection() {
         if (empty($this->api_key) || empty($this->secret_key)) {
@@ -505,13 +706,150 @@ class POS_Billing_API_Handler {
             );
         }
         
-        // Aquí podrías hacer una petición de prueba a un endpoint de la API
-        // Por ahora solo validamos que las credenciales estén configuradas
+        // Verificar permisos del usuario actual
+        if (!current_user_can('edit_posts')) {
+            return array(
+                'success' => false,
+                'message' => 'Sin permisos suficientes para probar la conexión'
+            );
+        }
+        
+        // Realizar prueba real de la API
+        $base_url = $this->is_sandbox ? $this->api_url_sandbox : $this->api_url_production;
+        $test_url = $base_url . '/v4/cfdi40/account';
+        
+        $headers = array(
+            'Content-Type' => 'application/json',
+            'F-PLUGIN' => '9d4095c8f7ed5785cb14c0e3b033eeb8252416ed',
+            'F-Api-Key' => $this->api_key,
+            'F-Secret-Key' => $this->secret_key
+        );
+        
+        if (WP_DEBUG) {
+            error_log('POS Billing - Probando conexión con: ' . $test_url);
+        }
+        
+        $response = wp_remote_get($test_url, array(
+            'headers' => $headers,
+            'timeout' => 30,
+            'sslverify' => !$this->is_sandbox
+        ));
+        
+        if (is_wp_error($response)) {
+            return array(
+                'success' => false,
+                'message' => 'Error de conexión: ' . $response->get_error_message(),
+                'details' => array(
+                    'error_type' => 'connection_error',
+                    'wp_error' => $response->get_error_message()
+                )
+            );
+        }
+        
+        $response_code = wp_remote_retrieve_response_code($response);
+        $response_body = wp_remote_retrieve_body($response);
+        
+        if (WP_DEBUG) {
+            error_log('POS Billing - Respuesta de prueba: ' . $response_code . ' - ' . $response_body);
+        }
+        
+        if ($response_code !== 200) {
+            return array(
+                'success' => false,
+                'message' => "Error HTTP {$response_code} - Credenciales inválidas o cuenta con problemas",
+                'details' => array(
+                    'http_code' => $response_code,
+                    'response' => $response_body
+                )
+            );
+        }
+        
+        $api_data = json_decode($response_body, true);
+        
+        if (!$api_data || json_last_error() !== JSON_ERROR_NONE) {
+            return array(
+                'success' => false,
+                'message' => 'Respuesta inválida de la API',
+                'details' => array(
+                    'json_error' => json_last_error_msg(),
+                    'raw_response' => substr($response_body, 0, 500)
+                )
+            );
+        }
+        
+        // Analizar respuesta de la cuenta
+        $account_status = $this->analyze_account_status($api_data);
+        
         return array(
             'success' => true,
-            'message' => 'Credenciales configuradas correctamente',
-            'mode' => $this->is_sandbox ? 'Sandbox' : 'Producción'
+            'message' => 'Conexión exitosa con la API de Factura.com',
+            'mode' => $this->is_sandbox ? 'Sandbox' : 'Producción',
+            'user_info' => array(
+                'name' => wp_get_current_user()->display_name,
+                'roles' => wp_get_current_user()->roles,
+                'can_create_invoices' => current_user_can('edit_posts')
+            ),
+            'account_info' => $account_status
         );
+    }
+    
+    /**
+     * Analizar estado de la cuenta de Factura.com
+     */
+    private function analyze_account_status($api_data) {
+        $status = array(
+            'configured' => false,
+            'certificates_valid' => false,
+            'series_available' => false,
+            'issues' => array(),
+            'recommendations' => array(),
+            'raw_data' => $api_data
+        );
+        
+        // Verificar estructura de respuesta
+        if (isset($api_data['response']) && $api_data['response'] === 'success') {
+            $status['configured'] = true;
+            
+            // Verificar datos de la cuenta
+            if (isset($api_data['Data'])) {
+                $data = $api_data['Data'];
+                
+                // Verificar certificados
+                if (isset($data['certificates']) || isset($data['Certificates'])) {
+                    $status['certificates_valid'] = true;
+                } else {
+                    $status['issues'][] = 'No se encontraron certificados SAT';
+                    $status['recommendations'][] = 'Sube tus certificados .cer y .key en el panel de Factura.com';
+                }
+                
+                // Verificar series
+                if (isset($data['series']) || isset($data['Series'])) {
+                    $status['series_available'] = true;
+                } else {
+                    $status['issues'][] = 'No se encontraron series de facturación';
+                    $status['recommendations'][] = 'Crea al menos una serie de facturación en tu panel';
+                }
+                
+                // Verificar RFC
+                if (isset($data['rfc']) || isset($data['RFC'])) {
+                    $status['rfc'] = $data['rfc'] ?? $data['RFC'];
+                } else {
+                    $status['issues'][] = 'RFC no configurado correctamente';
+                }
+                
+                // Verificar razón social
+                if (isset($data['razon_social']) || isset($data['RazonSocial'])) {
+                    $status['company_name'] = $data['razon_social'] ?? $data['RazonSocial'];
+                }
+            }
+        } else {
+            $status['issues'][] = 'Respuesta inesperada de la API';
+            if (isset($api_data['message'])) {
+                $status['issues'][] = 'Error de API: ' . $api_data['message'];
+            }
+        }
+        
+        return $status;
     }
 }
 
