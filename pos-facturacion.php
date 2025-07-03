@@ -62,13 +62,9 @@ function pos_billing_load_files() {
     if (is_admin()) {
         $admin_files = array(
             'admin/admin-page.php',
-            'admin/settings-page.php'
+            'admin/settings-page.php',
+            'admin/invoices-page.php'
         );
-        
-        // Cargar admin/invoices-page.php solo si existe
-        if (file_exists(POS_BILLING_PLUGIN_PATH . 'admin/invoices-page.php')) {
-            $admin_files[] = 'admin/invoices-page.php';
-        }
         
         foreach ($admin_files as $file) {
             $file_path = POS_BILLING_PLUGIN_PATH . $file;
@@ -257,15 +253,8 @@ add_action('admin_notices', function() {
 // Agregar enlace de configuración en la lista de plugins
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($links) {
     $settings_link = '<a href="' . admin_url('admin.php?page=pos-billing-settings') . '">⚙️ Configuración</a>';
-    
-    // Solo agregar enlace de facturas si el archivo existe
-    if (file_exists(POS_BILLING_PLUGIN_PATH . 'admin/invoices-page.php')) {
-        $invoices_link = '<a href="' . admin_url('admin.php?page=pos-billing-invoices') . '">📄 Facturas</a>';
-        array_unshift($links, $settings_link, $invoices_link);
-    } else {
-        array_unshift($links, $settings_link);
-    }
-    
+    $invoices_link = '<a href="' . admin_url('admin.php?page=pos-billing-invoices') . '">📄 Facturas</a>';
+    array_unshift($links, $settings_link, $invoices_link);
     return $links;
 });
 
@@ -323,9 +312,7 @@ function pos_billing_dashboard_widget_content() {
         }
         
         echo '<div style="text-align: center;">';
-        if (file_exists(POS_BILLING_PLUGIN_PATH . 'admin/invoices-page.php')) {
-            echo '<a href="' . admin_url('admin.php?page=pos-billing-invoices') . '" class="button">📄 Ver Facturas</a> ';
-        }
+        echo '<a href="' . admin_url('admin.php?page=pos-billing-invoices') . '" class="button">📄 Ver Facturas</a> ';
         echo '<a href="' . admin_url('admin.php?page=pos-billing-settings') . '" class="button">⚙️ Configuración</a>';
         echo '</div>';
     } catch (Exception $e) {
