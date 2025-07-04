@@ -517,21 +517,139 @@ class POS_Billing_API_Handler
 
         // Preparar datos según el formato de Factura.com
         $formatted_data = $this->format_cfdi_data($cfdi_data);
-        $body = json_encode($formatted_data, JSON_NUMERIC_CHECK);
-
-        // Log específico para debug del error "No puedes facturar 2"
+        // 🔍 DEBUG 1: VER TIPOS DESPUÉS DEL FORMATO
         if (WP_DEBUG) {
-            error_log('=== POS BILLING DEBUG ESPECÍFICO ===');
-            error_log('URL: ' . $url);
+            error_log('=== 🔍 DEBUG PHP - DESPUÉS DE format_cfdi_data ===');
+            error_log('Serie tipo: ' . gettype($formatted_data['Serie']) . ' valor: ' . $formatted_data['Serie']);
+            error_log('FormaPago tipo: ' . gettype($formatted_data['FormaPago']) . ' valor: "' . $formatted_data['FormaPago'] . '"');
+            error_log('Cantidad tipo: ' . gettype($formatted_data['Conceptos'][0]['Cantidad']) . ' valor: ' . $formatted_data['Conceptos'][0]['Cantidad']);
+            error_log('ValorUnitario tipo: ' . gettype($formatted_data['Conceptos'][0]['ValorUnitario']) . ' valor: ' . $formatted_data['Conceptos'][0]['ValorUnitario']);
+            if (isset($formatted_data['Conceptos'][0]['Impuestos']['Traslados'][0])) {
+                error_log('Base tipo: ' . gettype($formatted_data['Conceptos'][0]['Impuestos']['Traslados'][0]['Base']) . ' valor: ' . $formatted_data['Conceptos'][0]['Impuestos']['Traslados'][0]['Base']);
+            }
+        }
+        $body = json_encode($formatted_data);
+        if (WP_DEBUG) {
+            error_log('=== 🔍 DEBUG PHP - JSON FINAL ===');
+            error_log('JSON que se envía: ' . $body);
+            error_log('JSON con formato bonito: ' . json_encode($formatted_data, JSON_PRETTY_PRINT));
+        }
+        // ✅ AGREGAR ESTO JUSTO ANTES DE wp_remote_post()
+        if (WP_DEBUG) {
+            error_log('=== 🔍 DEBUG EXTREMO ===');
+            error_log('$formatted_data antes de json_encode:');
+            error_log('- Serie tipo: ' . gettype($formatted_data['Serie']) . ' valor: ' . $formatted_data['Serie']);
+            error_log('- Cantidad tipo: ' . gettype($formatted_data['Conceptos'][0]['Cantidad']) . ' valor: ' . $formatted_data['Conceptos'][0]['Cantidad']);
+            error_log('JSON antes de enviar: ' . $body);
             error_log('Headers: ' . print_r($headers, true));
-            error_log('Datos enviados: ' . $body);
-            error_log('Is Sandbox: ' . ($this->is_sandbox ? 'SÍ' : 'NO'));
-            error_log('API Key (primeros 10 chars): ' . substr($this->api_key, 0, 10) . '...');
-            error_log('Serie enviada: ' . $formatted_data['Serie']);
-            error_log('UID Receptor: ' . $formatted_data['Receptor']['UID']);
-            error_log('Conceptos count: ' . count($formatted_data['Conceptos']));
         }
 
+        // 🧪 TEST: Probar con datos exactos de la documentación
+        if (WP_DEBUG && isset($_GET['test_api'])) {
+            error_log('=== 🧪 PROBANDO CON DATOS DE DOCUMENTACIÓN ===');
+
+            $test_data = array(
+                "Receptor" => array(
+                    "UID" => "67a93f71cdddb" // Tu receptor que SÍ existe
+                ),
+                "TipoDocumento" => "factura",
+                "Conceptos" => array(
+                    array(
+                        "ClaveProdServ" => "43201830", // Tu producto que SÍ existe
+                        "Cantidad" => 1,
+                        "ClaveUnidad" => "H87",
+                        "Unidad" => "Pieza",
+                        "ValorUnitario" => 100.0,
+                        "Descripcion" => "DISCO DURO SSD",
+                        "ObjetoImp" => "02",
+                        "Impuestos" => array(
+                            "Traslados" => array(
+                                array(
+                                    "Base" => 100.0,
+                                    "Impuesto" => "002",
+                                    "TipoFactor" => "Tasa",
+                                    "TasaOCuota" => "0.16",
+                                    "Importe" => 16.0
+                                )
+                            )
+                        )
+                    )
+                ),
+                "UsoCFDI" => "G01",
+                "Serie" => 5483035, // Tu serie que SÍ existe  
+                "FormaPago" => "01",
+                "MetodoPago" => "PUE",
+                "Moneda" => "MXN",
+                "EnviarCorreo" => false
+            );
+
+            $test_body = json_encode($test_data);
+            error_log('🧪 TEST JSON: ' . $test_body);
+
+            // Hacer petición de prueba
+            $test_response = wp_remote_post($url, array(
+                'headers' => $headers,
+                'body' => $test_body,
+                'timeout' => 45,
+                'sslverify' => !$this->is_sandbox
+            ));
+
+            error_log('🧪 TEST RESPUESTA: ' . wp_remote_retrieve_body($test_response));
+        }
+        // 🧪 TEST: Probar con datos exactos que funcionan en el portal
+        if (WP_DEBUG) {
+            error_log('=== 🧪 PROBANDO CON DATOS SIMPLIFICADOS ===');
+
+            $test_data = array(
+                "Receptor" => array(
+                    "UID" => "67a93f71cdddb"
+                ),
+                "TipoDocumento" => "factura",
+                "Conceptos" => array(
+                    array(
+                        "ClaveProdServ" => "43201830", // Usa la clave exacta de tu producto
+                        "Cantidad" => 1,
+                        "ClaveUnidad" => "H87",
+                        "Unidad" => "Pieza",
+                        "ValorUnitario" => 100,
+                        "Descripcion" => "DISCO DURO SSD",
+                        "ObjetoImp" => "02",
+                        "Impuestos" => array(
+                            "Traslados" => array(
+                                array(
+                                    "Base" => 100,
+                                    "Impuesto" => "002",
+                                    "TipoFactor" => "Tasa",
+                                    "TasaOCuota" => "0.16",
+                                    "Importe" => 16
+                                )
+                            )
+                        )
+                    )
+                ),
+                "UsoCFDI" => "G01",
+                "Serie" => 5483035,
+                "FormaPago" => "01",
+                "MetodoPago" => "PUE",
+                "Moneda" => "MXN",
+                "EnviarCorreo" => false
+            );
+
+            $test_body = json_encode($test_data);
+            error_log('🧪 TEST JSON: ' . $test_body);
+
+            // Hacer petición de prueba
+            $test_response = wp_remote_post($url, array(
+                'headers' => $headers,
+                'body' => $test_body,
+                'timeout' => 45,
+                'sslverify' => !$this->is_sandbox
+            ));
+
+            $test_response_body = wp_remote_retrieve_body($test_response);
+            error_log('🧪 TEST RESPUESTA CODE: ' . wp_remote_retrieve_response_code($test_response));
+            error_log('🧪 TEST RESPUESTA BODY: ' . $test_response_body);
+        }
         // Realizar petición
         $response = wp_remote_post($url, array(
             'headers' => $headers,
@@ -679,100 +797,100 @@ class POS_Billing_API_Handler
     /**
      * Formatear datos del CFDI según el formato esperado por Factura.com - CORREGIDO CON FORMATO SAT
      */
-   private function format_cfdi_data($data)
-{
-    // 🔥 LOG PARA VER QUÉ LLEGA EXACTAMENTE
-    error_log('=== 🚀 FORMAT_CFDI_DATA - DATOS RECIBIDOS ===');
-    error_log('FormaPago recibido: "' . $data['FormaPago'] . '" (longitud: ' . strlen($data['FormaPago']) . ')');
-    error_log('ClaveProdServ recibido: "' . $data['Conceptos'][0]['ClaveProdServ'] . '" (longitud: ' . strlen($data['Conceptos'][0]['ClaveProdServ']) . ')');
-    error_log('ObjetoImp recibido: "' . $data['Conceptos'][0]['ObjetoImp'] . '" (longitud: ' . strlen($data['Conceptos'][0]['ObjetoImp']) . ')');
-    error_log('JSON COMPLETO RECIBIDO: ' . json_encode($data, JSON_PRETTY_PRINT));
-    
-    // ✅ SOLO COPIAR LOS DATOS SIN MODIFICAR NADA
-    $formatted = array(
-        'Receptor' => $data['Receptor'],
-        'TipoDocumento' => $data['TipoDocumento'],
-        'Conceptos' => $data['Conceptos'],
-        'UsoCFDI' => $data['UsoCFDI'],
-        'Serie' => (int)$data['Serie'], // Solo convertir a número
-        'FormaPago' => $data['FormaPago'], // NO TOCAR
-        'MetodoPago' => $data['MetodoPago'],
-        'Moneda' => $data['Moneda'],
-        'EnviarCorreo' => $data['EnviarCorreo'] ?? true
-    );
+    /**
+     * Formatear datos del CFDI según el formato esperado por Factura.com - TIPOS CORRECTOS
+     */
+    /**
+     * Formatear datos del CFDI según el formato esperado por Factura.com - SIN MODIFICAR STRINGS
+     */
+    /**
+     * Formatear datos del CFDI - FORZAR TIPOS FINALES
+     */
+    private function format_cfdi_data($data)
+    {
+        if (WP_DEBUG) {
+            error_log('=== 🚀 FORMAT_CFDI_DATA - DATOS RECIBIDOS ===');
+            error_log('JSON RECIBIDO: ' . json_encode($data, JSON_PRETTY_PRINT));
+        }
 
-    // Campos opcionales sin modificar
-    if (!empty($data['TipoCambio'])) {
-        $formatted['TipoCambio'] = $data['TipoCambio'];
-    }
-    if (!empty($data['NumOrder'])) {
-        $formatted['NumOrder'] = $data['NumOrder'];
-    }
-    if (!empty($data['LugarExpedicion'])) {
-        $formatted['LugarExpedicion'] = $data['LugarExpedicion'];
-    }
-    if (!empty($data['CondicionesDePago'])) {
-        $formatted['CondicionesDePago'] = $data['CondicionesDePago'];
-    }
-    
-    // Comentarios
-    $comentarios = '';
-    if (!empty($data['ReferenciaAdicional'])) {
-        $comentarios .= 'Ref: ' . $data['ReferenciaAdicional'];
-    }
-    if (!empty($data['Comentarios'])) {
-        if (!empty($comentarios)) $comentarios .= ' | ';
-        $comentarios .= $data['Comentarios'];
-    }
-    if (!empty($comentarios)) {
-        $formatted['Comentarios'] = $comentarios;
-    }
-    
-    // EnviarCorreo como string
-    if (isset($formatted['EnviarCorreo'])) {
-        $formatted['EnviarCorreo'] = $formatted['EnviarCorreo'] === true || 
-                                     $formatted['EnviarCorreo'] === 'true' || 
-                                     $formatted['EnviarCorreo'] === '1' || 
-                                     $formatted['EnviarCorreo'] === 1 ? "1" : "0";
-    }
-    
-    // ✅ SOLO CONVERTIR NÚMEROS EN CONCEPTOS - NO TOCAR STRINGS
-    foreach ($formatted['Conceptos'] as &$concepto) {
-        // Solo convertir números, NO tocar strings
-        $concepto['Cantidad'] = (float)$concepto['Cantidad'];
-        $concepto['ValorUnitario'] = (float)$concepto['ValorUnitario'];
-        $concepto['Descuento'] = (float)($concepto['Descuento'] ?? 0);
-        
-        if (!isset($concepto['Importe'])) {
-            $concepto['Importe'] = $concepto['Cantidad'] * $concepto['ValorUnitario'];
+        // ✅ FORZAR TIPOS ESPECÍFICOS SEGÚN DOCUMENTACIÓN
+        $formatted = array(
+            'Receptor' => $data['Receptor'],
+            'TipoDocumento' => (string)$data['TipoDocumento'],
+            'UsoCFDI' => (string)$data['UsoCFDI'],
+            'Serie' => (int)$data['Serie'], // ← FORZAR A INTEGER
+            'FormaPago' => (string)$data['FormaPago'], // ← MANTENER STRING
+            'MetodoPago' => (string)$data['MetodoPago'],
+            'Moneda' => (string)$data['Moneda'],
+            'EnviarCorreo' => (bool)$data['EnviarCorreo'] // ← FORZAR A BOOLEAN
+        );
+
+        // Campos opcionales
+        if (!empty($data['TipoCambio'])) {
+            $formatted['TipoCambio'] = (float)$data['TipoCambio'];
         }
-        $concepto['Importe'] = (float)$concepto['Importe'];
-        
-        // ❌ NO TOCAR ClaveProdServ, ObjetoImp - DEJARLOS COMO VIENEN
-        // Solo procesar impuestos (números)
-        if (isset($concepto['Impuestos']['Traslados'])) {
-            foreach ($concepto['Impuestos']['Traslados'] as &$traslado) {
-                $traslado['Base'] = (float)$traslado['Base'];
-                $traslado['TasaOCuota'] = (float)$traslado['TasaOCuota'];
-                $traslado['Importe'] = (float)$traslado['Importe'];
-                // ❌ NO TOCAR Impuesto - DEJARLO COMO VIENE
+        if (!empty($data['NumOrder'])) {
+            $formatted['NumOrder'] = (string)$data['NumOrder'];
+        }
+        if (!empty($data['LugarExpedicion'])) {
+            $formatted['LugarExpedicion'] = (string)$data['LugarExpedicion'];
+        }
+        if (!empty($data['Comentarios'])) {
+            $formatted['Comentarios'] = (string)$data['Comentarios'];
+        }
+
+        // ✅ CONCEPTOS - FORZAR TIPOS ESPECÍFICOS
+        $formatted['Conceptos'] = array();
+
+        foreach ($data['Conceptos'] as $concepto) {
+            $formatted_concepto = array(
+                'ClaveProdServ' => (string)$concepto['ClaveProdServ'], // STRING
+                'Cantidad' => (float)$concepto['Cantidad'], // ← FORZAR A FLOAT
+                'ClaveUnidad' => (string)$concepto['ClaveUnidad'],
+                'Unidad' => (string)$concepto['Unidad'],
+                'Descripcion' => (string)$concepto['Descripcion'],
+                'ValorUnitario' => (float)$concepto['ValorUnitario'], // ← FORZAR A FLOAT
+                'Importe' => (float)$concepto['Importe'], // ← FORZAR A FLOAT
+                'ObjetoImp' => (string)$concepto['ObjetoImp'] // STRING
+            );
+
+            // Descuento opcional
+            if (isset($concepto['Descuento']) && $concepto['Descuento'] > 0) {
+                $formatted_concepto['Descuento'] = (float)$concepto['Descuento'];
             }
+
+            // ✅ IMPUESTOS - FORZAR TIPOS
+            if (isset($concepto['Impuestos']['Traslados'])) {
+                $formatted_concepto['Impuestos'] = array();
+                $formatted_concepto['Impuestos']['Traslados'] = array();
+
+                foreach ($concepto['Impuestos']['Traslados'] as $traslado) {
+                    $formatted_concepto['Impuestos']['Traslados'][] = array(
+                        'Base' => (float)$traslado['Base'], // ← FORZAR A FLOAT
+                        'Impuesto' => (string)$traslado['Impuesto'], // STRING "002"
+                        'TipoFactor' => (string)$traslado['TipoFactor'], // STRING
+                        'TasaOCuota' => (string)$traslado['TasaOCuota'], // STRING "0.16"
+                        'Importe' => (float)$traslado['Importe'] // ← FORZAR A FLOAT
+                    );
+                }
+            }
+
+            $formatted['Conceptos'][] = $formatted_concepto;
         }
+
+        if (WP_DEBUG) {
+            error_log('=== ✅ DATOS FINALES CON TIPOS FORZADOS ===');
+            error_log('JSON FINAL: ' . json_encode($formatted, JSON_PRETTY_PRINT));
+            error_log('TIPOS VERIFICADOS:');
+            error_log('- Serie: ' . gettype($formatted['Serie']) . ' = ' . $formatted['Serie']);
+            error_log('- FormaPago: ' . gettype($formatted['FormaPago']) . ' = ' . $formatted['FormaPago']);
+            error_log('- Cantidad: ' . gettype($formatted['Conceptos'][0]['Cantidad']) . ' = ' . $formatted['Conceptos'][0]['Cantidad']);
+            error_log('- ValorUnitario: ' . gettype($formatted['Conceptos'][0]['ValorUnitario']) . ' = ' . $formatted['Conceptos'][0]['ValorUnitario']);
+            error_log('- Base: ' . gettype($formatted['Conceptos'][0]['Impuestos']['Traslados'][0]['Base']) . ' = ' . $formatted['Conceptos'][0]['Impuestos']['Traslados'][0]['Base']);
+        }
+
+        return $formatted;
     }
-    
-    // 🔥 LOG FINAL PARA VERIFICAR QUE NO SE PERDIÓ NADA
-    error_log('=== ✅ DATOS FINALES ENVIADOS ===');
-    error_log('FormaPago FINAL: "' . $formatted['FormaPago'] . '" (longitud: ' . strlen($formatted['FormaPago']) . ')');
-    error_log('Serie FINAL: ' . $formatted['Serie'] . ' (tipo: ' . gettype($formatted['Serie']) . ')');
-    error_log('ClaveProdServ FINAL: "' . $formatted['Conceptos'][0]['ClaveProdServ'] . '" (longitud: ' . strlen($formatted['Conceptos'][0]['ClaveProdServ']) . ')');
-    error_log('ObjetoImp FINAL: "' . $formatted['Conceptos'][0]['ObjetoImp'] . '" (longitud: ' . strlen($formatted['Conceptos'][0]['ObjetoImp']) . ')');
-    if (isset($formatted['Conceptos'][0]['Impuestos']['Traslados'][0])) {
-        error_log('Impuesto FINAL: "' . $formatted['Conceptos'][0]['Impuestos']['Traslados'][0]['Impuesto'] . '" (longitud: ' . strlen($formatted['Conceptos'][0]['Impuestos']['Traslados'][0]['Impuesto']) . ')');
-    }
-    error_log('JSON FINAL COMPLETO: ' . json_encode($formatted, JSON_PRETTY_PRINT));
-    
-    return $formatted;
-}
     /**
      * Procesar CFDI exitoso y guardar en base de datos - MEJORADO
      */
