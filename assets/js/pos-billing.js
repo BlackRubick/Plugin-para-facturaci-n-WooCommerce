@@ -12,27 +12,27 @@ function mostrarAyudaDetallada() {
         '.success { background: #d4edda; padding: 10px; border-radius: 5px; color: #155724; }' +
         '</style></head><body>' +
         '<div class="container">' +
-        '<h1>🆘 Solución para "No puedes facturar 2"</h1>' +
+        '<h1> Solución para "No puedes facturar 2"</h1>' +
         '<div class="warning">' +
-        '<strong>⚠️ Este error indica que tu cuenta de Factura.com no está completamente configurada.</strong>' +
+        '<strong> Este error indica que tu cuenta de Factura.com no está completamente configurada.</strong>' +
         '</div>' +
         '<div class="step">' +
-        '<h3>1️⃣ Verificar Certificados SAT</h3>' +
+        '<h3> Verificar Certificados SAT</h3>' +
         '<p>Ve a <a href="https://sandbox.factura.com" target="_blank">Factura.com</a> → Configuración → Certificados</p>' +
         '<ul><li>Debe aparecer tu certificado .cer</li><li>Debe aparecer tu llave .key</li><li>Estado: "Válido"</li></ul>' +
         '</div>' +
         '<div class="step">' +
-        '<h3>2️⃣ Verificar Series</h3>' +
+        '<h3> Verificar Series</h3>' +
         '<p>Ve a Configuración → Series</p>' +
         '<ul><li>Debe existir la serie ID: 1212</li><li>Estado: "Activa"</li><li>Tipo: "Factura"</li></ul>' +
         '</div>' +
         '<div class="step">' +
-        '<h3>3️⃣ Verificar Receptor</h3>' +
+        '<h3> Verificar Receptor</h3>' +
         '<p>Ve a Receptores → Buscar</p>' +
         '<ul><li>Busca UID: 67a93f71cdddb</li><li>Debe existir y estar activo</li></ul>' +
         '</div>' +
         '<div class="success">' +
-        '<strong>✅ Si todo está configurado y sigue fallando:</strong><br>' +
+        '<strong> Si todo está configurado y sigue fallando:</strong><br>' +
         'Contacta al soporte de Factura.com con esta información específica.' +
         '</div>' +
         '<p style="text-align: center; margin-top: 30px;">' +
@@ -45,7 +45,6 @@ function mostrarAyudaDetallada() {
     helpWindow.focus();
 }
 
-// Funcionalidad del botón de facturación - VERSIÓN SIMPLIFICADA QUE FUNCIONA
 document.addEventListener("DOMContentLoaded", function () {
   const billingBtn = document.getElementById("pos-billing-btn");
 
@@ -132,13 +131,13 @@ function abrirModuloFacturacion() {
         </div>
         
         <div class="alert alert-info">
-            <strong>ℹ️ Información:</strong> Los totales se calculan automáticamente cuando ingresas cantidad y precio.
+            <strong> Información:</strong> Los totales se calculan automáticamente cuando ingresas cantidad y precio.
         </div>
         
         <form id="cfdiformulario">
             <!-- DATOS DEL RECEPTOR -->
             <div class="section">
-                <h3>👤 Datos del Receptor</h3>
+                <h3> Datos del Receptor</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label>UID del Receptor <span class="required">*</span></label>
@@ -154,7 +153,7 @@ function abrirModuloFacturacion() {
             
             <!-- CONFIGURACIÓN DEL CFDI -->
             <div class="section">
-                <h3>⚙️ Configuración del CFDI</h3>
+                <h3> Configuración del CFDI</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tipo de Documento <span class="required">*</span></label>
@@ -164,16 +163,16 @@ function abrirModuloFacturacion() {
                             <option value="nota_credito">Nota de Crédito</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Uso de CFDI <span class="required">*</span></label>
-                        <select id="usoCFDI" required>
-                            <option value="">Seleccionar...</option>
-                            <option value="G01">G01 - Adquisición de mercancías</option>
-                            <option value="G02">G02 - Devoluciones, descuentos</option>
-                            <option value="G03">G03 - Gastos en general</option>
-                            <option value="P01">P01 - Por definir</option>
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label>Uso de CFDI <span class="required">*</span></label>
+                            <select id="usoCFDI" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="G01">G01 - Adquisición de mercancías</option>
+                                <option value="G02">G02 - Devoluciones, descuentos</option>
+                                <option value="G03">G03 - Gastos en general</option>
+                                <option value="S01" selected>S01 - Sin efectos fiscales</option>
+                            </select>
+                        </div>
                 </div>
                 
                 <div class="form-row-3">
@@ -218,7 +217,7 @@ function abrirModuloFacturacion() {
             
             <!-- CONCEPTOS -->
             <div class="section">
-                <h3>🛍️ Conceptos/Productos</h3>
+                <h3>Conceptos/Productos</h3>
                 <div id="conceptos">
                     <!-- Concepto inicial -->
                     <div class="producto-row">
@@ -278,7 +277,7 @@ function abrirModuloFacturacion() {
                     </div>
                 </div>
                 
-                <button type="button" id="agregarConcepto" class="btn btn-add">➕ Agregar Concepto</button>
+                <button type="button" id="agregarConcepto" class="btn btn-add"> Agregar Concepto</button>
             </div>
             
             <!-- TOTALES -->
@@ -331,24 +330,24 @@ function abrirModuloFacturacion() {
             
             <!-- BOTONES -->
             <div class="form-actions">
-                <button type="submit" class="btn" id="submitBtn">💾 Generar CFDI</button>
-                <button type="button" onclick="window.close()" class="btn btn-cancel">❌ Cancelar</button>
+                <button type="submit" class="btn" id="submitBtn">Generar CFDI</button>
+                <button type="button" onclick="window.close()" class="btn btn-cancel">Cancelar</button>
             </div>
         </form>
     </div>
     
     <script>
-        // ✅ FUNCIONES AUXILIARES PARA FORMATEO CORRECTO
+        // FUNCIONES AUXILIARES PARA FORMATEO CORRECTO
         function formatearDatosParaAPI(datos) {
-            console.log('🔄 FORMATEANDO DATOS PARA API...');
+            console.log(' FORMATEANDO DATOS PARA API...');
             console.log('Datos ANTES del formateo:', datos);
             
-            // ✅ FORMATEAR DATOS PRINCIPALES CON TIPOS ESPECÍFICOS
+            // FORMATEAR DATOS PRINCIPALES CON TIPOS ESPECÍFICOS
             const datosFormateados = {
                 Receptor: {
-                    UID: String(datos.Receptor.UID).trim() // ← STRING
+                    UID: String(datos.Receptor.UID).trim()
                 },
-                TipoDocumento: String(datos.TipoDocumento), // ← STRING
+                TipoDocumento: String(datos.TipoDocumento), 
                 UsoCFDI: String(datos.UsoCFDI), // ← STRING
                 Serie: parseInt(datos.Serie, 10), // ← NUMBER
                 FormaPago: String(datos.FormaPago).padStart(2, '0'), // ← STRING con padding
@@ -376,7 +375,7 @@ function abrirModuloFacturacion() {
                 datosFormateados.Comentarios = String(datos.Comentarios); // ← STRING
             }
             
-            // ✅ FORMATEAR CONCEPTOS CON TIPOS ESPECÍFICOS
+            // FORMATEAR CONCEPTOS CON TIPOS ESPECÍFICOS
             datosFormateados.Conceptos = datos.Conceptos.map(concepto => {
                 const conceptoFormateado = {
                     ClaveProdServ: String(concepto.ClaveProdServ).padStart(8, '0'), // ← STRING con padding
@@ -394,7 +393,7 @@ function abrirModuloFacturacion() {
                     conceptoFormateado.Descuento = parseFloat(concepto.Descuento); // ← NUMBER
                 }
                 
-                // ✅ FORMATEAR IMPUESTOS SI EXISTEN
+                //  FORMATEAR IMPUESTOS SI EXISTEN
                 if (concepto.Impuestos && concepto.Impuestos.Traslados) {
                     conceptoFormateado.Impuestos = {
                         Traslados: concepto.Impuestos.Traslados.map(traslado => ({
@@ -410,8 +409,8 @@ function abrirModuloFacturacion() {
                 return conceptoFormateado;
             });
             
-            console.log('✅ Datos DESPUÉS del formateo:', datosFormateados);
-            console.log('📋 Verificación de tipos:');
+            console.log(' Datos DESPUÉS del formateo:', datosFormateados);
+            console.log(' Verificación de tipos:');
             console.log('- FormaPago:', typeof datosFormateados.FormaPago, '=', datosFormateados.FormaPago);
             console.log('- Serie:', typeof datosFormateados.Serie, '=', datosFormateados.Serie);
             console.log('- ClaveProdServ:', typeof datosFormateados.Conceptos[0].ClaveProdServ, '=', datosFormateados.Conceptos[0].ClaveProdServ);
@@ -421,7 +420,7 @@ function abrirModuloFacturacion() {
             return datosFormateados;
         }
 
-        // ✅ FUNCIÓN PRINCIPAL DE CÁLCULO
+        // FUNCIÓN PRINCIPAL DE CÁLCULO
         function calcularTotales() {
             let subtotal = 0;
             let totalDescuentos = 0;
@@ -459,7 +458,7 @@ function abrirModuloFacturacion() {
             document.getElementById('total').textContent = '$' + total.toFixed(2);
         }
         
-        // ✅ AGREGAR EVENT LISTENERS
+        // AGREGAR EVENT LISTENERS
         function agregarEventListeners(elemento) {
             const campos = elemento.querySelectorAll('.cantidad, .precioUnitario, .descuento');
             campos.forEach(function(campo) {
@@ -479,7 +478,6 @@ function abrirModuloFacturacion() {
             }
         }
         
-        // ✅ AGREGAR CONCEPTO
         function agregarConcepto() {
             const container = document.getElementById('conceptos');
             const btnAgregar = document.getElementById('agregarConcepto');
@@ -549,7 +547,6 @@ function abrirModuloFacturacion() {
             agregarEventListeners(nuevoSecundario);
         }
         
-        // ✅ ELIMINAR CONCEPTO
         function eliminarConcepto(boton) {
             const fila = boton.closest('.producto-row');
             const filaSecundaria = fila.nextElementSibling;
@@ -560,7 +557,6 @@ function abrirModuloFacturacion() {
             calcularTotales();
         }
         
-        // ✅ RECOPILAR DATOS CON FORMATO CORRECTO
         function recopilarDatos() {
             const conceptos = [];
             const filasConceptos = document.querySelectorAll('.producto-row');
@@ -574,7 +570,6 @@ function abrirModuloFacturacion() {
                 const descuento = filaSecundaria ? parseFloat(filaSecundaria.querySelector('.descuento').value) || 0 : 0;
                 const importe = cantidad * precioUnitario;
                 
-                // ✅ CONSTRUIR CONCEPTO CON TIPOS CORRECTOS
                 const concepto = {
                     // ← STRINGS (mantenidos como texto)
                     ClaveProdServ: fila.querySelector('.claveProdServ').value.trim(),
@@ -590,7 +585,6 @@ function abrirModuloFacturacion() {
                     Descuento: descuento
                 };
                 
-                // ✅ AGREGAR IMPUESTOS CON TIPOS CORRECTOS
                 if (concepto.ObjetoImp === '02') {
                     const baseGravable = importe - descuento;
                     const ivaImporte = baseGravable * 0.16;
@@ -609,7 +603,6 @@ function abrirModuloFacturacion() {
                 conceptos.push(concepto);
             });
             
-            // ✅ CONSTRUIR DATOS PRINCIPALES CON TIPOS CORRECTOS
             const datosBasicos = {
                 Receptor: {
                     UID: document.getElementById('receptorUID').value.trim() // ← STRING
@@ -634,11 +627,9 @@ function abrirModuloFacturacion() {
             
             console.log('📋 Datos básicos recopilados:', datosBasicos);
             
-            // ✅ FORMATEAR DATOS PARA LA API
             return formatearDatosParaAPI(datosBasicos);
         }
         
-        // ✅ VALIDAR DATOS
         function validarDatos(datos) {
             console.log('🔍 Validando datos:', datos);
             
@@ -675,12 +666,11 @@ function abrirModuloFacturacion() {
             return true;
         }
         
-        // ✅ ENVIAR CFDI CON DATOS FORMATEADOS
         function enviarCFDI(datos) {
             if (isProcessing) return;
             isProcessing = true;
             
-            console.log('📤 Enviando CFDI con datos formateados:', datos);
+            console.log(' Enviando CFDI con datos formateados:', datos);
             
             document.getElementById('loading').style.display = 'block';
             document.getElementById('submitBtn').disabled = true;
@@ -693,19 +683,19 @@ function abrirModuloFacturacion() {
             if (window.parent && window.parent.pos_billing_ajax) {
                 ajaxUrl = window.parent.pos_billing_ajax.ajax_url || ajaxUrl;
                 nonce = window.parent.pos_billing_ajax.nonce || '';
-                console.log('📡 Usando configuración del parent:', { ajaxUrl, nonce: nonce.substring(0, 10) + '...' });
+                console.log(' Usando configuración del parent:', { ajaxUrl, nonce: nonce.substring(0, 10) + '...' });
             }
             
             // Método 2: Desde window.opener
             if (!nonce && window.opener && window.opener.pos_billing_ajax) {
                 ajaxUrl = window.opener.pos_billing_ajax.ajax_url || ajaxUrl;
                 nonce = window.opener.pos_billing_ajax.nonce || '';
-                console.log('📡 Usando configuración del opener:', { ajaxUrl, nonce: nonce.substring(0, 10) + '...' });
+                console.log(' Usando configuración del opener:', { ajaxUrl, nonce: nonce.substring(0, 10) + '...' });
             }
             
             // Método 3: Generar nonce usando WordPress REST API
             if (!nonce) {
-                console.log('⚠️ No se encontró nonce, intentando generar uno nuevo...');
+                console.log(' No se encontró nonce, intentando generar uno nuevo...');
                 
                 fetch('/wp-admin/admin-ajax.php', {
                     method: 'POST',
@@ -718,10 +708,10 @@ function abrirModuloFacturacion() {
                 .then(data => {
                     if (data.success && data.data.nonce) {
                         nonce = data.data.nonce;
-                        console.log('✅ Nonce obtenido del servidor');
+                        console.log(' Nonce obtenido del servidor');
                         enviarCFDIConNonce(datos, ajaxUrl, nonce);
                     } else {
-                        console.log('⚠️ No se pudo obtener nonce, intentando sin él...');
+                        console.log(' No se pudo obtener nonce, intentando sin él...');
                         enviarCFDIConNonce(datos, ajaxUrl, '');
                     }
                 })
@@ -736,8 +726,8 @@ function abrirModuloFacturacion() {
         }
         
         function enviarCFDIConNonce(datos, ajaxUrl, nonce) {
-            console.log('📤 Enviando CFDI con nonce:', nonce ? '✅ Presente' : '❌ Ausente');
-            console.log('📋 Datos finales que se envían a PHP:', JSON.stringify(datos, null, 2));
+            console.log(' Enviando CFDI con nonce:', nonce ? '✅ Presente' : '❌ Ausente');
+            console.log(' Datos finales que se envían a PHP:', JSON.stringify(datos, null, 2));
             
             const formData = new FormData();
             formData.append('action', 'pos_billing_create_cfdi');
@@ -759,7 +749,7 @@ function abrirModuloFacturacion() {
                     document.getElementById('result-container').className = 'result-container result-success';
                     document.getElementById('result-content').innerHTML = \`
                         <div style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #28a745;">
-                            ✅ CFDI Generado Exitosamente
+                             CFDI Generado Exitosamente
                         </div>
                         <div style="background: white; padding: 15px; border-radius: 5px;">
                             <p><strong>UUID:</strong> \${data.data.uuid || 'N/A'}</p>
@@ -767,7 +757,7 @@ function abrirModuloFacturacion() {
                             <p><strong>Total:</strong> $\${data.data.total || '0.00'}</p>
                         </div>
                         <div style="margin-top: 20px; text-align: center;">
-                            <button onclick="window.location.reload()" class="btn">📄 Nueva Factura</button>
+                            <button onclick="window.location.reload()" class="btn"> Nueva Factura</button>
                             <button onclick="window.close()" class="btn btn-cancel">❌ Cerrar</button>
                         </div>
                     \`;
@@ -804,10 +794,10 @@ function abrirModuloFacturacion() {
         
         // ✅ INICIALIZACIÓN
         window.addEventListener('load', function() {
-            console.log('🚀 Formulario cargado');
+            console.log(' Formulario cargado');
             
             // Debug de la configuración disponible
-            console.log('🔍 Configuración disponible:', {
+            console.log(' Configuración disponible:', {
                 parent_ajax: window.parent.pos_billing_ajax ? '✅ Disponible' : '❌ No disponible',
                 opener_ajax: window.opener && window.opener.pos_billing_ajax ? '✅ Disponible' : '❌ No disponible',
                 parent_nonce: window.parent.pos_billing_ajax?.nonce ? '✅ Presente' : '❌ Ausente',
@@ -817,7 +807,7 @@ function abrirModuloFacturacion() {
             // Cargar configuraciones de WordPress
             const wpSettings = window.parent.pos_billing_ajax?.settings?.defaults || 
                               window.opener?.pos_billing_ajax?.settings?.defaults || {};
-            console.log('⚙️ Configuraciones cargadas:', wpSettings);
+            console.log(' Configuraciones cargadas:', wpSettings);
             
             if (wpSettings.serie) document.getElementById('serie').value = wpSettings.serie;
             if (wpSettings.forma_pago) document.getElementById('formaPago').value = wpSettings.forma_pago;
@@ -844,12 +834,12 @@ function abrirModuloFacturacion() {
                 e.preventDefault();
                 
                 if (isProcessing) {
-                    alert('⏳ Ya se está procesando una solicitud...');
+                    alert(' Ya se está procesando una solicitud...');
                     return;
                 }
                 
                 const datos = recopilarDatos();
-                console.log('📋 Datos finales para envío:', datos);
+                console.log(' Datos finales para envío:', datos);
                 
                 if (validarDatos(datos)) {
                     enviarCFDI(datos);
@@ -859,10 +849,9 @@ function abrirModuloFacturacion() {
             // Calcular totales inicial
             setTimeout(calcularTotales, 100);
             
-            console.log('✅ Formulario configurado correctamente');
+            console.log(' Formulario configurado correctamente');
         });
         
-        // ✅ FUNCIÓN DE PRUEBA CON DATOS VÁLIDOS
         function llenarDatosPrueba() {
             const wpSettings = window.parent.pos_billing_ajax?.settings?.defaults || 
                               window.opener?.pos_billing_ajax?.settings?.defaults || {};
@@ -884,8 +873,8 @@ function abrirModuloFacturacion() {
             
             calcularTotales();
             
-            alert('✅ Datos de prueba cargados\\n\\n' +
-                  '⚠️ IMPORTANTE: Verifica en Factura.com:\\n\\n' +
+            alert(' Datos de prueba cargados\\n\\n' +
+                  ' IMPORTANTE: Verifica en Factura.com:\\n\\n' +
                   '1. Serie ID: ' + (wpSettings.serie || '1247') + '\\n' +
                   '2. Receptor UID: ' + (wpSettings.test_receptor_uid || '55c0fdc67593d') + '\\n' +
                   '3. Certificados SAT configurados\\n' +
@@ -897,7 +886,7 @@ function abrirModuloFacturacion() {
             if (window.location.hostname.includes('localhost') || window.location.hostname.includes('dev')) {
                 const pruebaBtn = document.createElement('button');
                 pruebaBtn.type = 'button';
-                pruebaBtn.textContent = '🧪 Datos Prueba';
+                pruebaBtn.textContent = ' Datos Prueba';
                 pruebaBtn.className = 'btn';
                 pruebaBtn.style.background = '#6f42c1';
                 pruebaBtn.onclick = llenarDatosPrueba;
