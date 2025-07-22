@@ -126,7 +126,7 @@ function abrirModuloFacturacion() {
 <body>
     <div class="container">
         <div class="header">
-            <h1>📄 Sistema de Facturación CFDI 4.0</h1>
+            <h1> Sistema de Facturación CFDI 4.0</h1>
             <p>Integración con Factura.com - Generar nueva factura</p>
         </div>
         
@@ -302,7 +302,7 @@ function abrirModuloFacturacion() {
             
             <!-- OPCIONES ADICIONALES -->
             <div class="section">
-                <h3>⚡ Opciones Adicionales</h3>
+                <h3>Opciones Adicionales</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label>

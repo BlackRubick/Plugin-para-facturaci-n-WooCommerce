@@ -236,36 +236,36 @@ add_action('admin_notices', function() {
         $can_use = current_user_can('edit_posts');
         
         echo '<div class="notice notice-success is-dismissible">';
-        echo '<h3>🎉 ¡POS Facturación activado correctamente!</h3>';
+        echo '<h3> ¡POS Facturación activado correctamente!</h3>';
         
-        echo '<p><strong>👤 Información del usuario:</strong></p>';
+        echo '<p><strong> Información del usuario:</strong></p>';
         echo '<ul>';
         echo '<li>Usuario: <strong>' . $current_user->display_name . '</strong></li>';
         echo '<li>Rol: <strong>' . implode(', ', $current_user->roles) . '</strong></li>';
-        echo '<li>Puede usar el plugin: ' . ($can_use ? '✅ Sí' : '❌ No') . '</li>';
-        echo '<li>Puede configurar API: ' . ($can_configure ? '✅ Sí' : '❌ No') . '</li>';
+        echo '<li>Puede usar el plugin: ' . ($can_use ? ' Sí' : ' No') . '</li>';
+        echo '<li>Puede configurar API: ' . ($can_configure ? 'Sí' : ' No') . '</li>';
         echo '</ul>';
         
         if ($can_use) {
             echo '<p><strong>Para comenzar a generar CFDIs:</strong></p>';
             echo '<ol>';
             if ($can_configure) {
-                echo '<li>📝 <a href="' . $settings_url . '">Configura tus credenciales de la API</a> de Factura.com</li>';
+                echo '<li> <a href="' . $settings_url . '">Configura tus credenciales de la API</a> de Factura.com</li>';
             } else {
-                echo '<li>📝 Solicita al administrador configurar las credenciales de la API</li>';
+                echo '<li> Solicita al administrador configurar las credenciales de la API</li>';
             }
-            echo '<li>📄 Usa el shortcode <code>[pos_billing_button]</code> en cualquier página o entrada</li>';
-            echo '<li>🚀 ¡Comienza a facturar!</li>';
+            echo '<li> Usa el shortcode <code>[pos_billing_button]</code> en cualquier página o entrada</li>';
+            echo '<li> ¡Comienza a facturar!</li>';
             echo '</ol>';
             
             if ($can_configure) {
-                echo '<p><a href="' . $settings_url . '" class="button button-primary">⚙️ Ir a Configuración</a></p>';
+                echo '<p><a href="' . $settings_url . '" class="button button-primary"> Ir a Configuración</a></p>';
             } else {
-                echo '<p><a href="' . admin_url('admin.php?page=pos-billing') . '" class="button button-primary">📄 Ver Panel</a></p>';
+                echo '<p><a href="' . admin_url('admin.php?page=pos-billing') . '" class="button button-primary"> Ver Panel</a></p>';
             }
         } else {
             echo '<div class="notice notice-warning inline">';
-            echo '<p><strong>⚠️ Permisos insuficientes:</strong> Tu rol actual no permite usar este plugin. Contacta al administrador para obtener permisos de "Editor" o superiores.</p>';
+            echo '<p><strong> Permisos insuficientes:</strong> Tu rol actual no permite usar este plugin. Contacta al administrador para obtener permisos de "Editor" o superiores.</p>';
             echo '</div>';
         }
         
@@ -293,11 +293,11 @@ add_action('admin_notices', function() {
         if ($can_configure) {
             $settings_url = admin_url('admin.php?page=pos-billing-settings');
             echo '<div class="notice notice-warning">';
-            echo '<p><strong>⚠️ Configuración pendiente:</strong> Para usar el plugin de facturación, necesitas <a href="' . $settings_url . '">configurar tus credenciales de la API</a> de Factura.com.</p>';
+            echo '<p><strong> Configuración pendiente:</strong> Para usar el plugin de facturación, necesitas <a href="' . $settings_url . '">configurar tus credenciales de la API</a> de Factura.com.</p>';
             echo '</div>';
         } else {
             echo '<div class="notice notice-info">';
-            echo '<p><strong>ℹ️ Configuración pendiente:</strong> El administrador debe configurar las credenciales de la API de Factura.com para usar el plugin.</p>';
+            echo '<p><strong> Configuración pendiente:</strong> El administrador debe configurar las credenciales de la API de Factura.com para usar el plugin.</p>';
             echo '</div>';
         }
     }
@@ -332,12 +332,12 @@ add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($links) 
     $new_links = array();
     
     if (current_user_can('edit_posts')) {
-        $new_links[] = '<a href="' . admin_url('admin.php?page=pos-billing') . '">📄 Panel</a>';
-        $new_links[] = '<a href="' . admin_url('admin.php?page=pos-billing-invoices') . '">📋 Facturas</a>';
+        $new_links[] = '<a href="' . admin_url('admin.php?page=pos-billing') . '"> Panel</a>';
+        $new_links[] = '<a href="' . admin_url('admin.php?page=pos-billing-invoices') . '"> Facturas</a>';
     }
     
     if (current_user_can('manage_options')) {
-        $new_links[] = '<a href="' . admin_url('admin.php?page=pos-billing-settings') . '">⚙️ Configuración</a>';
+        $new_links[] = '<a href="' . admin_url('admin.php?page=pos-billing-settings') . '"> Configuración</a>';
     }
     
     return array_merge($new_links, $links);
@@ -369,7 +369,7 @@ add_filter('admin_footer_text', function($text) {
             $user_info = ' | Usuario: ' . wp_get_current_user()->display_name;
             $user_info .= ' (' . implode(', ', wp_get_current_user()->roles) . ')';
         }
-        return 'POS Facturación v' . POS_BILLING_VERSION . ' | Desarrollado por <strong>BlackRubick</strong> 🚀 | <a href="https://factura.com" target="_blank">Powered by Factura.com</a>' . $user_info;
+        return 'POS Facturación v' . POS_BILLING_VERSION . ' | Desarrollado por <strong>BlackRubick</strong>  | <a href="https://factura.com" target="_blank">Powered by Factura.com</a>' . $user_info;
     }
     return $text;
 });
@@ -379,7 +379,7 @@ add_action('wp_dashboard_setup', function() {
     if (current_user_can('edit_posts') && class_exists('POS_Billing_Database')) {
         wp_add_dashboard_widget(
             'pos_billing_dashboard_widget',
-            '📄 POS Facturación - Resumen',
+            ' POS Facturación - Resumen',
             'pos_billing_dashboard_widget_content'
         );
     }
@@ -395,8 +395,8 @@ function pos_billing_dashboard_widget_content() {
         echo '<div style="background: #f0f8ff; padding: 10px; border-radius: 5px; margin-bottom: 15px;">';
         echo '<strong>👤 Usuario:</strong> ' . $current_user->display_name . '<br>';
         echo '<strong>🎭 Rol:</strong> ' . implode(', ', $current_user->roles) . '<br>';
-        echo '<strong>🔑 Permisos:</strong> ' . (current_user_can('edit_posts') ? '✅ Puede facturar' : '❌ Sin permisos') . '<br>';
-        echo '<strong>⚙️ Configuración:</strong> ' . ($can_configure ? '✅ Puede configurar' : '❌ Solo lectura');
+        echo '<strong>🔑 Permisos:</strong> ' . (current_user_can('edit_posts') ? ' Puede facturar' : '❌ Sin permisos') . '<br>';
+        echo '<strong>⚙️ Configuración:</strong> ' . ($can_configure ? ' Puede configurar' : ' Solo lectura');
         echo '</div>';
         
         echo '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">';
@@ -407,19 +407,19 @@ function pos_billing_dashboard_widget_content() {
         if (!$api_configured) {
             echo '<div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
             if ($can_configure) {
-                echo '<strong>⚠️ Configuración pendiente:</strong> <a href="' . admin_url('admin.php?page=pos-billing-settings') . '">Configura tu API</a>';
+                echo '<strong> Configuración pendiente:</strong> <a href="' . admin_url('admin.php?page=pos-billing-settings') . '">Configura tu API</a>';
             } else {
-                echo '<strong>⚠️ Configuración pendiente:</strong> Solicita al administrador configurar la API';
+                echo '<strong> Configuración pendiente:</strong> Solicita al administrador configurar la API';
             }
             echo '</div>';
         }
         
         echo '<div style="text-align: center;">';
-        echo '<a href="' . admin_url('admin.php?page=pos-billing-invoices') . '" class="button">📄 Ver Facturas</a> ';
+        echo '<a href="' . admin_url('admin.php?page=pos-billing-invoices') . '" class="button"> Ver Facturas</a> ';
         if ($can_configure) {
-            echo '<a href="' . admin_url('admin.php?page=pos-billing-settings') . '" class="button">⚙️ Configuración</a>';
+            echo '<a href="' . admin_url('admin.php?page=pos-billing-settings') . '" class="button"> Configuración</a>';
         } else {
-            echo '<a href="' . admin_url('admin.php?page=pos-billing') . '" class="button">📋 Panel</a>';
+            echo '<a href="' . admin_url('admin.php?page=pos-billing') . '" class="button"> Panel</a>';
         }
         echo '</div>';
     } catch (Exception $e) {
