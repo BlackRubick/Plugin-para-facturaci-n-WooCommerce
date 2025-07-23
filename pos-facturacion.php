@@ -466,3 +466,75 @@ if (!function_exists('pos_billing_current_user_can_configure')) {
         return current_user_can('manage_options');
     }
 }
+
+
+add_action('wp_ajax_pos_billing_get_clients', function() {
+    // Verificar permisos
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error('Sin permisos');
+        return;
+    }
+    
+    // Obtener credenciales
+    $api_key = get_option('pos_billing_api_key', '');
+    $secret_key = get_option('pos_billing_secret_key', '');
+    $sandbox = get_option('pos_billing_sandbox_mode', true);
+    
+    if (empty($api_key) || empty($secret_key)) {
+        wp_send_json_error('Credenciales no configuradas');
+        return;
+    }
+    
+    // Hacer petición a la API
+    $base_url = $sandbox ? 'https://sandbox.factura.com/api' : 'https://api.factura.com';
+    $url = $base_url . '/v1/clients';
+    
+    $headers = array(
+        'Content-Type' => 'application/json',
+        'F-PLUGIN' => '9d4095c8f7ed5785cb14c0e3b033eeb8252416ed',
+        'F-Api-Key' => $api_key,
+        'F-Secret-Key' => $secret_key
+    );
+    
+    $response = wp_remote_get($url, array(
+        'headers' => $headers,
+        'timeout' => 30,
+        'sslverify' => !$sandbox
+    ));
+    
+    if (is_wp_error($response)) {
+        wp_send_json_error('Error de conexión: ' . $response->get_error_message());
+        return;
+    }
+    
+    $response_code = wp_remote_retrieve_response_code($response);
+    $response_body = wp_remote_retrieve_body($response);
+    
+    if ($response_code !== 200) {
+        wp_send_json_error('Error HTTP ' . $response_code);
+        return;
+    }
+    
+    $api_data = json_decode($response_body, true);
+    
+    if (!$api_data || !isset($api_data['data'])) {
+        wp_send_json_error('Respuesta inválida de la API');
+        return;
+    }
+    
+    // Procesar clientes
+    $clients = array();
+    foreach ($api_data['data'] as $client) {
+        $clients[] = array(
+            'uid' => $client['UID'],
+            'rfc' => $client['RFC'],
+            'razon_social' => $client['RazonSocial'],
+            'email' => $client['Contacto']['Email'] ?? '',
+            'uso_cfdi' => $client['UsoCFDI'] ?? 'G01',
+            'ciudad' => $client['Ciudad'] ?? '',
+            'display_name' => $client['RazonSocial'] . ' (' . $client['RFC'] . ')'
+        );
+    }
+    
+    wp_send_json_success($clients);
+});

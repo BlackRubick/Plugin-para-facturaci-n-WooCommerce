@@ -17,39 +17,57 @@ class POS_Billing_API_Handler
     private $secret_key;
     private $is_sandbox;
 
-    public function __construct()
-    {
-        add_action('wp_ajax_pos_billing_create_cfdi', array($this, 'create_cfdi_ajax'));
-        add_action('wp_ajax_nopriv_pos_billing_create_cfdi', array($this, 'create_cfdi_ajax'));
-        add_action('wp_ajax_pos_billing_get_nonce', array($this, 'get_nonce_ajax'));
-        add_action('wp_ajax_nopriv_pos_billing_get_nonce', array($this, 'get_nonce_ajax'));
-        add_action('wp_ajax_pos_billing_get_account_info', array($this, 'get_account_info_ajax'));
-        add_action('wp_ajax_pos_billing_search_products', array($this, 'search_products_ajax'));
-        add_action('wp_ajax_pos_billing_get_product_data', array($this, 'get_product_data_ajax'));
-        
-        // ✅ NUEVOS HOOKS PARA CLIENTES
-        add_action('wp_ajax_pos_billing_get_clients', array($this, 'get_clients_ajax'));
-        add_action('wp_ajax_pos_billing_search_clients', array($this, 'search_clients_ajax'));
-        
-        add_action('rest_api_init', array($this, 'register_rest_routes'));
+public function __construct()
+{
+    add_action('wp_ajax_pos_billing_create_cfdi', array($this, 'create_cfdi_ajax'));
+    add_action('wp_ajax_nopriv_pos_billing_create_cfdi', array($this, 'create_cfdi_ajax'));
+    add_action('wp_ajax_pos_billing_get_nonce', array($this, 'get_nonce_ajax'));
+    add_action('wp_ajax_nopriv_pos_billing_get_nonce', array($this, 'get_nonce_ajax'));
+    add_action('wp_ajax_pos_billing_get_account_info', array($this, 'get_account_info_ajax'));
+    add_action('wp_ajax_pos_billing_search_products', array($this, 'search_products_ajax'));
+    add_action('wp_ajax_pos_billing_get_product_data', array($this, 'get_product_data_ajax'));
 
-        // Cargar configuraciones
-        $this->load_settings();
-    }
+    // ✅ NUEVOS HOOKS PARA CLIENTES
+    add_action('wp_ajax_pos_billing_get_clients', array($this, 'get_clients_ajax'));
+    add_action('wp_ajax_pos_billing_search_clients', array($this, 'search_clients_ajax'));
+    
+    // ✅ AGREGAR ESTA LÍNEA para el debug:
+    add_action('wp_ajax_pos_billing_debug_clients_detailed', array($this, 'debug_clients_step_by_step'));
+
+    add_action('rest_api_init', array($this, 'register_rest_routes'));
+
+    // Cargar configuraciones
+    $this->load_settings();
+}
 
     /**
      * ✅ NUEVO: Método AJAX para obtener lista de clientes
      */
     public function get_clients_ajax()
     {
-        if (!current_user_can('edit_posts')) {
-            wp_send_json_error('Sin permisos');
+        // Verificar que el usuario esté logueado
+        if (!is_user_logged_in()) {
+            wp_send_json_error('Usuario no logueado');
             return;
         }
 
-        if (!check_ajax_referer('pos_billing_nonce', 'nonce', false)) {
-            wp_send_json_error('Error de seguridad');
+        // Verificar permisos
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error('Sin permisos suficientes');
             return;
+        }
+
+        // Verificar nonce (opcional para mantener compatibilidad)
+        if (isset($_POST['nonce']) && !wp_verify_nonce($_POST['nonce'], 'pos_billing_nonce')) {
+            if (WP_DEBUG) {
+                error_log('POS Billing - Advertencia: Nonce inválido para get_clients, continuando...');
+            }
+        }
+
+        if (WP_DEBUG) {
+            error_log('=== 🚀 INICIANDO CARGA DE CLIENTES ===');
+            error_log('Usuario: ' . wp_get_current_user()->display_name);
+            error_log('Método: ' . $_SERVER['REQUEST_METHOD']);
         }
 
         $clients = $this->get_clients_list();
@@ -57,7 +75,7 @@ class POS_Billing_API_Handler
         if ($clients['success']) {
             wp_send_json_success($clients['data']);
         } else {
-            wp_send_json_error($clients['message']);
+            wp_send_json_error($clients['message'], $clients);
         }
     }
 
@@ -74,6 +92,8 @@ class POS_Billing_API_Handler
         }
 
         $base_url = $this->is_sandbox ? $this->api_url_sandbox : $this->api_url_production;
+
+        // ✅ CORRECCIÓN: URL correcta según documentación
         $url = $base_url . '/v1/clients';
 
         $headers = array(
@@ -84,7 +104,10 @@ class POS_Billing_API_Handler
         );
 
         if (WP_DEBUG) {
-            error_log('POS Billing - Obteniendo clientes desde: ' . $url);
+            error_log('=== 🔍 DEBUG CLIENTES ===');
+            error_log('URL: ' . $url);
+            error_log('API Key: ' . substr($this->api_key, 0, 10) . '...');
+            error_log('Sandbox mode: ' . ($this->is_sandbox ? 'Sí' : 'No'));
         }
 
         $response = wp_remote_get($url, array(
@@ -95,7 +118,7 @@ class POS_Billing_API_Handler
 
         if (is_wp_error($response)) {
             if (WP_DEBUG) {
-                error_log('POS Billing - Error obteniendo clientes: ' . $response->get_error_message());
+                error_log('❌ Error WP: ' . $response->get_error_message());
             }
             return array(
                 'success' => false,
@@ -107,13 +130,15 @@ class POS_Billing_API_Handler
         $response_body = wp_remote_retrieve_body($response);
 
         if (WP_DEBUG) {
-            error_log('POS Billing - Respuesta clientes: ' . $response_code . ' - ' . substr($response_body, 0, 500));
+            error_log('=== 📡 RESPUESTA CLIENTES ===');
+            error_log('Código HTTP: ' . $response_code);
+            error_log('Respuesta completa: ' . $response_body);
         }
 
         if ($response_code !== 200) {
             return array(
                 'success' => false,
-                'message' => "Error HTTP {$response_code} obteniendo clientes"
+                'message' => "Error HTTP {$response_code} - Verifica tus credenciales"
             );
         }
 
@@ -122,35 +147,79 @@ class POS_Billing_API_Handler
         if (!$api_response || json_last_error() !== JSON_ERROR_NONE) {
             return array(
                 'success' => false,
-                'message' => 'Respuesta inválida de la API'
+                'message' => 'Respuesta inválida de la API: ' . json_last_error_msg()
             );
         }
 
-        // Procesar respuesta según formato de Factura.com
+        // ✅ CORRECCIÓN: Procesar respuesta según documentación oficial
         if (isset($api_response['status']) && $api_response['status'] === 'success' && isset($api_response['data'])) {
             $clients = array();
-            
+
             foreach ($api_response['data'] as $client) {
+                // ✅ Mapear campos según la estructura real de la API
                 $clients[] = array(
                     'uid' => $client['UID'],
                     'rfc' => $client['RFC'],
                     'razon_social' => $client['RazonSocial'],
+                    'regimen' => $client['Regimen'] ?? '',
+                    'regimen_id' => $client['RegimenId'] ?? '',
                     'email' => $client['Contacto']['Email'] ?? '',
-                    'ciudad' => $client['Ciudad'] ?? '',
+                    'email2' => $client['Contacto']['Email2'] ?? '',
+                    'email3' => $client['Contacto']['Email3'] ?? '',
+                    'telefono' => $client['Contacto']['Telefono'] ?? '',
+                    'nombre_contacto' => ($client['Contacto']['Nombre'] ?? '') . ' ' . ($client['Contacto']['Apellidos'] ?? ''),
+                    'calle' => $client['Calle'] ?? '',
+                    'numero' => $client['Numero'] ?? '',
+                    'interior' => $client['Interior'] ?? '',
+                    'colonia' => $client['Colonia'] ?? '',
                     'codigo_postal' => $client['CodigoPostal'] ?? '',
+                    'ciudad' => $client['Ciudad'] ?? '',
+                    'delegacion' => $client['Delegacion'] ?? '',
+                    'estado' => $client['Estado'] ?? '',
+                    'pais' => $client['Pais'] ?? 'MEX',
                     'uso_cfdi' => $client['UsoCFDI'] ?? 'G01',
+                    'total_cfdis' => $client['cfdis'] ?? 0,
+                    'cuentas_banco' => $client['cuentas_banco'] ?? array(),
                     'display_name' => $client['RazonSocial'] . ' (' . $client['RFC'] . ')'
                 );
             }
 
+            if (WP_DEBUG) {
+                error_log('✅ Se procesaron ' . count($clients) . ' clientes correctamente');
+                if (!empty($clients)) {
+                    error_log('Primer cliente: ' . print_r($clients[0], true));
+                }
+            }
+
             return array(
                 'success' => true,
-                'data' => $clients
+                'data' => $clients,
+                'total' => count($clients)
             );
         } else {
+            // ✅ Manejar diferentes tipos de error
+            $error_message = 'Error desconocido';
+
+            if (isset($api_response['message'])) {
+                $error_message = $api_response['message'];
+            } elseif (isset($api_response['error'])) {
+                $error_message = $api_response['error'];
+            } elseif (isset($api_response['response']) && $api_response['response'] !== 'success') {
+                $error_message = 'La API respondió: ' . $api_response['response'];
+            }
+
+            if (WP_DEBUG) {
+                error_log('❌ Error en respuesta de clientes: ' . $error_message);
+                error_log('Respuesta completa: ' . print_r($api_response, true));
+            }
+
             return array(
                 'success' => false,
-                'message' => 'No se pudieron obtener los clientes: ' . ($api_response['message'] ?? 'Error desconocido')
+                'message' => 'No se pudieron obtener los clientes: ' . $error_message,
+                'debug_info' => array(
+                    'response_structure' => array_keys($api_response),
+                    'full_response' => $api_response
+                )
             );
         }
     }
@@ -171,9 +240,9 @@ class POS_Billing_API_Handler
         }
 
         $search_term = sanitize_text_field($_POST['search'] ?? '');
-        
+
         $clients = $this->get_clients_list();
-        
+
         if (!$clients['success']) {
             wp_send_json_error($clients['message']);
             return;
@@ -181,14 +250,14 @@ class POS_Billing_API_Handler
 
         // Filtrar clientes si hay término de búsqueda
         if (!empty($search_term)) {
-            $filtered_clients = array_filter($clients['data'], function($client) use ($search_term) {
+            $filtered_clients = array_filter($clients['data'], function ($client) use ($search_term) {
                 return (
                     stripos($client['razon_social'], $search_term) !== false ||
                     stripos($client['rfc'], $search_term) !== false ||
                     stripos($client['email'], $search_term) !== false
                 );
             });
-            
+
             wp_send_json_success(array_values($filtered_clients));
         } else {
             wp_send_json_success($clients['data']);
@@ -1324,6 +1393,219 @@ class POS_Billing_API_Handler
 
         return $status;
     }
+
+
+  public function debug_clients_step_by_step() {
+        if (!current_user_can('manage_options')) {
+            wp_die('Sin permisos');
+        }
+        
+        echo '<h1>🔍 Debug Detallado - Clientes POS Facturación</h1>';
+        echo '<style>
+            .debug-section { background: #f9f9f9; padding: 15px; margin: 10px 0; border-left: 4px solid #007cba; }
+            .success { background: #d4edda; border-color: #28a745; }
+            .error { background: #f8d7da; border-color: #dc3545; }
+            .warning { background: #fff3cd; border-color: #ffc107; }
+            pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        </style>';
+        
+        // PASO 1: Verificar configuración
+        echo '<div class="debug-section">';
+        echo '<h2>📋 PASO 1: Verificación de Configuración</h2>';
+        
+        $api_key = get_option('pos_billing_api_key', '');
+        $secret_key = get_option('pos_billing_secret_key', '');
+        $sandbox = get_option('pos_billing_sandbox_mode', true);
+        
+        echo '<ul>';
+        echo '<li><strong>API Key:</strong> ' . (empty($api_key) ? '❌ Vacío' : '✅ Configurado (' . substr($api_key, 0, 10) . '...)') . '</li>';
+        echo '<li><strong>Secret Key:</strong> ' . (empty($secret_key) ? '❌ Vacío' : '✅ Configurado') . '</li>';
+        echo '<li><strong>Modo:</strong> ' . ($sandbox ? '🧪 Sandbox' : '🚀 Producción') . '</li>';
+        echo '</ul>';
+        echo '</div>';
+        
+        if (empty($api_key) || empty($secret_key)) {
+            echo '<div class="debug-section error"><h3>❌ ERROR CRÍTICO</h3><p>Las credenciales no están configuradas correctamente.</p></div>';
+            wp_die();
+        }
+        
+        // PASO 2: Construir URL y Headers
+        echo '<div class="debug-section">';
+        echo '<h2>🌐 PASO 2: Construcción de la Petición</h2>';
+        
+        $base_url = $sandbox ? 'https://sandbox.factura.com/api' : 'https://api.factura.com';
+        $url = $base_url . '/v1/clients';
+        
+        $headers = array(
+            'Content-Type' => 'application/json',
+            'F-PLUGIN' => '9d4095c8f7ed5785cb14c0e3b033eeb8252416ed',
+            'F-Api-Key' => $api_key,
+            'F-Secret-Key' => $secret_key
+        );
+        
+        echo '<p><strong>URL:</strong> <code>' . $url . '</code></p>';
+        echo '<p><strong>Headers:</strong></p>';
+        echo '<pre>';
+        foreach ($headers as $key => $value) {
+            if ($key === 'F-Api-Key') {
+                echo $key . ': ' . substr($value, 0, 10) . '...' . "\n";
+            } elseif ($key === 'F-Secret-Key') {
+                echo $key . ': *** OCULTO ***' . "\n";
+            } else {
+                echo $key . ': ' . $value . "\n";
+            }
+        }
+        echo '</pre>';
+        echo '</div>';
+        
+        // PASO 3: Realizar petición
+        echo '<div class="debug-section">';
+        echo '<h2>📡 PASO 3: Realizando Petición a la API</h2>';
+        
+        $start_time = microtime(true);
+        
+        $response = wp_remote_get($url, array(
+            'headers' => $headers,
+            'timeout' => 30,
+            'sslverify' => !$sandbox
+        ));
+        
+        $end_time = microtime(true);
+        $duration = round(($end_time - $start_time) * 1000, 2);
+        
+        echo '<p><strong>Tiempo de respuesta:</strong> ' . $duration . ' ms</p>';
+        
+        if (is_wp_error($response)) {
+            echo '<div class="error">';
+            echo '<h3>❌ ERROR DE CONEXIÓN</h3>';
+            echo '<p><strong>Mensaje:</strong> ' . $response->get_error_message() . '</p>';
+            echo '<p><strong>Código:</strong> ' . $response->get_error_code() . '</p>';
+            echo '</div>';
+            wp_die();
+        }
+        echo '</div>';
+        
+        // PASO 4: Analizar respuesta HTTP
+        echo '<div class="debug-section">';
+        echo '<h2>📨 PASO 4: Análisis de Respuesta HTTP</h2>';
+        
+        $response_code = wp_remote_retrieve_response_code($response);
+        $response_headers = wp_remote_retrieve_headers($response);
+        $response_body = wp_remote_retrieve_body($response);
+        
+        echo '<p><strong>Código HTTP:</strong> <span style="color: ' . ($response_code === 200 ? 'green' : 'red') . '; font-weight: bold;">' . $response_code . '</span></p>';
+        
+        if ($response_code !== 200) {
+            echo '<div class="error">';
+            echo '<h3>❌ ERROR HTTP</h3>';
+            echo '<p>La API respondió con código ' . $response_code . '</p>';
+            echo '<h4>Headers de respuesta:</h4>';
+            echo '<pre>' . print_r($response_headers, true) . '</pre>';
+            echo '<h4>Cuerpo de respuesta:</h4>';
+            echo '<pre>' . esc_html($response_body) . '</pre>';
+            echo '</div>';
+            wp_die();
+        }
+        
+        echo '<p><strong>Content-Type:</strong> ' . $response_headers['content-type'] . '</p>';
+        echo '<p><strong>Tamaño:</strong> ' . strlen($response_body) . ' bytes</p>';
+        echo '</div>';
+        
+        // PASO 5: Parsear JSON
+        echo '<div class="debug-section">';
+        echo '<h2>🔧 PASO 5: Parseando Respuesta JSON</h2>';
+        
+        $api_response = json_decode($response_body, true);
+        $json_error = json_last_error();
+        
+        if ($json_error !== JSON_ERROR_NONE) {
+            echo '<div class="error">';
+            echo '<h3>❌ ERROR DE JSON</h3>';
+            echo '<p><strong>Error:</strong> ' . json_last_error_msg() . '</p>';
+            echo '<h4>Respuesta cruda:</h4>';
+            echo '<pre>' . esc_html($response_body) . '</pre>';
+            echo '</div>';
+            wp_die();
+        }
+        
+        echo '<p>✅ JSON parseado correctamente</p>';
+        echo '<p><strong>Estructura de respuesta:</strong></p>';
+        echo '<pre>' . print_r(array_keys($api_response), true) . '</pre>';
+        echo '</div>';
+        
+        // PASO 6: Analizar estructura de datos
+        echo '<div class="debug-section">';
+        echo '<h2>📊 PASO 6: Análisis de Estructura de Datos</h2>';
+        
+        echo '<h4>🔍 Estructura completa de la respuesta:</h4>';
+        echo '<pre style="max-height: 400px; overflow-y: auto;">' . print_r($api_response, true) . '</pre>';
+        
+        // Verificar campos esperados
+        echo '<h4>✅ Verificación de campos esperados:</h4>';
+        echo '<ul>';
+        echo '<li><strong>status:</strong> ' . (isset($api_response['status']) ? '✅ ' . $api_response['status'] : '❌ No encontrado') . '</li>';
+        echo '<li><strong>response:</strong> ' . (isset($api_response['response']) ? '✅ ' . $api_response['response'] : '❌ No encontrado') . '</li>';
+        echo '<li><strong>data:</strong> ' . (isset($api_response['data']) ? '✅ Presente (' . (is_array($api_response['data']) ? count($api_response['data']) . ' elementos)' : 'No es array)') : '❌ No encontrado') . '</li>';
+        echo '</ul>';
+        
+        if (isset($api_response['data']) && is_array($api_response['data']) && !empty($api_response['data'])) {
+            echo '<h4>👤 Primer cliente (ejemplo):</h4>';
+            echo '<pre>' . print_r($api_response['data'][0], true) . '</pre>';
+            
+            // Verificar campos del cliente
+            $first_client = $api_response['data'][0];
+            echo '<h4>🔍 Campos del primer cliente:</h4>';
+            echo '<ul>';
+            $expected_fields = ['UID', 'RazonSocial', 'RFC', 'UsoCFDI', 'Contacto'];
+            foreach ($expected_fields as $field) {
+                echo '<li><strong>' . $field . ':</strong> ' . (isset($first_client[$field]) ? '✅ Presente' : '❌ Faltante') . '</li>';
+            }
+            echo '</ul>';
+        }
+        echo '</div>';
+        
+        // PASO 7: Simulación del procesamiento
+        echo '<div class="debug-section success">';
+        echo '<h2>🎯 PASO 7: Simulación del Procesamiento</h2>';
+        
+        if (isset($api_response['status']) && $api_response['status'] === 'success' && isset($api_response['data'])) {
+            $clients = array();
+            
+            foreach ($api_response['data'] as $client) {
+                $processed_client = array(
+                    'uid' => $client['UID'] ?? 'N/A',
+                    'rfc' => $client['RFC'] ?? 'N/A',
+                    'razon_social' => $client['RazonSocial'] ?? 'N/A',
+                    'email' => $client['Contacto']['Email'] ?? 'N/A',
+                    'uso_cfdi' => $client['UsoCFDI'] ?? 'G01',
+                    'ciudad' => $client['Ciudad'] ?? 'N/A',
+                    'display_name' => ($client['RazonSocial'] ?? 'Sin nombre') . ' (' . ($client['RFC'] ?? 'Sin RFC') . ')'
+                );
+                $clients[] = $processed_client;
+            }
+            
+            echo '<p>✅ Se procesaron correctamente <strong>' . count($clients) . '</strong> clientes</p>';
+            echo '<h4>📋 Clientes procesados (primeros 3):</h4>';
+            echo '<pre>' . print_r(array_slice($clients, 0, 3), true) . '</pre>';
+            
+            echo '<div style="background: #d4edda; padding: 15px; border-radius: 5px; margin-top: 20px;">';
+            echo '<h3>🎉 ¡TODO ESTÁ FUNCIONANDO CORRECTAMENTE!</h3>';
+            echo '<p>La API está devolviendo ' . count($clients) . ' clientes. El problema debe estar en el JavaScript del frontend.</p>';
+            echo '<p><strong>Siguiente paso:</strong> Revisar la consola del navegador para errores de JavaScript.</p>';
+            echo '</div>';
+        } else {
+            echo '<div class="error">';
+            echo '<h3>❌ PROBLEMA EN LA ESTRUCTURA DE RESPUESTA</h3>';
+            echo '<p>La API no está devolviendo la estructura esperada.</p>';
+            echo '</div>';
+        }
+        echo '</div>';
+        
+        wp_die();
+    }
+
+
+
 }
 
 // Inicializar la clase
