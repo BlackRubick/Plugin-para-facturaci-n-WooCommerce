@@ -26,10 +26,173 @@ class POS_Billing_API_Handler
         add_action('wp_ajax_pos_billing_get_account_info', array($this, 'get_account_info_ajax'));
         add_action('wp_ajax_pos_billing_search_products', array($this, 'search_products_ajax'));
         add_action('wp_ajax_pos_billing_get_product_data', array($this, 'get_product_data_ajax'));
+        
+        // ✅ NUEVOS HOOKS PARA CLIENTES
+        add_action('wp_ajax_pos_billing_get_clients', array($this, 'get_clients_ajax'));
+        add_action('wp_ajax_pos_billing_search_clients', array($this, 'search_clients_ajax'));
+        
         add_action('rest_api_init', array($this, 'register_rest_routes'));
 
         // Cargar configuraciones
         $this->load_settings();
+    }
+
+    /**
+     * ✅ NUEVO: Método AJAX para obtener lista de clientes
+     */
+    public function get_clients_ajax()
+    {
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error('Sin permisos');
+            return;
+        }
+
+        if (!check_ajax_referer('pos_billing_nonce', 'nonce', false)) {
+            wp_send_json_error('Error de seguridad');
+            return;
+        }
+
+        $clients = $this->get_clients_list();
+
+        if ($clients['success']) {
+            wp_send_json_success($clients['data']);
+        } else {
+            wp_send_json_error($clients['message']);
+        }
+    }
+
+    /**
+     * ✅ NUEVO: Obtener lista de clientes desde la API de Factura.com
+     */
+    private function get_clients_list()
+    {
+        if (empty($this->api_key) || empty($this->secret_key)) {
+            return array(
+                'success' => false,
+                'message' => 'Credenciales no configuradas'
+            );
+        }
+
+        $base_url = $this->is_sandbox ? $this->api_url_sandbox : $this->api_url_production;
+        $url = $base_url . '/v1/clients';
+
+        $headers = array(
+            'Content-Type' => 'application/json',
+            'F-PLUGIN' => '9d4095c8f7ed5785cb14c0e3b033eeb8252416ed',
+            'F-Api-Key' => $this->api_key,
+            'F-Secret-Key' => $this->secret_key
+        );
+
+        if (WP_DEBUG) {
+            error_log('POS Billing - Obteniendo clientes desde: ' . $url);
+        }
+
+        $response = wp_remote_get($url, array(
+            'headers' => $headers,
+            'timeout' => 30,
+            'sslverify' => !$this->is_sandbox
+        ));
+
+        if (is_wp_error($response)) {
+            if (WP_DEBUG) {
+                error_log('POS Billing - Error obteniendo clientes: ' . $response->get_error_message());
+            }
+            return array(
+                'success' => false,
+                'message' => 'Error de conexión: ' . $response->get_error_message()
+            );
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        $response_body = wp_remote_retrieve_body($response);
+
+        if (WP_DEBUG) {
+            error_log('POS Billing - Respuesta clientes: ' . $response_code . ' - ' . substr($response_body, 0, 500));
+        }
+
+        if ($response_code !== 200) {
+            return array(
+                'success' => false,
+                'message' => "Error HTTP {$response_code} obteniendo clientes"
+            );
+        }
+
+        $api_response = json_decode($response_body, true);
+
+        if (!$api_response || json_last_error() !== JSON_ERROR_NONE) {
+            return array(
+                'success' => false,
+                'message' => 'Respuesta inválida de la API'
+            );
+        }
+
+        // Procesar respuesta según formato de Factura.com
+        if (isset($api_response['status']) && $api_response['status'] === 'success' && isset($api_response['data'])) {
+            $clients = array();
+            
+            foreach ($api_response['data'] as $client) {
+                $clients[] = array(
+                    'uid' => $client['UID'],
+                    'rfc' => $client['RFC'],
+                    'razon_social' => $client['RazonSocial'],
+                    'email' => $client['Contacto']['Email'] ?? '',
+                    'ciudad' => $client['Ciudad'] ?? '',
+                    'codigo_postal' => $client['CodigoPostal'] ?? '',
+                    'uso_cfdi' => $client['UsoCFDI'] ?? 'G01',
+                    'display_name' => $client['RazonSocial'] . ' (' . $client['RFC'] . ')'
+                );
+            }
+
+            return array(
+                'success' => true,
+                'data' => $clients
+            );
+        } else {
+            return array(
+                'success' => false,
+                'message' => 'No se pudieron obtener los clientes: ' . ($api_response['message'] ?? 'Error desconocido')
+            );
+        }
+    }
+
+    /**
+     * ✅ NUEVO: Buscar clientes por término de búsqueda
+     */
+    public function search_clients_ajax()
+    {
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error('Sin permisos');
+            return;
+        }
+
+        if (!check_ajax_referer('pos_billing_nonce', 'nonce', false)) {
+            wp_send_json_error('Error de seguridad');
+            return;
+        }
+
+        $search_term = sanitize_text_field($_POST['search'] ?? '');
+        
+        $clients = $this->get_clients_list();
+        
+        if (!$clients['success']) {
+            wp_send_json_error($clients['message']);
+            return;
+        }
+
+        // Filtrar clientes si hay término de búsqueda
+        if (!empty($search_term)) {
+            $filtered_clients = array_filter($clients['data'], function($client) use ($search_term) {
+                return (
+                    stripos($client['razon_social'], $search_term) !== false ||
+                    stripos($client['rfc'], $search_term) !== false ||
+                    stripos($client['email'], $search_term) !== false
+                );
+            });
+            
+            wp_send_json_success(array_values($filtered_clients));
+        } else {
+            wp_send_json_success($clients['data']);
+        }
     }
 
     /**
@@ -795,15 +958,6 @@ class POS_Billing_API_Handler
     }
 
     /**
-     * Formatear datos del CFDI según el formato esperado por Factura.com - CORREGIDO CON FORMATO SAT
-     */
-    /**
-     * Formatear datos del CFDI según el formato esperado por Factura.com - TIPOS CORRECTOS
-     */
-    /**
-     * Formatear datos del CFDI según el formato esperado por Factura.com - SIN MODIFICAR STRINGS
-     */
-    /**
      * Formatear datos del CFDI - FORZAR TIPOS FINALES
      */
     private function format_cfdi_data($data)
@@ -891,6 +1045,7 @@ class POS_Billing_API_Handler
 
         return $formatted;
     }
+
     /**
      * Procesar CFDI exitoso y guardar en base de datos - MEJORADO
      */
