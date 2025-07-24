@@ -128,17 +128,17 @@ function abrirModuloFacturacion() {
 <body>
     <div class="container">
         <div class="header">
-            <h1>💼 Sistema de Facturación CFDI 4.0</h1>
+            <h1> Sistema de Facturación CFDI 4.0</h1>
             <p>Integración con Factura.com - Generar nueva factura</p>
         </div>
         
         <div class="alert alert-info">
-            <strong>ℹ️ Información:</strong> Los totales se calculan automáticamente cuando ingresas cantidad y precio.
+            <strong> Información:</strong> Los totales se calculan automáticamente cuando ingresas cantidad y precio.
         </div>
         
         <form id="cfdiformulario">
             <div class="section">
-                <h3>👤 Datos del Receptor</h3>
+                <h3> Datos del Receptor</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Cliente <span class="required">*</span>
@@ -149,7 +149,7 @@ function abrirModuloFacturacion() {
                         </select>
                         <div class="help-text">Selecciona un cliente de tu catálogo de Factura.com</div>
                         <div class="help-text" style="font-size: 11px; color: #888;">
-                            💡 <strong>Tip:</strong> Si no aparece tu cliente, agrégalo en el panel de Factura.com y recarga la lista
+                             <strong>Tip:</strong> Si no aparece tu cliente, agrégalo en el panel de Factura.com y recarga la lista
                         </div>
                     </div>
                     <div class="form-group">
@@ -169,7 +169,7 @@ function abrirModuloFacturacion() {
                     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
                 ">
                     <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px;">
-                        📋 Información del Cliente Seleccionado
+                         Información del Cliente Seleccionado
                     </h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px;">
                         <div><strong>RFC:</strong> <span id="clienteRFC" style="color: #666;">-</span></div>
@@ -181,7 +181,7 @@ function abrirModuloFacturacion() {
             </div>
             
             <div class="section">
-                <h3>⚙️ Configuración del CFDI</h3>
+                <h3> Configuración del CFDI</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tipo de Documento <span class="required">*</span></label>
@@ -244,7 +244,7 @@ function abrirModuloFacturacion() {
             </div>
             
             <div class="section">
-                <h3>🛍️ Conceptos/Productos</h3>
+                <h3> Conceptos/Productos</h3>
                 <div id="conceptos">
                     <div class="producto-row">
                         <div class="form-group">
@@ -325,7 +325,7 @@ function abrirModuloFacturacion() {
             </div>
             
             <div class="section">
-                <h3>📋 Opciones Adicionales</h3>
+                <h3> Opciones Adicionales</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label>
@@ -350,8 +350,8 @@ function abrirModuloFacturacion() {
             </div>
             
             <div class="form-actions">
-                <button type="submit" class="btn" id="submitBtn">💾 Generar CFDI</button>
-                <button type="button" onclick="window.close()" class="btn btn-cancel">❌ Cancelar</button>
+                <button type="submit" class="btn" id="submitBtn"> Generar CFDI</button>
+                <button type="button" onclick="window.close()" class="btn btn-cancel"> Cancelar</button>
             </div>
         </form>
     </div>
