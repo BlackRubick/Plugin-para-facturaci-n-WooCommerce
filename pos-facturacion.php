@@ -143,8 +143,9 @@ function pos_billing_enqueue_scripts() {
     
     // Verificar que los archivos CSS y JS existan
     $css_file = POS_BILLING_PLUGIN_PATH . 'assets/css/pos-billing.css';
-    $js_file = POS_BILLING_PLUGIN_PATH . 'assets/js/pos-billing.js';
+    $js_main_file = POS_BILLING_PLUGIN_PATH . 'assets/js/pos-billing.js';
     
+    // Cargar CSS
     if (file_exists($css_file)) {
         wp_enqueue_style(
             'pos-billing-css',
@@ -154,17 +155,76 @@ function pos_billing_enqueue_scripts() {
         );
     }
     
-    if (file_exists($js_file)) {
+    // ✅ CARGAR MÓDULOS EN ORDEN CORRECTO
+    $js_modules = array(
+        // 1. Utilidades primero (otros módulos dependen de él)
+        'utils' => array(
+            'file' => 'assets/js/modules/utils.js',
+            'deps' => array('jquery')
+        ),
+        // 2. Módulos independientes
+        'clients' => array(
+            'file' => 'assets/js/modules/clients.js',
+            'deps' => array('jquery', 'pos-billing-utils')
+        ),
+        'calculations' => array(
+            'file' => 'assets/js/modules/calculations.js',
+            'deps' => array('jquery', 'pos-billing-utils')
+        ),
+        'popup-manager' => array(
+            'file' => 'assets/js/modules/popup-manager.js',
+            'deps' => array('jquery', 'pos-billing-utils')
+        ),
+        // 3. Módulos que dependen de otros
+        'form-handler' => array(
+            'file' => 'assets/js/modules/form-handler.js',
+            'deps' => array('jquery', 'pos-billing-utils', 'pos-billing-calculations')
+        ),
+        'cfdi-creator' => array(
+            'file' => 'assets/js/modules/cfdi-creator.js',
+            'deps' => array('jquery', 'pos-billing-utils', 'pos-billing-clients')
+        )
+    );
+    
+    // Cargar cada módulo
+    foreach ($js_modules as $handle => $config) {
+        $file_path = POS_BILLING_PLUGIN_PATH . $config['file'];
+        
+        if (file_exists($file_path)) {
+            wp_enqueue_script(
+                "pos-billing-{$handle}",
+                POS_BILLING_PLUGIN_URL . $config['file'],
+                $config['deps'],
+                POS_BILLING_VERSION,
+                true // Cargar en footer
+            );
+            
+            if (WP_DEBUG) {
+                error_log("POS Billing - Módulo cargado: {$handle}");
+            }
+        } else {
+            if (WP_DEBUG) {
+                error_log("POS Billing - Archivo no encontrado: {$config['file']}");
+            }
+        }
+    }
+    
+    // ✅ CARGAR ARCHIVO PRINCIPAL AL FINAL (depende de todos los módulos)
+    if (file_exists($js_main_file)) {
+        $all_module_handles = array_map(function($handle) {
+            return "pos-billing-{$handle}";
+        }, array_keys($js_modules));
+        
         wp_enqueue_script(
-            'pos-billing-js',
+            'pos-billing-main',
             POS_BILLING_PLUGIN_URL . 'assets/js/pos-billing.js',
-            array('jquery'),
+            array_merge(array('jquery'), $all_module_handles), // Depende de todos los módulos
             POS_BILLING_VERSION,
-            true
+            true // Cargar en footer
         );
         
-        // Localizar script con datos de WordPress
-        wp_localize_script('pos-billing-js', 'pos_billing_ajax', array(
+        // ✅ LOCALIZAR DATOS SOLO EN EL ARCHIVO PRINCIPAL
+        wp_localize_script('pos-billing-main', 'pos_billing_ajax', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('pos_billing_nonce'),
             'rest_nonce' => wp_create_nonce('wp_rest'),
@@ -180,12 +240,20 @@ function pos_billing_enqueue_scripts() {
             'debug' => array(
                 'wp_debug' => WP_DEBUG,
                 'is_admin' => is_admin(),
-                'current_time' => current_time('timestamp')
+                'current_time' => current_time('timestamp'),
+                'plugin_version' => POS_BILLING_VERSION
             )
         ));
+        
+        if (WP_DEBUG) {
+            error_log("POS Billing - Archivo principal cargado con dependencias: " . implode(', ', $all_module_handles));
+        }
+    } else {
+        if (WP_DEBUG) {
+            error_log("POS Billing - ERROR: Archivo principal no encontrado: assets/js/pos-billing.js");
+        }
     }
 }
-
 // Función para obtener configuraciones públicas
 function pos_billing_get_public_settings() {
     return array(
