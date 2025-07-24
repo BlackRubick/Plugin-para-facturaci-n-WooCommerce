@@ -12,27 +12,27 @@ function mostrarAyudaDetallada() {
         '.success { background: #d4edda; padding: 10px; border-radius: 5px; color: #155724; }' +
         '</style></head><body>' +
         '<div class="container">' +
-        '<h1>🔧 Solución para "No puedes facturar 2"</h1>' +
+        '<h1> Solución para "No puedes facturar 2"</h1>' +
         '<div class="warning">' +
-        '<strong>⚠️ Este error indica que tu cuenta de Factura.com no está completamente configurada.</strong>' +
+        '<strong> Este error indica que tu cuenta de Factura.com no está completamente configurada.</strong>' +
         '</div>' +
         '<div class="step">' +
-        '<h3>📋 Verificar Certificados SAT</h3>' +
+        '<h3> Verificar Certificados SAT</h3>' +
         '<p>Ve a <a href="https://sandbox.factura.com" target="_blank">Factura.com</a> → Configuración → Certificados</p>' +
         '<ul><li>Debe aparecer tu certificado .cer</li><li>Debe aparecer tu llave .key</li><li>Estado: "Válido"</li></ul>' +
         '</div>' +
         '<div class="step">' +
-        '<h3>🔢 Verificar Series</h3>' +
+        '<h3> Verificar Series</h3>' +
         '<p>Ve a Configuración → Series</p>' +
         '<ul><li>Debe existir la serie ID: 1212</li><li>Estado: "Activa"</li><li>Tipo: "Factura"</li></ul>' +
         '</div>' +
         '<div class="step">' +
-        '<h3>👤 Verificar Receptor</h3>' +
+        '<h3> Verificar Receptor</h3>' +
         '<p>Ve a Receptores → Buscar</p>' +
         '<ul><li>Busca UID: 67a93f71cdddb</li><li>Debe existir y estar activo</li></ul>' +
         '</div>' +
         '<div class="success">' +
-        '<strong>✅ Si todo está configurado y sigue fallando:</strong><br>' +
+        '<strong> Si todo está configurado y sigue fallando:</strong><br>' +
         'Contacta al soporte de Factura.com con esta información específica.' +
         '</div>' +
         '<p style="text-align: center; margin-top: 30px;">' +
@@ -145,7 +145,7 @@ function abrirModuloFacturacion() {
                             <button type="button" onclick="recargarClientes()" class="btn btn-reload" title="Recargar lista de clientes">🔄</button>
                         </label>
                         <select id="receptorUID" required>
-                            <option value="">⏳ Cargando clientes...</option>
+                            <option value=""> Cargando clientes...</option>
                         </select>
                         <div class="help-text">Selecciona un cliente de tu catálogo de Factura.com</div>
                         <div class="help-text" style="font-size: 11px; color: #888;">
@@ -366,7 +366,7 @@ let isProcessing = false;
  * ✅ FUNCIÓN PARA CARGAR CLIENTES (que ya sabemos que funciona)
  */
 function cargarClientes() {
-    console.log('🔄 Cargando clientes desde Factura.com...');
+    console.log(' Cargando clientes desde Factura.com...');
     
     const selectElement = document.getElementById('receptorUID');
     if (!selectElement) {
@@ -374,7 +374,7 @@ function cargarClientes() {
         return;
     }
     
-    console.log('📋 Elemento receptorUID encontrado: SÍ');
+    console.log(' Elemento receptorUID encontrado: SÍ');
     
     selectElement.innerHTML = '<option value="" disabled>⏳ Detectando WordPress y cargando clientes...</option>';
     selectElement.disabled = true;
@@ -677,7 +677,7 @@ function formatearDatosParaAPI(datos) {
  * ✅ NUEVA: RECOPILAR DATOS DEL FORMULARIO
  */
 function recopilarDatos() {
-    console.log('📋 Recopilando datos del formulario...');
+    console.log(' Recopilando datos del formulario...');
     
     const conceptos = [];
     const filasConceptos = document.querySelectorAll('.producto-row');
@@ -741,7 +741,7 @@ function recopilarDatos() {
         datosBasicos.Receptor.ResidenciaFiscal = residenciaFiscal;
     }
     
-    console.log('📋 Datos recopilados:', datosBasicos);
+    console.log(' Datos recopilados:', datosBasicos);
     return formatearDatosParaAPI(datosBasicos);
 }
 
@@ -793,7 +793,7 @@ function enviarCFDI(datos) {
         return;
     }
     
-    console.log('📡 Enviando CFDI...');
+    console.log(' Enviando CFDI...');
     isProcessing = true;
     
     document.getElementById('loading').style.display = 'block';
