@@ -1,8 +1,3 @@
-/**
- * Módulo de utilidades para POS Facturación
- * assets/js/modules/utils.js
- */
-
 class POSBillingUtils {
     constructor(config) {
         this.config = config;

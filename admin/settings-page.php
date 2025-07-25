@@ -1,13 +1,12 @@
 <?php
 /**
- * Página de configuración del plugin en el admin - PERMISOS CORREGIDOS
+ * Página de configuración del plugin en el admin 
  */
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Agregar subpágina de configuración
 add_action('admin_menu', 'pos_billing_settings_menu');
 
 function pos_billing_settings_menu() {
@@ -15,22 +14,19 @@ function pos_billing_settings_menu() {
         'pos-billing',
         'Configuración API',
         'Configuración',
-        'edit_posts', // Cambiado de 'manage_options' a 'edit_posts'
+        'edit_posts', 
         'pos-billing-settings',
         'pos_billing_settings_page'
     );
 }
 
 function pos_billing_settings_page() {
-    // Verificar permisos - solo admin puede cambiar configuración API
     $can_edit_settings = current_user_can('manage_options');
     
-    // Mostrar información para todos los usuarios, pero solo permitir edición a admins
     if (!current_user_can('edit_posts')) {
         wp_die(__('No tienes permisos suficientes para acceder a esta página.'));
     }
     
-    // Guardar configuraciones si se envió el formulario Y tiene permisos
     if ($can_edit_settings && isset($_POST['submit']) && check_admin_referer('pos_billing_settings_nonce')) {
         update_option('pos_billing_api_key', sanitize_text_field($_POST['api_key']));
         update_option('pos_billing_secret_key', sanitize_text_field($_POST['secret_key']));
@@ -41,10 +37,9 @@ function pos_billing_settings_page() {
         update_option('pos_billing_default_uso_cfdi', sanitize_text_field($_POST['default_uso_cfdi']));
         update_option('pos_billing_lugar_expedicion', sanitize_text_field($_POST['lugar_expedicion']));
         
-        echo '<div class="notice notice-success"><p>✅ Configuración guardada correctamente</p></div>';
+        echo '<div class="notice notice-success"><p> Configuración guardada correctamente</p></div>';
     }
     
-    // Obtener configuraciones actuales
     $api_key = get_option('pos_billing_api_key', '');
     $secret_key = get_option('pos_billing_secret_key', '');
     $sandbox_mode = get_option('pos_billing_sandbox_mode', true);
@@ -54,15 +49,14 @@ function pos_billing_settings_page() {
     $default_uso_cfdi = get_option('pos_billing_default_uso_cfdi', 'G01');
     $lugar_expedicion = get_option('pos_billing_lugar_expedicion', '');
     
-    // Verificar estado de la configuración
     $api_configured = !empty($api_key) && !empty($secret_key);
     ?>
     
     <div class="wrap">
-        <h1>⚙️ Configuración POS Facturación</h1>
+        <h1> Configuración POS Facturación</h1>
         
         <div class="notice notice-info">
-            <p><strong>ℹ️ Estado del Usuario:</strong></p>
+            <p><strong> Estado del Usuario:</strong></p>
             <ul>
                 <li>Usuario: <strong><?php echo wp_get_current_user()->display_name; ?></strong></li>
                 <li>Rol: <strong><?php echo implode(', ', wp_get_current_user()->roles); ?></strong></li>
@@ -73,7 +67,7 @@ function pos_billing_settings_page() {
         
         <?php if (!$can_edit_settings): ?>
         <div class="notice notice-warning">
-            <p><strong>⚠️ Solo lectura:</strong> Solo los administradores pueden modificar la configuración de la API. Contacta al administrador del sitio para cambiar estos valores.</p>
+            <p><strong> Solo lectura:</strong> Solo los administradores pueden modificar la configuración de la API. Contacta al administrador del sitio para cambiar estos valores.</p>
         </div>
         <?php endif; ?>
         
@@ -94,7 +88,7 @@ function pos_billing_settings_page() {
                     <th>Modo:</th>
                     <td>
                         <span style="color: <?php echo $sandbox_mode ? '#ff8c00' : '#46b450'; ?>; font-weight: bold;">
-                            <?php echo $sandbox_mode ? '🧪 Sandbox (Pruebas)' : '🚀 Producción'; ?>
+                            <?php echo $sandbox_mode ? ' Sandbox (Pruebas)' : ' Producción'; ?>
                         </span>
                     </td>
                 </tr>
@@ -109,8 +103,8 @@ function pos_billing_settings_page() {
         
         <?php if (!$api_configured): ?>
         <div class="notice notice-warning">
-            <p><strong>⚠️ Configuración requerida:</strong> Para usar el plugin, debes configurar tus credenciales de la API de Factura.com.</p>
-            <p>📋 <strong>Cómo obtener las credenciales:</strong></p>
+            <p><strong> Configuración requerida:</strong> Para usar el plugin, debes configurar tus credenciales de la API de Factura.com.</p>
+            <p> <strong>Cómo obtener las credenciales:</strong></p>
             <ol>
                 <li>Regístrate en <a href="https://sandbox.factura.com" target="_blank">Factura.com</a></li>
                 <li>Ve a tu panel de control</li>
@@ -124,7 +118,7 @@ function pos_billing_settings_page() {
             <?php wp_nonce_field('pos_billing_settings_nonce'); ?>
             
             <div class="card">
-                <h2>🔑 Credenciales de la API</h2>
+                <h2> Credenciales de la API</h2>
                 <table class="form-table">
                     <tr>
                         <th scope="row">
@@ -169,7 +163,7 @@ function pos_billing_settings_page() {
             </div>
             
             <div class="card">
-                <h2>⚙️ Configuraciones por Defecto</h2>
+                <h2> Configuraciones por Defecto</h2>
                 <p>Estos valores se pre-cargarán en el formulario de facturación:</p>
                 
                 <table class="form-table">
@@ -239,26 +233,26 @@ function pos_billing_settings_page() {
             </div>
             
             <?php if ($can_edit_settings): ?>
-                <?php submit_button('💾 Guardar Configuración'); ?>
+                <?php submit_button(' Guardar Configuración'); ?>
             <?php else: ?>
                 <p class="description">
-                    <em>🔒 Solo los administradores pueden modificar esta configuración. Contacta al administrador del sitio para realizar cambios.</em>
+                    <em> Solo los administradores pueden modificar esta configuración. Contacta al administrador del sitio para realizar cambios.</em>
                 </p>
             <?php endif; ?>
         </form>
         
         <div class="card">
-            <h2>🧪 Probar Conexión</h2>
+            <h2> Probar Conexión</h2>
             <p>Una vez configuradas las credenciales, puedes probar la conexión:</p>
             <button type="button" id="test-connection" class="button button-secondary" 
                     <?php echo $api_configured ? '' : 'disabled'; ?>>
-                🔍 Probar Conexión con la API
+                 Probar Conexión con la API
             </button>
             <div id="test-result" style="margin-top: 10px;"></div>
         </div>
         
         <div class="card">
-            <h2>📚 Shortcodes Disponibles</h2>
+            <h2> Shortcodes Disponibles</h2>
             <table class="wp-list-table widefat striped">
                 <thead>
                     <tr>
@@ -294,7 +288,7 @@ function pos_billing_settings_page() {
         const result = document.getElementById('test-result');
         
         button.disabled = true;
-        button.textContent = '⏳ Probando...';
+        button.textContent = ' Probando...';
         result.innerHTML = '';
         
         fetch(ajaxurl, {
@@ -317,7 +311,7 @@ function pos_billing_settings_page() {
         })
         .finally(() => {
             button.disabled = false;
-            button.textContent = '🔍 Probar Conexión con la API';
+            button.textContent = ' Probar Conexión con la API';
         });
     });
     </script>
@@ -325,7 +319,6 @@ function pos_billing_settings_page() {
     <?php
 }
 
-// Agregar acción AJAX para probar conexión - con permisos más flexibles
 add_action('wp_ajax_pos_billing_test_connection', 'pos_billing_test_connection_ajax');
 
 function pos_billing_test_connection_ajax() {
@@ -334,14 +327,12 @@ function pos_billing_test_connection_ajax() {
         return;
     }
     
-    // Permitir a usuarios con capacidad de editar posts
     if (!current_user_can('edit_posts')) {
         wp_send_json_error('Sin permisos');
         return;
     }
     
-    // Aquí podrías hacer una petición de prueba a la API
-    // Por ahora solo verificamos que las credenciales estén configuradas
+
     $api_key = get_option('pos_billing_api_key', '');
     $secret_key = get_option('pos_billing_secret_key', '');
     

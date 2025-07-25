@@ -1,7 +1,3 @@
-/**
- * Módulo de creación de CFDI para POS Facturación
- * assets/js/modules/cfdi-creator.js
- */
 
 class POSBillingCFDICreator {
     constructor(config, modules) {

@@ -26,12 +26,10 @@ class POS_Billing {
     }
     
     private function load_dependencies() {
-        // Las dependencias ya se cargan en el archivo principal
-        // Aquí solo inicializamos lo que necesitamos
+
     }
     
     private function define_admin_hooks() {
-        // Hooks del administrador
         add_action('admin_init', array($this, 'register_settings'));
     }
     
@@ -41,11 +39,9 @@ class POS_Billing {
     }
     
     private function init_api_handler() {
-        // El API Handler se inicializa automáticamente en su propio archivo
     }
     
     public function enqueue_scripts() {
-        // Esta función se maneja en el archivo principal
     }
     
     public function load_textdomain() {
@@ -72,7 +68,7 @@ class POS_Billing {
     }
     
     /**
-     * Obtener configuraciones públicas (que se pueden enviar al frontend)
+     * Obtener configuraciones públicas las que se mandan pal front
      */
     public function get_public_settings() {
         return array(
@@ -89,10 +85,8 @@ class POS_Billing {
     }
     
     public static function activate() {
-        // La activación se maneja en el archivo principal
     }
     
     public static function deactivate() {
-        // La desactivación se maneja en el archivo principal
     }
 }

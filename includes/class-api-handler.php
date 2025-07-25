@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Clase para manejar la integración con la API de Factura.com - PERMISOS CORREGIDOS
+ * Clase para manejar la integración con la API de Factura.com 
  */
 
 if (!defined('ABSPATH')) {
@@ -41,8 +41,7 @@ public function __construct()
 }
 
     /**
-     * ✅ NUEVO: Método AJAX para obtener lista de clientes
-     */
+     *  Método AJAX para obtener lista de clientes*/
     public function get_clients_ajax()
     {
         // Verificar que el usuario esté logueado
@@ -80,8 +79,7 @@ public function __construct()
     }
 
     /**
-     * ✅ NUEVO: Obtener lista de clientes desde la API de Factura.com
-     */
+     *Obtener lista de clientes desde la API de Factura.com*/
     private function get_clients_list()
     {
         if (empty($this->api_key) || empty($this->secret_key)) {
@@ -93,7 +91,6 @@ public function __construct()
 
         $base_url = $this->is_sandbox ? $this->api_url_sandbox : $this->api_url_production;
 
-        // ✅ CORRECCIÓN: URL correcta según documentación
         $url = $base_url . '/v1/clients';
 
         $headers = array(
@@ -151,12 +148,11 @@ public function __construct()
             );
         }
 
-        // ✅ CORRECCIÓN: Procesar respuesta según documentación oficial
         if (isset($api_response['status']) && $api_response['status'] === 'success' && isset($api_response['data'])) {
             $clients = array();
 
             foreach ($api_response['data'] as $client) {
-                // ✅ Mapear campos según la estructura real de la API
+                // Mapear campos según la estructura  de la API
                 $clients[] = array(
                     'uid' => $client['UID'],
                     'rfc' => $client['RFC'],
@@ -185,7 +181,7 @@ public function __construct()
             }
 
             if (WP_DEBUG) {
-                error_log('✅ Se procesaron ' . count($clients) . ' clientes correctamente');
+                error_log('Se procesaron ' . count($clients) . ' clientes correctamente');
                 if (!empty($clients)) {
                     error_log('Primer cliente: ' . print_r($clients[0], true));
                 }
@@ -197,7 +193,7 @@ public function __construct()
                 'total' => count($clients)
             );
         } else {
-            // ✅ Manejar diferentes tipos de error
+            //  Manejar diferentes tipos de error
             $error_message = 'Error desconocido';
 
             if (isset($api_response['message'])) {
@@ -225,7 +221,7 @@ public function __construct()
     }
 
     /**
-     * ✅ NUEVO: Buscar clientes por término de búsqueda
+     *  Buscar clientes por término de búsqueda
      */
     public function search_clients_ajax()
     {
@@ -766,7 +762,6 @@ public function __construct()
             error_log('JSON que se envía: ' . $body);
             error_log('JSON con formato bonito: ' . json_encode($formatted_data, JSON_PRETTY_PRINT));
         }
-        // ✅ AGREGAR ESTO JUSTO ANTES DE wp_remote_post()
         if (WP_DEBUG) {
             error_log('=== 🔍 DEBUG EXTREMO ===');
             error_log('$formatted_data antes de json_encode:');
@@ -1036,7 +1031,6 @@ public function __construct()
             error_log('JSON RECIBIDO: ' . json_encode($data, JSON_PRETTY_PRINT));
         }
 
-        // ✅ FORZAR TIPOS ESPECÍFICOS SEGÚN DOCUMENTACIÓN
         $formatted = array(
             'Receptor' => $data['Receptor'],
             'TipoDocumento' => (string)$data['TipoDocumento'],
@@ -1180,7 +1174,7 @@ public function __construct()
     }
 
     /**
-     * Calcular totales de conceptos - MEJORADO
+     * Calcular totales de conceptos 
      */
     private function calculate_totals($conceptos)
     {
@@ -1409,7 +1403,6 @@ public function __construct()
             pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
         </style>';
         
-        // PASO 1: Verificar configuración
         echo '<div class="debug-section">';
         echo '<h2>📋 PASO 1: Verificación de Configuración</h2>';
         
@@ -1429,7 +1422,6 @@ public function __construct()
             wp_die();
         }
         
-        // PASO 2: Construir URL y Headers
         echo '<div class="debug-section">';
         echo '<h2>🌐 PASO 2: Construcción de la Petición</h2>';
         
@@ -1458,7 +1450,6 @@ public function __construct()
         echo '</pre>';
         echo '</div>';
         
-        // PASO 3: Realizar petición
         echo '<div class="debug-section">';
         echo '<h2>📡 PASO 3: Realizando Petición a la API</h2>';
         
@@ -1485,7 +1476,6 @@ public function __construct()
         }
         echo '</div>';
         
-        // PASO 4: Analizar respuesta HTTP
         echo '<div class="debug-section">';
         echo '<h2>📨 PASO 4: Análisis de Respuesta HTTP</h2>';
         
@@ -1511,7 +1501,6 @@ public function __construct()
         echo '<p><strong>Tamaño:</strong> ' . strlen($response_body) . ' bytes</p>';
         echo '</div>';
         
-        // PASO 5: Parsear JSON
         echo '<div class="debug-section">';
         echo '<h2>🔧 PASO 5: Parseando Respuesta JSON</h2>';
         
@@ -1533,14 +1522,12 @@ public function __construct()
         echo '<pre>' . print_r(array_keys($api_response), true) . '</pre>';
         echo '</div>';
         
-        // PASO 6: Analizar estructura de datos
         echo '<div class="debug-section">';
         echo '<h2>📊 PASO 6: Análisis de Estructura de Datos</h2>';
         
         echo '<h4>🔍 Estructura completa de la respuesta:</h4>';
         echo '<pre style="max-height: 400px; overflow-y: auto;">' . print_r($api_response, true) . '</pre>';
         
-        // Verificar campos esperados
         echo '<h4>✅ Verificación de campos esperados:</h4>';
         echo '<ul>';
         echo '<li><strong>status:</strong> ' . (isset($api_response['status']) ? '✅ ' . $api_response['status'] : '❌ No encontrado') . '</li>';
@@ -1564,7 +1551,6 @@ public function __construct()
         }
         echo '</div>';
         
-        // PASO 7: Simulación del procesamiento
         echo '<div class="debug-section success">';
         echo '<h2>🎯 PASO 7: Simulación del Procesamiento</h2>';
         
@@ -1608,5 +1594,4 @@ public function __construct()
 
 }
 
-// Inicializar la clase
 new POS_Billing_API_Handler();

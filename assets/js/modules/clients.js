@@ -1,7 +1,3 @@
-/**
- * Módulo de gestión de clientes para POS Facturación
- * assets/js/modules/clients.js
- */
 
 class POSBillingClients {
     constructor(config) {

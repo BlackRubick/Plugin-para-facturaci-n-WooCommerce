@@ -1,7 +1,4 @@
-/**
- * Módulo de manejo de formularios para POS Facturación
- * assets/js/modules/form-handler.js
- */
+
 
 class POSBillingFormHandler {
     constructor(config, modules) {

@@ -1,7 +1,3 @@
-/**
- * Módulo de gestión del popup - SINTAXIS CORREGIDA
- * assets/js/modules/popup-manager.js
- */
 
 class POSBillingPopupManager {
     constructor(config) {

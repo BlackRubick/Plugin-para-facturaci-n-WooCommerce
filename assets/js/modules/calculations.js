@@ -1,7 +1,3 @@
-/**
- * Módulo de cálculos y totales para POS Facturación
- * assets/js/modules/calculations.js
- */
 
 class POSBillingCalculations {
     constructor(config) {

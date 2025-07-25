@@ -1,4 +1,3 @@
-// ✅ FUNCIÓN PARA MOSTRAR AYUDA DETALLADA
 function mostrarAyudaDetallada() {
     const helpWindow = window.open('', 'ayuda_detallada', 'width=800,height=600,scrollbars=yes,resizable=yes');
     
