@@ -1438,3 +1438,785 @@ console.log('✅ PASO 3 completado - Script cargado con funcionalidad crear CFDI
     alert("Por favor, permita ventanas emergentes para usar el módulo de facturación");
   }
 }
+
+// AGREGAR ESTA NUEVA FUNCIÓN AL FINAL DE TU pos-billing.js
+
+/**
+ * NUEVA FUNCIÓN: Renderizar formulario directamente en un div
+ */
+function abrirModuloFacturacionEmbebido(targetDivId) {
+  const targetDiv = document.getElementById(targetDivId);
+  
+  if (!targetDiv) {
+    console.error('❌ No se encontró el div objetivo:', targetDivId);
+    return;
+  }
+
+  // Usar el mismo HTML que ya tienes, pero insertarlo directamente en el div
+  const htmlContent = `
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; background: #f5f5f5; padding: 20px; height: 100%; box-sizing: border-box; overflow-y: auto;">
+    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 1100px; margin: 0 auto;">
+        <!-- AQUÍ VA TODO EL HTML DE TU FORMULARIO EXISTENTE -->
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 20px;">
+            <h1 style="color: #333; margin: 0; font-size: 28px;"> Sistema de Facturación CFDI 4.0</h1>
+            <p style="color: #666; margin: 10px 0 0 0; font-size: 16px;">Integración con Factura.com - Generar nueva factura</p>
+        </div>
+        
+
+        
+        <form id="cfdiformulario-${targetDivId}">
+            <!-- Resto del formulario igual que en tu código original -->
+            <!-- Solo cambio los IDs para que sean únicos agregando el sufijo del div -->
+            
+            <div style="margin-bottom: 35px; padding-bottom: 25px; border-bottom: 2px solid #eee;">
+                <h3 style="color: #333; margin-bottom: 20px; font-size: 20px;"> Datos del Receptor</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">
+                            Cliente <span style="color: #dc3545;">*</span>
+                            <button type="button" onclick="recargarClientesEmbebido('${targetDivId}')" 
+                                    style="background: #17a2b8; font-size: 12px; padding: 8px 12px; margin-left: 10px; color: white; border: none; border-radius: 4px; cursor: pointer;" 
+                                    title="Recargar lista de clientes">🔄</button>
+                        </label>
+                        <select id="receptorUID-${targetDivId}" required 
+                                style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                            <option value="">🔄 Cargando clientes...</option>
+                        </select>
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">Selecciona un cliente de tu catálogo de Factura.com</div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Residencia Fiscal</label>
+                        <input type="text" id="residenciaFiscal-${targetDivId}" placeholder="Solo para extranjeros"
+                               style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">Opcional - Solo para clientes del extranjero</div>
+                    </div>
+                </div>
+                
+                <!-- Información del cliente -->
+                <div id="clienteInfo-${targetDivId}" style="display: none; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 20px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px;"> Información del Cliente Seleccionado</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px;">
+                        <div><strong>RFC:</strong> <span id="clienteRFC-${targetDivId}" style="color: #666;">-</span></div>
+                        <div><strong>Email:</strong> <span id="clienteEmail-${targetDivId}" style="color: #666;">-</span></div>
+                        <div><strong>Uso CFDI:</strong> <span id="clienteUsoCFDI-${targetDivId}" style="color: #666;">-</span></div>
+                        <div><strong>Ciudad:</strong> <span id="clienteCiudad-${targetDivId}" style="color: #666;">-</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Configuración del CFDI -->
+            <div style="margin-bottom: 35px; padding-bottom: 25px; border-bottom: 2px solid #eee;">
+                <h3 style="color: #333; margin-bottom: 20px; font-size: 20px;"> Configuración del CFDI</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Tipo de Documento <span style="color: #dc3545;">*</span></label>
+                        <select id="tipoDocumento-${targetDivId}" required style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                            <option value="">Seleccionar...</option>
+                            <option value="factura" selected>Factura</option>
+                            <option value="nota_credito">Nota de Crédito</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Uso de CFDI <span style="color: #dc3545;">*</span></label>
+                        <select id="usoCFDI-${targetDivId}" required style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                            <option value="">Seleccionar...</option>
+                            <option value="G01">G01 - Adquisición de mercancías</option>
+                            <option value="G02">G02 - Devoluciones, descuentos</option>
+                            <option value="G03">G03 - Gastos en general</option>
+                            <option value="S01" selected>S01 - Sin efectos fiscales</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Serie <span style="color: #dc3545;">*</span></label>
+                        <input type="number" id="serie-${targetDivId}" required placeholder="ej: 5483035"
+                               style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Forma de Pago <span style="color: #dc3545;">*</span></label>
+                        <select id="formaPago-${targetDivId}" required style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                            <option value="">Seleccionar...</option>
+                            <option value="01">01 - Efectivo</option>
+                            <option value="03">03 - Transferencia</option>
+                            <option value="04">04 - Tarjeta de crédito</option>
+                            <option value="28">28 - Tarjeta de débito</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Método de Pago <span style="color: #dc3545;">*</span></label>
+                        <select id="metodoPago-${targetDivId}" required style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                            <option value="">Seleccionar...</option>
+                            <option value="PUE" selected>PUE - Pago en una exhibición</option>
+                            <option value="PPD">PPD - Pago en parcialidades</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Moneda <span style="color: #dc3545;">*</span></label>
+                        <select id="moneda-${targetDivId}" required style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                            <option value="MXN" selected>Peso Mexicano</option>
+                            <option value="USD">Dólar Americano</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Número de Orden</label>
+                        <input type="text" id="numOrder-${targetDivId}" placeholder="Se genera automáticamente"
+                               style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Conceptos/Productos -->
+            <div style="margin-bottom: 35px; padding-bottom: 25px; border-bottom: 2px solid #eee;">
+                <h3 style="color: #333; margin-bottom: 20px; font-size: 20px;"> Conceptos/Productos</h3>
+                <div id="conceptos-${targetDivId}">
+                    <!-- Primer concepto -->
+                    <div class="producto-row-${targetDivId}" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 40px; gap: 15px; margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; position: relative; border: 2px solid #e9ecef;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Descripción <span style="color: #dc3545;">*</span></label>
+                            <input type="text" class="descripcion-${targetDivId}" placeholder="Descripción del producto/servicio" required
+                                   style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Clave Prod/Serv <span style="color: #dc3545;">*</span></label>
+                            <input type="text" class="claveProdServ-${targetDivId}" placeholder="ej: 43232408" required
+                                   style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Cantidad <span style="color: #dc3545;">*</span></label>
+                            <input type="number" class="cantidad-${targetDivId}" value="1" min="0.000001" step="0.000001" required
+                                   style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Precio Unitario <span style="color: #dc3545;">*</span></label>
+                            <input type="number" class="precioUnitario-${targetDivId}" step="0.01" required
+                                   style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Total</label>
+                            <input type="number" class="totalConcepto-${targetDivId}" readonly
+                                   style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px; background-color: #f8f9fa !important; color: #495057;">
+                        </div>
+                        <div></div>
+                    </div>
+                    
+                    <!-- Información secundaria del primer concepto -->
+                    <div class="producto-row-secondary-${targetDivId}" style="margin-bottom: 20px; padding: 20px; background: #f1f3f4; border-radius: 10px; border: 1px solid #dee2e6;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Clave Unidad <span style="color: #dc3545;">*</span></label>
+                                <select class="claveUnidad-${targetDivId}" required style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="E48" selected>E48 - Unidad de servicio</option>
+                                    <option value="H87">H87 - Pieza</option>
+                                    <option value="KGM">KGM - Kilogramo</option>
+                                </select>
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Unidad <span style="color: #dc3545;">*</span></label>
+                                <input type="text" class="unidad-${targetDivId}" value="Unidad de servicio" required
+                                       style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Descuento</label>
+                                <input type="number" class="descuento-${targetDivId}" value="0" step="0.01"
+                                       style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Objeto Impuesto <span style="color: #dc3545;">*</span></label>
+                                <select class="objetoImp-${targetDivId}" required style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                                    <option value="02" selected>02 - Sí objeto de impuesto</option>
+                                    <option value="01">01 - No objeto de impuesto</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="button" id="agregarConcepto-${targetDivId}" 
+                        style="padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 5px; font-size: 16px; font-weight: 600;">
+                    ➕ Agregar Concepto
+                </button>
+            </div>
+            
+            <!-- Totales -->
+            <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 25px; border-radius: 10px; margin: 25px 0; border: 2px solid #dee2e6;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px;">
+                    <span>Subtotal:</span>
+                    <span id="subtotal-${targetDivId}">$0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px;">
+                    <span>Descuentos:</span>
+                    <span id="totalDescuentos-${targetDivId}">$0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px;">
+                    <span>IVA (16%):</span>
+                    <span id="iva-${targetDivId}">$0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 20px; border-top: 2px solid #333; padding-top: 15px; color: #28a745;">
+                    <span>Total:</span>
+                    <span id="total-${targetDivId}">$0.00</span>
+                </div>
+            </div>
+            
+            <!-- Opciones adicionales -->
+            <div style="margin-bottom: 35px;">
+                <h3 style="color: #333; margin-bottom: 20px; font-size: 20px;"> Opciones Adicionales</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">
+                            <input type="checkbox" id="enviarCorreo-${targetDivId}" checked style="margin-right: 8px;">
+                            Enviar factura por correo electrónico
+                        </label>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Comentarios</label>
+                        <textarea id="comentarios-${targetDivId}" rows="2" placeholder="Comentarios adicionales"
+                                  style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Loading y resultados -->
+            <div id="loading-${targetDivId}" style="display: none; text-align: center; padding: 20px;">
+                <div style="border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
+                <p>Generando CFDI, por favor espere...</p>
+            </div>
+            
+            <div id="result-container-${targetDivId}" style="display: none; background: #f8f9fa; border-radius: 10px; padding: 25px; margin-top: 20px;">
+                <div id="result-content-${targetDivId}"></div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div style="text-align: center; margin-top: 40px; padding-top: 25px; border-top: 2px solid #eee;">
+                <button type="submit" id="submitBtn-${targetDivId}" 
+                        style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 5px; font-size: 16px; font-weight: 600;">
+                    📄 Generar CFDI
+                </button>
+                <button type="button" onclick="cerrarFormularioEmbebido('${targetDivId}')" 
+                        style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 5px; font-size: 16px; font-weight: 600;">
+                    ❌ Limpiar Formulario
+                </button>
+            </div>
+        </form>
+    </div>
+</div>`;
+
+  // Insertar el HTML en el div
+  targetDiv.innerHTML = htmlContent;
+  
+  // Configurar todas las funcionalidades (exactamente igual que en tu código original)
+  configurarFormularioEmbebido(targetDivId);
+}
+
+/**
+ * Configurar funcionalidades del formulario embebido
+ */
+function configurarFormularioEmbebido(targetDivId) {
+  console.log('🔧 Configurando formulario embebido:', targetDivId);
+  
+  // Cargar clientes
+  cargarClientesEmbebido(targetDivId);
+  
+  // Configurar event listeners para calcular totales
+  const conceptos = document.querySelectorAll(`.producto-row-${targetDivId}`);
+  conceptos.forEach(concepto => {
+    agregarEventListenersEmbebido(concepto, targetDivId);
+  });
+  
+  // Configurar formulario
+  const formulario = document.getElementById(`cfdiformulario-${targetDivId}`);
+  if (formulario) {
+    formulario.addEventListener('submit', function(e) {
+      e.preventDefault();
+      enviarCFDIEmbebido(targetDivId);
+    });
+  }
+  
+  // Configurar botón agregar concepto
+  const agregarBtn = document.getElementById(`agregarConcepto-${targetDivId}`);
+  if (agregarBtn) {
+    agregarBtn.addEventListener('click', function() {
+      agregarConceptoEmbebido(targetDivId);
+    });
+  }
+  
+  // Generar número de orden automático
+  const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 1000);
+  const numOrderEl = document.getElementById(`numOrder-${targetDivId}`);
+  if (numOrderEl) {
+    numOrderEl.value = 'ORD-' + timestamp + '-' + random;
+  }
+  
+  // Calcular totales inicial
+  setTimeout(() => calcularTotalesEmbebido(targetDivId), 100);
+}
+
+/**
+ * Cargar clientes para formulario embebido
+ */
+function cargarClientesEmbebido(targetDivId) {
+  // Reutilizar exactamente la misma lógica pero con IDs únicos
+  console.log('🔄 Cargando clientes para formulario embebido...');
+  
+  const selectElement = document.getElementById(`receptorUID-${targetDivId}`);
+  if (!selectElement) {
+    console.error('❌ No se encontró el elemento receptorUID para:', targetDivId);
+    return;
+  }
+  
+  selectElement.innerHTML = '<option value="" disabled>⏳ Cargando clientes...</option>';
+  selectElement.disabled = true;
+  
+  // Usar las mismas URLs que tu función original
+  const urls = [
+    '/wp-admin/admin-ajax.php',
+    '/pos-dashboard/wp-admin/admin-ajax.php',
+    window.location.origin + '/wp-admin/admin-ajax.php',
+    window.location.origin + '/pos-dashboard/wp-admin/admin-ajax.php'
+  ];
+  
+  probarURLsClientesEmbebido(urls, selectElement, targetDivId);
+}
+
+/**
+ * Probar URLs para clientes (versión embebida)
+ */
+async function probarURLsClientesEmbebido(urls, selectElement, targetDivId) {
+  for (let i = 0; i < urls.length; i++) {
+    const url = urls[i];
+    console.log('🧪 Probando URL ' + (i + 1) + ' para embebido: ' + url);
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=pos_billing_get_clients'
+      });
+      
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log('✅ ¡FUNCIONA! URL correcta para embebido: ' + url);
+        
+        if (data.success && data.data && Array.isArray(data.data)) {
+          selectElement.innerHTML = '<option value="">Seleccionar cliente...</option>';
+          
+          data.data.forEach((client) => {
+            const option = document.createElement('option');
+            option.value = client.uid;
+            option.textContent = client.display_name;
+            
+            option.setAttribute('data-rfc', client.rfc || '');
+            option.setAttribute('data-email', client.email || '');
+            option.setAttribute('data-uso-cfdi', client.uso_cfdi || 'G01');
+            option.setAttribute('data-ciudad', client.ciudad || '');
+            option.setAttribute('data-razon-social', client.razon_social || '');
+            
+            selectElement.appendChild(option);
+          });
+          
+          selectElement.disabled = false;
+          console.log('🎉 ¡Clientes cargados exitosamente en formulario embebido!');
+          
+          // Configurar evento de selección de cliente
+          configurarEventoClienteEmbebido(selectElement, targetDivId);
+          
+          return;
+        } else {
+          console.log('⚠️ Respuesta exitosa pero sin clientes válidos');
+          selectElement.innerHTML = '<option value="">❌ No hay clientes</option>';
+          selectElement.disabled = false;
+          return;
+        }
+      }
+    } catch (error) {
+      console.log('❌ Error: ' + error.message);
+    }
+  }
+  
+  console.error('❌ No se pudo conectar con ninguna URL');
+  selectElement.innerHTML = '<option value="">❌ Error de conexión</option>';
+  selectElement.disabled = false;
+}
+
+/**
+ * Configurar evento cuando se selecciona un cliente (versión embebida)
+ */
+function configurarEventoClienteEmbebido(selectElement, targetDivId) {
+  selectElement.addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    if (selectedOption.value) {
+      // Auto-completar uso CFDI si está disponible
+      const usoCfdi = selectedOption.getAttribute('data-uso-cfdi');
+      if (usoCfdi) {
+        const usoCfdiSelect = document.getElementById(`usoCFDI-${targetDivId}`);
+        if (usoCfdiSelect) {
+          usoCfdiSelect.value = usoCfdi;
+        }
+      }
+      
+      // Mostrar información del cliente
+      mostrarInfoClienteEmbebido(selectedOption, targetDivId);
+    } else {
+      mostrarInfoClienteEmbebido(null, targetDivId);
+    }
+  });
+}
+
+/**
+ * Mostrar información del cliente (versión embebida)
+ */
+function mostrarInfoClienteEmbebido(option, targetDivId) {
+  const infoDiv = document.getElementById(`clienteInfo-${targetDivId}`);
+  
+  if (!option || !option.value || option.value === '') {
+    if (infoDiv) {
+      infoDiv.style.display = 'none';
+    }
+    return;
+  }
+  
+  const elementos = {
+    [`clienteRFC-${targetDivId}`]: option.getAttribute('data-rfc') || '-',
+    [`clienteEmail-${targetDivId}`]: option.getAttribute('data-email') || '-',
+    [`clienteUsoCFDI-${targetDivId}`]: option.getAttribute('data-uso-cfdi') || '-',
+    [`clienteCiudad-${targetDivId}`]: option.getAttribute('data-ciudad') || '-'
+  };
+  
+  Object.keys(elementos).forEach(id => {
+    const elemento = document.getElementById(id);
+    if (elemento) {
+      elemento.textContent = elementos[id];
+    }
+  });
+  
+  if (infoDiv) {
+    infoDiv.style.display = 'block';
+  }
+}
+
+/**
+ * Recargar clientes para formulario embebido
+ */
+function recargarClientesEmbebido(targetDivId) {
+  console.log('🔄 Recargando lista de clientes para formulario embebido...');
+  cargarClientesEmbebido(targetDivId);
+}
+
+/**
+ * Calcular totales para formulario embebido
+ */
+function calcularTotalesEmbebido(targetDivId) {
+  console.log('🧮 Calculando totales para formulario embebido...');
+  
+  let subtotal = 0;
+  let totalDescuentos = 0;
+  
+  const conceptos = document.querySelectorAll(`.producto-row-${targetDivId}`);
+  
+  conceptos.forEach(function(concepto) {
+    const cantidad = parseFloat(concepto.querySelector(`.cantidad-${targetDivId}`).value) || 0;
+    const precio = parseFloat(concepto.querySelector(`.precioUnitario-${targetDivId}`).value) || 0;
+    const filaSecundaria = concepto.nextElementSibling;
+    const descuento = filaSecundaria && filaSecundaria.classList.contains(`producto-row-secondary-${targetDivId}`) ? 
+      parseFloat(filaSecundaria.querySelector(`.descuento-${targetDivId}`).value) || 0 : 0;
+    
+    const importeConcepto = cantidad * precio;
+    const totalConcepto = importeConcepto - descuento;
+    
+    const campoTotal = concepto.querySelector(`.totalConcepto-${targetDivId}`);
+    if (campoTotal) {
+      campoTotal.value = totalConcepto.toFixed(2);
+    }
+    
+    subtotal += importeConcepto;
+    totalDescuentos += descuento;
+  });
+  
+  const subtotalFinal = subtotal - totalDescuentos;
+  const iva = subtotalFinal * 0.16;
+  const total = subtotalFinal + iva;
+  
+  const subtotalEl = document.getElementById(`subtotal-${targetDivId}`);
+  const totalDescuentosEl = document.getElementById(`totalDescuentos-${targetDivId}`);
+  const ivaEl = document.getElementById(`iva-${targetDivId}`);
+  const totalEl = document.getElementById(`total-${targetDivId}`);
+  
+  if (subtotalEl) subtotalEl.textContent = ' + subtotal.toFixed(2)';
+  if (totalDescuentosEl) totalDescuentosEl.textContent = ' + totalDescuentos.toFixed(2)';
+  if (ivaEl) ivaEl.textContent = ' + iva.toFixed(2)';
+  if (totalEl) totalEl.textContent = ' + total.toFixed(2)';
+}
+
+/**
+ * Agregar event listeners para formulario embebido
+ */
+function agregarEventListenersEmbebido(elemento, targetDivId) {
+  const campos = elemento.querySelectorAll(`.cantidad-${targetDivId}, .precioUnitario-${targetDivId}, .descuento-${targetDivId}`);
+  campos.forEach(function(campo) {
+    campo.addEventListener('input', () => calcularTotalesEmbebido(targetDivId));
+    campo.addEventListener('change', () => calcularTotalesEmbebido(targetDivId));
+  });
+  
+  const claveUnidad = elemento.querySelector(`.claveUnidad-${targetDivId}`);
+  if (claveUnidad) {
+    claveUnidad.addEventListener('change', function() {
+      const unidadInput = elemento.querySelector(`.unidad-${targetDivId}`);
+      if (this.value === 'E48') unidadInput.value = 'Unidad de servicio';
+      else if (this.value === 'H87') unidadInput.value = 'Pieza';
+      else if (this.value === 'KGM') unidadInput.value = 'Kilogramo';
+    });
+  }
+}
+
+/**
+ * Agregar concepto para formulario embebido
+ */
+function agregarConceptoEmbebido(targetDivId) {
+  // Lógica similar a tu función original pero adaptada para IDs únicos
+  console.log('➕ Agregando concepto para formulario embebido...');
+  // Implementar según necesites
+}
+
+/**
+ * Enviar CFDI para formulario embebido
+ */
+function enviarCFDIEmbebido(targetDivId) {
+  console.log('📤 Enviando CFDI para formulario embebido...');
+  
+  // Recopilar datos del formulario embebido
+  const datos = recopilarDatosEmbebido(targetDivId);
+  
+  if (validarDatosEmbebido(datos, targetDivId)) {
+    // Usar la misma lógica de envío pero adaptada
+    enviarCFDIConDatos(datos, targetDivId);
+  }
+}
+
+/**
+ * Recopilar datos del formulario embebido
+ */
+function recopilarDatosEmbebido(targetDivId) {
+  // Similar a tu función original pero con IDs únicos
+  const conceptos = [];
+  const filasConceptos = document.querySelectorAll(`.producto-row-${targetDivId}`);
+  
+  filasConceptos.forEach(function(fila) {
+    const filaSecundaria = fila.nextElementSibling;
+    
+    const cantidad = parseFloat(fila.querySelector(`.cantidad-${targetDivId}`).value);
+    const precioUnitario = parseFloat(fila.querySelector(`.precioUnitario-${targetDivId}`).value);
+    const descuento = filaSecundaria ? parseFloat(filaSecundaria.querySelector(`.descuento-${targetDivId}`).value) || 0 : 0;
+    const importe = cantidad * precioUnitario;
+    
+    const concepto = {
+      ClaveProdServ: fila.querySelector(`.claveProdServ-${targetDivId}`).value.trim(),
+      ClaveUnidad: filaSecundaria ? filaSecundaria.querySelector(`.claveUnidad-${targetDivId}`).value : 'E48',
+      Unidad: filaSecundaria ? filaSecundaria.querySelector(`.unidad-${targetDivId}`).value : 'Unidad de servicio',
+      Descripcion: fila.querySelector(`.descripcion-${targetDivId}`).value.trim(),
+      ObjetoImp: filaSecundaria ? filaSecundaria.querySelector(`.objetoImp-${targetDivId}`).value : '02',
+      Cantidad: cantidad,
+      ValorUnitario: precioUnitario,
+      Importe: importe,
+      Descuento: descuento
+    };
+    
+    if (concepto.ObjetoImp === '02') {
+      const baseGravable = importe - descuento;
+      const ivaImporte = baseGravable * 0.16;
+      
+      concepto.Impuestos = {
+        Traslados: [{
+          Base: baseGravable,
+          Impuesto: '002',
+          TipoFactor: 'Tasa',
+          TasaOCuota: 0.16,
+          Importe: ivaImporte
+        }]
+      };
+    }
+    
+    conceptos.push(concepto);
+  });
+  
+  const datosBasicos = {
+    Receptor: {
+      UID: document.getElementById(`receptorUID-${targetDivId}`).value.trim()
+    },
+    TipoDocumento: document.getElementById(`tipoDocumento-${targetDivId}`).value,
+    Conceptos: conceptos,
+    UsoCFDI: document.getElementById(`usoCFDI-${targetDivId}`).value,
+    Serie: document.getElementById(`serie-${targetDivId}`).value,
+    FormaPago: document.getElementById(`formaPago-${targetDivId}`).value,
+    MetodoPago: document.getElementById(`metodoPago-${targetDivId}`).value,
+    Moneda: document.getElementById(`moneda-${targetDivId}`).value,
+    EnviarCorreo: document.getElementById(`enviarCorreo-${targetDivId}`).checked,
+    NumOrder: document.getElementById(`numOrder-${targetDivId}`).value || null,
+    Comentarios: document.getElementById(`comentarios-${targetDivId}`).value || null
+  };
+  
+  const residenciaFiscal = document.getElementById(`residenciaFiscal-${targetDivId}`).value.trim();
+  if (residenciaFiscal) {
+    datosBasicos.Receptor.ResidenciaFiscal = residenciaFiscal;
+  }
+  
+  return formatearDatosParaAPI(datosBasicos);
+}
+
+/**
+ * Validar datos del formulario embebido
+ */
+function validarDatosEmbebido(datos, targetDivId) {
+  // Usar la misma lógica de validación que tu función original
+  if (!datos.Receptor.UID) {
+    alert('❌ El UID del receptor es obligatorio');
+    return false;
+  }
+  if (!datos.Serie) {
+    alert('❌ La serie es obligatoria');
+    return false;
+  }
+  if (datos.Conceptos.length === 0) {
+    alert('❌ Debe agregar al menos un concepto');
+    return false;
+  }
+  
+  for (let i = 0; i < datos.Conceptos.length; i++) {
+    const concepto = datos.Conceptos[i];
+    if (!concepto.ClaveProdServ || !concepto.Descripcion) {
+      alert('❌ El concepto ' + (i + 1) + ' debe tener descripción y clave de producto/servicio');
+      return false;
+    }
+    if (concepto.Cantidad <= 0) {
+      alert('❌ El concepto ' + (i + 1) + ' debe tener cantidad mayor a 0');
+      return false;
+    }
+    if (concepto.ValorUnitario <= 0) {
+      alert('❌ El concepto ' + (i + 1) + ' debe tener precio unitario mayor a 0');
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+/**
+ * Enviar CFDI con datos específicos
+ */
+function enviarCFDIConDatos(datos, targetDivId) {
+  console.log('📡 Enviando CFDI con datos para formulario embebido...');
+  
+  document.getElementById(`loading-${targetDivId}`).style.display = 'block';
+  document.getElementById(`submitBtn-${targetDivId}`).disabled = true;
+  
+  let ajaxUrl = window.urlAjaxFuncional || '/wp-admin/admin-ajax.php';
+  let nonce = '';
+  
+  if (window.pos_billing_ajax) {
+    ajaxUrl = window.pos_billing_ajax.ajax_url || ajaxUrl;
+    nonce = window.pos_billing_ajax.nonce || '';
+  }
+  
+  const formData = new FormData();
+  formData.append('action', 'pos_billing_create_cfdi');
+  if (nonce) {
+    formData.append('nonce', nonce);
+  }
+  formData.append('cfdi_data', JSON.stringify(datos));
+  
+  fetch(ajaxUrl, {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('📨 Respuesta del servidor para formulario embebido:', data);
+    
+    document.getElementById(`loading-${targetDivId}`).style.display = 'none';
+    document.getElementById(`submitBtn-${targetDivId}`).disabled = false;
+    
+    if (data.success) {
+      console.log('✅ CFDI creado exitosamente en formulario embebido');
+      document.getElementById(`result-container-${targetDivId}`).className = 'result-container result-success';
+      document.getElementById(`result-content-${targetDivId}`).innerHTML = 
+        '<div style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #28a745;">' +
+          '✅ CFDI Generado Exitosamente' +
+        '</div>' +
+        '<div style="background: white; padding: 15px; border-radius: 5px;">' +
+          '<p><strong>UUID:</strong> ' + (data.data.uuid || 'N/A') + '</p>' +
+          '<p><strong>Folio:</strong> ' + (data.data.folio || 'N/A') + '</p>' +
+          '<p><strong>Total:</strong> ' + (data.data.total || '0.00') + '</p>' +
+        '</div>' +
+        '<div style="margin-top: 20px; text-align: center;">' +
+          '<button onclick="limpiarFormularioEmbebido(\'' + targetDivId + '\')" style="padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 5px;">🔄 Nueva Factura</button>' +
+        '</div>';
+      document.getElementById(`result-container-${targetDivId}`).style.display = 'block';
+    } else {
+      console.error('❌ Error creando CFDI en formulario embebido:', data);
+      let errorMsg = data.data || data.message || 'Error desconocido';
+      if (typeof errorMsg === 'object') {
+        if (errorMsg.specific_analysis) {
+          errorMsg = errorMsg.specific_analysis.error_type + ': ' + (errorMsg.message || 'Error en la API');
+        } else {
+          errorMsg = JSON.stringify(errorMsg);
+        }
+      }
+      alert('❌ Error: ' + errorMsg);
+    }
+  })
+  .catch(error => {
+    console.error('❌ Error de conexión en formulario embebido:', error);
+    document.getElementById(`loading-${targetDivId}`).style.display = 'none';
+    document.getElementById(`submitBtn-${targetDivId}`).disabled = false;
+    alert('❌ Error de conexión: ' + error.message);
+  });
+}
+
+/**
+ * Limpiar formulario embebido
+ */
+function limpiarFormularioEmbebido(targetDivId) {
+  const formulario = document.getElementById(`cfdiformulario-${targetDivId}`);
+  if (formulario) {
+    formulario.reset();
+    
+    // Limpiar información del cliente
+    const clienteInfo = document.getElementById(`clienteInfo-${targetDivId}`);
+    if (clienteInfo) {
+      clienteInfo.style.display = 'none';
+    }
+    
+    // Limpiar resultados
+    const resultContainer = document.getElementById(`result-container-${targetDivId}`);
+    if (resultContainer) {
+      resultContainer.style.display = 'none';
+    }
+    
+    // Recalcular totales
+    calcularTotalesEmbebido(targetDivId);
+    
+    // Recargar clientes
+    cargarClientesEmbebido(targetDivId);
+    
+    console.log('🧹 Formulario embebido limpiado');
+  }
+}
+
+/**
+ * Cerrar formulario embebido (equivalente a cerrar popup)
+ */
+function cerrarFormularioEmbebido(targetDivId) {
+  const targetDiv = document.getElementById(targetDivId);
+  if (targetDiv) {
+    targetDiv.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">Formulario cerrado. <a href="#" onclick="abrirModuloFacturacionEmbebido(\'' + targetDivId + '\')">Volver a abrir</a></p>';
+  }
+}
