@@ -122,6 +122,42 @@ function abrirModuloFacturacion() {
         .readonly-field { background-color: #f8f9fa !important; color: #495057; }
         .btn-reload { background: #17a2b8; font-size: 12px; padding: 8px 12px; margin-left: 10px; }
         .btn-reload:hover { background: #138496; }
+        
+        /* NUEVOS ESTILOS PARA IMPORTAR PEDIDO */
+        .import-order-section { 
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 25px; 
+            border-left: 4px solid #2196f3; 
+        }
+        .import-order-section h3 { 
+            color: #1976d2; 
+            margin: 0 0 15px 0; 
+            font-size: 18px; 
+        }
+        .btn-import { 
+            background: #2196f3; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-import:hover { 
+            background: #1976d2; 
+            transform: translateY(-1px); 
+        }
+        .import-order-input { 
+            display: none; 
+            margin-top: 15px; 
+        }
+        .import-order-input.show { 
+            display: block; 
+        }
     </style>
 </head>
 <body>
@@ -238,6 +274,39 @@ function abrirModuloFacturacion() {
                     <div class="form-group">
                         <label>Número de Orden</label>
                         <input type="text" id="numOrder" placeholder="Se genera automáticamente">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- NUEVA SECCIÓN PARA IMPORTAR PEDIDO -->
+            <div class="import-order-section">
+                <h3>📦 Importar Pedido</h3>
+                <p style="margin: 0 0 15px 0; color: #666;">Importa los datos de un pedido existente para agilizar la creación de la factura.</p>
+                <button type="button" id="toggleImportOrder" class="btn-import">
+                    📥 Importar Pedido
+                </button>
+                <div id="importOrderInput" class="import-order-input">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Número de Pedido</label>
+                            <input type="text" id="numeroPedido" placeholder="Ingresa el número de pedido">
+                            <div class="help-text">Ejemplo: PED-2024-001, ORD-123456, etc.</div>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: end; gap: 10px;">
+                            <button type="button" id="buscarPedido" class="btn btn-add" style="margin: 0;">
+                                🔍 Buscar Pedido
+                            </button>
+                            <button type="button" id="cancelarImport" class="btn btn-cancel" style="margin: 0;">
+                                ❌ Cancelar
+                            </button>
+                        </div>
+                    </div>
+                    <div id="pedidoInfo" style="display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <h4 style="margin: 0 0 10px 0; color: #28a745;">✅ Pedido Encontrado</h4>
+                        <div id="pedidoDetalles"></div>
+                        <button type="button" id="aplicarPedido" class="btn" style="margin-top: 10px;">
+                            ✅ Aplicar Datos del Pedido
+                        </button>
                     </div>
                 </div>
             </div>
@@ -584,10 +653,10 @@ function calcularTotales() {
     const ivaEl = document.getElementById('iva');
     const totalEl = document.getElementById('total');
     
-    if (subtotalEl) subtotalEl.textContent = '$' + subtotal.toFixed(2);
-    if (totalDescuentosEl) totalDescuentosEl.textContent = '$' + totalDescuentos.toFixed(2);
-    if (ivaEl) ivaEl.textContent = '$' + iva.toFixed(2);
-    if (totalEl) totalEl.textContent = '$' + total.toFixed(2);
+    if (subtotalEl) subtotalEl.textContent = ' + subtotal.toFixed(2);
+    if (totalDescuentosEl) totalDescuentosEl.textContent = ' + totalDescuentos.toFixed(2);
+    if (ivaEl) ivaEl.textContent = ' + iva.toFixed(2);
+    if (totalEl) totalEl.textContent = ' + total.toFixed(2);
 }
 
 /**
@@ -839,7 +908,7 @@ function enviarCFDI(datos) {
                 '<div style="background: white; padding: 15px; border-radius: 5px;">' +
                     '<p><strong>UUID:</strong> ' + (data.data.uuid || 'N/A') + '</p>' +
                     '<p><strong>Folio:</strong> ' + (data.data.folio || 'N/A') + '</p>' +
-                    '<p><strong>Total:</strong> $' + (data.data.total || '0.00') + '</p>' +
+                    '<p><strong>Total:</strong>  + (data.data.total || '0.00') + '</p>' +
                 '</div>' +
                 '<div style="margin-top: 20px; text-align: center;">' +
                     '<button onclick="window.location.reload()" class="btn">🔄 Nueva Factura</button>' +
@@ -870,17 +939,447 @@ function enviarCFDI(datos) {
     });
 }
 
+// ✅ NUEVAS FUNCIONES PARA IMPORTAR PEDIDO
+
+/**
+ * 📦 FUNCIÓN PARA MANEJAR LA FUNCIONALIDAD DE IMPORTAR PEDIDO
+ */
+function configurarImportarPedido() {
+    console.log('📦 Configurando funcionalidad de importar pedido...');
+    
+    const toggleBtn = document.getElementById('toggleImportOrder');
+    const importInput = document.getElementById('importOrderInput');
+    const buscarBtn = document.getElementById('buscarPedido');
+    const cancelarBtn = document.getElementById('cancelarImport');
+    const aplicarBtn = document.getElementById('aplicarPedido');
+    
+    // Mostrar/ocultar input de importar pedido
+    if (toggleBtn && importInput) {
+        toggleBtn.addEventListener('click', function() {
+            if (importInput.classList.contains('show')) {
+                importInput.classList.remove('show');
+                toggleBtn.textContent = '📥 Importar Pedido';
+            } else {
+                importInput.classList.add('show');
+                toggleBtn.textContent = '📥 Ocultar Importar';
+                // Enfocar el campo de número de pedido
+                const numeroPedido = document.getElementById('numeroPedido');
+                if (numeroPedido) {
+                    numeroPedido.focus();
+                }
+            }
+        });
+    }
+    
+    // Buscar pedido
+    if (buscarBtn) {
+        buscarBtn.addEventListener('click', function() {
+            buscarPedidoPorNumero();
+        });
+    }
+    
+    // Cancelar importación
+    if (cancelarBtn) {
+        cancelarBtn.addEventListener('click', function() {
+            cancelarImportacion();
+        });
+    }
+    
+    // Aplicar datos del pedido
+    if (aplicarBtn) {
+        aplicarBtn.addEventListener('click', function() {
+            aplicarDatosPedido();
+        });
+    }
+    
+    // Permitir buscar con Enter
+    const numeroPedido = document.getElementById('numeroPedido');
+    if (numeroPedido) {
+        numeroPedido.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscarPedidoPorNumero();
+            }
+        });
+    }
+}
+
+/**
+ * 🔍 FUNCIÓN PARA BUSCAR PEDIDO POR NÚMERO
+ */
+function buscarPedidoPorNumero() {
+    const numeroPedido = document.getElementById('numeroPedido').value.trim();
+    
+    if (!numeroPedido) {
+        alert('❌ Por favor, ingresa un número de pedido');
+        return;
+    }
+    
+    console.log('🔍 Buscando pedido:', numeroPedido);
+    
+    // Deshabilitar botón mientras busca
+    const buscarBtn = document.getElementById('buscarPedido');
+    const originalText = buscarBtn.textContent;
+    buscarBtn.disabled = true;
+    buscarBtn.textContent = '🔍 Buscando...';
+    
+    // Simular búsqueda de pedido (aquí puedes integrar con tu API real)
+    setTimeout(() => {
+        // Datos de ejemplo - reemplaza con tu lógica real
+        const pedidoEjemplo = simularBusquedaPedido(numeroPedido);
+        
+        buscarBtn.disabled = false;
+        buscarBtn.textContent = originalText;
+        
+        if (pedidoEjemplo) {
+            mostrarPedidoEncontrado(pedidoEjemplo);
+        } else {
+            mostrarPedidoNoEncontrado();
+        }
+    }, 1500); // Simular delay de API
+}
+
+/**
+ * 🎭 FUNCIÓN PARA SIMULAR BÚSQUEDA DE PEDIDO (reemplaza con tu lógica real)
+ */
+function simularBusquedaPedido(numeroPedido) {
+    // Simulación de datos - en tu implementación real, aquí harías una llamada a tu API
+    const pedidosEjemplo = {
+        'PED-2024-001': {
+            numero: 'PED-2024-001',
+            cliente: {
+                nombre: 'ACME Corporation',
+                rfc: 'ACM123456789',
+                uid: '67a93f71cdddb' // Usar UID existente en tu sistema
+            },
+            productos: [
+                {
+                    descripcion: 'Disco Duro SSD 1TB',
+                    claveProdServ: '43201830',
+                    cantidad: 2,
+                    precioUnitario: 1500.00,
+                    claveUnidad: 'H87',
+                    unidad: 'Pieza'
+                },
+                {
+                    descripcion: 'Memoria RAM 16GB',
+                    claveProdServ: '43201604',
+                    cantidad: 1,
+                    precioUnitario: 2800.00,
+                    claveUnidad: 'H87',
+                    unidad: 'Pieza'
+                }
+            ],
+            total: 5800.00,
+            fecha: '2024-01-15'
+        },
+        'ORD-123456': {
+            numero: 'ORD-123456',
+            cliente: {
+                nombre: 'Tech Solutions SA',
+                rfc: 'TSO987654321',
+                uid: '67a93f71cdddb'
+            },
+            productos: [
+                {
+                    descripcion: 'Laptop Business',
+                    claveProdServ: '43211507',
+                    cantidad: 1,
+                    precioUnitario: 15000.00,
+                    claveUnidad: 'H87',
+                    unidad: 'Pieza'
+                }
+            ],
+            total: 15000.00,
+            fecha: '2024-01-20'
+        }
+    };
+    
+    return pedidosEjemplo[numeroPedido.toUpperCase()] || null;
+}
+
+/**
+ * ✅ FUNCIÓN PARA MOSTRAR PEDIDO ENCONTRADO
+ */
+function mostrarPedidoEncontrado(pedido) {
+    console.log('✅ Pedido encontrado:', pedido);
+    
+    const pedidoInfo = document.getElementById('pedidoInfo');
+    const pedidoDetalles = document.getElementById('pedidoDetalles');
+    
+    if (!pedidoInfo || !pedidoDetalles) return;
+    
+    // Guardar datos del pedido para uso posterior
+    window.pedidoActual = pedido;
+    
+    // Mostrar detalles
+    let html = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">';
+    html += '<div><strong>📋 Número:</strong> ' + pedido.numero + '</div>';
+    html += '<div><strong>👤 Cliente:</strong> ' + pedido.cliente.nombre + '</div>';
+    html += '<div><strong>🏢 RFC:</strong> ' + pedido.cliente.rfc + '</div>';
+    html += '<div><strong>💰 Total:</strong>  + pedido.total.toFixed(2) + '</div>';
+    html += '</div>';
+    
+    html += '<div style="margin-top: 15px;"><strong>📦 Productos:</strong></div>';
+    html += '<div style="max-height: 150px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 5px;">';
+    
+    pedido.productos.forEach((producto, index) => {
+        html += '<div style="padding: 8px; border-bottom: 1px solid #ddd;">';
+        html += '<strong>' + (index + 1) + '.</strong> ' + producto.descripcion;
+        html += '<br><small>Cantidad: ' + producto.cantidad + ' | Precio:  + producto.precioUnitario.toFixed(2) + '</small>';
+        html += '</div>';
+    });
+    
+    html += '</div>';
+    
+    pedidoDetalles.innerHTML = html;
+    pedidoInfo.style.display = 'block';
+}
+
+/**
+ * ❌ FUNCIÓN PARA MOSTRAR PEDIDO NO ENCONTRADO
+ */
+function mostrarPedidoNoEncontrado() {
+    console.log('❌ Pedido no encontrado');
+    
+    const pedidoInfo = document.getElementById('pedidoInfo');
+    const pedidoDetalles = document.getElementById('pedidoDetalles');
+    
+    if (!pedidoInfo || !pedidoDetalles) return;
+    
+    pedidoDetalles.innerHTML = 
+        '<div style="text-align: center; padding: 20px; color: #dc3545;">' +
+        '<h4 style="margin: 0 0 10px 0;">❌ Pedido No Encontrado</h4>' +
+        '<p style="margin: 0;">El número de pedido ingresado no existe en el sistema.</p>' +
+        '<p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Verifica el número e intenta nuevamente.</p>' +
+        '</div>';
+    
+    pedidoInfo.style.display = 'block';
+    
+    // Ocultar automáticamente después de 3 segundos
+    setTimeout(() => {
+        if (pedidoInfo) {
+            pedidoInfo.style.display = 'none';
+        }
+    }, 3000);
+}
+
+/**
+ * 🚫 FUNCIÓN PARA CANCELAR IMPORTACIÓN
+ */
+function cancelarImportacion() {
+    console.log('🚫 Cancelando importación...');
+    
+    // Limpiar campos
+    const numeroPedido = document.getElementById('numeroPedido');
+    if (numeroPedido) {
+        numeroPedido.value = '';
+    }
+    
+    // Ocultar información del pedido
+    const pedidoInfo = document.getElementById('pedidoInfo');
+    if (pedidoInfo) {
+        pedidoInfo.style.display = 'none';
+    }
+    
+    // Ocultar sección de importar
+    const importInput = document.getElementById('importOrderInput');
+    const toggleBtn = document.getElementById('toggleImportOrder');
+    
+    if (importInput && toggleBtn) {
+        importInput.classList.remove('show');
+        toggleBtn.textContent = '📥 Importar Pedido';
+    }
+    
+    // Limpiar datos del pedido actual
+    window.pedidoActual = null;
+}
+
+/**
+ * ✅ FUNCIÓN PARA APLICAR DATOS DEL PEDIDO AL FORMULARIO
+ */
+function aplicarDatosPedido() {
+    if (!window.pedidoActual) {
+        alert('❌ No hay datos de pedido para aplicar');
+        return;
+    }
+    
+    console.log('✅ Aplicando datos del pedido al formulario...');
+    
+    const pedido = window.pedidoActual;
+    
+    // 1. Seleccionar cliente si existe
+    const clienteSelect = document.getElementById('receptorUID');
+    if (clienteSelect && pedido.cliente.uid) {
+        // Buscar la opción que coincida con el UID
+        const options = clienteSelect.options;
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === pedido.cliente.uid) {
+                clienteSelect.selectedIndex = i;
+                // Disparar evento change para mostrar info del cliente
+                clienteSelect.dispatchEvent(new Event('change'));
+                break;
+            }
+        }
+    }
+    
+    // 2. Limpiar conceptos existentes (excepto el primero)
+    limpiarConceptosExistentes();
+    
+    // 3. Aplicar productos del pedido
+    pedido.productos.forEach((producto, index) => {
+        if (index === 0) {
+            // Usar el primer concepto existente
+            aplicarProductoAConcepto(producto, 0);
+        } else {
+            // Agregar nuevos conceptos
+            agregarNuevoConcepto();
+            aplicarProductoAConcepto(producto, index);
+        }
+    });
+    
+    // 4. Actualizar número de orden con referencia al pedido
+    const numOrderField = document.getElementById('numOrder');
+    if (numOrderField) {
+        numOrderField.value = 'REF-' + pedido.numero + '-' + Date.now();
+    }
+    
+    // 5. Agregar comentario con referencia al pedido
+    const comentariosField = document.getElementById('comentarios');
+    if (comentariosField) {
+        comentariosField.value = 'Factura generada a partir del pedido: ' + pedido.numero;
+    }
+    
+    // 6. Recalcular totales
+    calcularTotales();
+    
+    // 7. Mostrar confirmación
+    alert('✅ Datos del pedido aplicados correctamente\n\n' +
+          '📋 Pedido: ' + pedido.numero + '\n' +
+          '👤 Cliente: ' + pedido.cliente.nombre + '\n' +
+          '📦 Productos: ' + pedido.productos.length + '\n' +
+          '💰 Total:  + pedido.total.toFixed(2));
+    
+    // 8. Cerrar sección de importar
+    cancelarImportacion();
+    
+    console.log('✅ Datos del pedido aplicados exitosamente');
+}
+
+/**
+ * 🗑️ FUNCIÓN PARA LIMPIAR CONCEPTOS EXISTENTES (excepto el primero)
+ */
+function limpiarConceptosExistentes() {
+    const conceptos = document.querySelectorAll('.producto-row');
+    
+    // Eliminar todos los conceptos excepto el primero
+    for (let i = conceptos.length - 1; i > 0; i--) {
+        const concepto = conceptos[i];
+        const filaSecundaria = concepto.nextElementSibling;
+        
+        if (filaSecundaria && filaSecundaria.classList.contains('producto-row-secondary')) {
+            filaSecundaria.remove();
+        }
+        concepto.remove();
+    }
+    
+    // Limpiar el primer concepto
+    const primerConcepto = document.querySelector('.producto-row');
+    if (primerConcepto) {
+        limpiarCamposConcepto(primerConcepto);
+    }
+}
+
+/**
+ * 🧹 FUNCIÓN PARA LIMPIAR CAMPOS DE UN CONCEPTO
+ */
+function limpiarCamposConcepto(conceptoRow) {
+    const descripcion = conceptoRow.querySelector('.descripcion');
+    const claveProdServ = conceptoRow.querySelector('.claveProdServ');
+    const cantidad = conceptoRow.querySelector('.cantidad');
+    const precioUnitario = conceptoRow.querySelector('.precioUnitario');
+    const totalConcepto = conceptoRow.querySelector('.totalConcepto');
+    
+    if (descripcion) descripcion.value = '';
+    if (claveProdServ) claveProdServ.value = '';
+    if (cantidad) cantidad.value = '1';
+    if (precioUnitario) precioUnitario.value = '';
+    if (totalConcepto) totalConcepto.value = '';
+    
+    // Limpiar fila secundaria
+    const filaSecundaria = conceptoRow.nextElementSibling;
+    if (filaSecundaria && filaSecundaria.classList.contains('producto-row-secondary')) {
+        const claveUnidad = filaSecundaria.querySelector('.claveUnidad');
+        const unidad = filaSecundaria.querySelector('.unidad');
+        const descuento = filaSecundaria.querySelector('.descuento');
+        const objetoImp = filaSecundaria.querySelector('.objetoImp');
+        
+        if (claveUnidad) claveUnidad.value = 'E48';
+        if (unidad) unidad.value = 'Unidad de servicio';
+        if (descuento) descuento.value = '0';
+        if (objetoImp) objetoImp.value = '02';
+    }
+}
+
+/**
+ * 📦 FUNCIÓN PARA APLICAR PRODUCTO A UN CONCEPTO ESPECÍFICO
+ */
+function aplicarProductoAConcepto(producto, index) {
+    const conceptos = document.querySelectorAll('.producto-row');
+    const concepto = conceptos[index];
+    
+    if (!concepto) {
+        console.error('❌ No se encontró el concepto en el índice:', index);
+        return;
+    }
+    
+    // Aplicar datos principales
+    const descripcion = concepto.querySelector('.descripcion');
+    const claveProdServ = concepto.querySelector('.claveProdServ');
+    const cantidad = concepto.querySelector('.cantidad');
+    const precioUnitario = concepto.querySelector('.precioUnitario');
+    
+    if (descripcion) descripcion.value = producto.descripcion;
+    if (claveProdServ) claveProdServ.value = producto.claveProdServ;
+    if (cantidad) cantidad.value = producto.cantidad;
+    if (precioUnitario) precioUnitario.value = producto.precioUnitario;
+    
+    // Aplicar datos secundarios
+    const filaSecundaria = concepto.nextElementSibling;
+    if (filaSecundaria && filaSecundaria.classList.contains('producto-row-secondary')) {
+        const claveUnidad = filaSecundaria.querySelector('.claveUnidad');
+        const unidad = filaSecundaria.querySelector('.unidad');
+        
+        if (claveUnidad && producto.claveUnidad) claveUnidad.value = producto.claveUnidad;
+        if (unidad && producto.unidad) unidad.value = producto.unidad;
+    }
+}
+
+/**
+ * ➕ FUNCIÓN PARA AGREGAR NUEVO CONCEPTO (utilizando la lógica existente)
+ */
+function agregarNuevoConcepto() {
+    // Utilizar la función existente de agregar concepto
+    const agregarBtn = document.getElementById('agregarConcepto');
+    if (agregarBtn) {
+        agregarBtn.click();
+    }
+}
+
 /**
  * ✅ EVENTO LOAD PRINCIPAL
  */
 window.addEventListener('load', function() {
-    console.log('🚀 EVENTO LOAD DISPARADO - PASO 3 (clientes + totales + crear CFDI)');
+    console.log('🚀 EVENTO LOAD DISPARADO - PASO 3 (clientes + totales + crear CFDI + importar pedido)');
     
     const testElement = document.getElementById('receptorUID');
     console.log('📋 Elemento receptorUID encontrado:', testElement ? 'SÍ' : 'NO');
     
     // ✅ CARGAR CLIENTES
     cargarClientes();
+    
+    // ✅ CONFIGURAR FUNCIONALIDAD DE IMPORTAR PEDIDO
+    configurarImportarPedido();
     
     // ✅ CONFIGURAR EVENT LISTENERS PARA CONCEPTOS INICIALES
     const conceptoInicial = document.querySelector('.producto-row');
@@ -924,10 +1423,10 @@ window.addEventListener('load', function() {
     // ✅ CALCULAR TOTALES INICIAL
     setTimeout(calcularTotales, 100);
     
-    console.log('✅ PASO 3 - Todo configurado: clientes + totales + crear CFDI');
+    console.log('✅ PASO 3 - Todo configurado: clientes + totales + crear CFDI + importar pedido');
 });
 
-console.log('✅ PASO 3 completado - Script cargado con funcionalidad crear CFDI');
+console.log('✅ PASO 3 completado - Script cargado con funcionalidad crear CFDI e importar pedido');
     </script>
 </body>
 </html>`;
