@@ -8,10 +8,9 @@ function pos_billing_button_shortcode($atts) {
     $atts = shortcode_atts(array(
         'text' => 'Facturación',
         'width' => '100%',
-        'height' => '100vh' // ← CAMBIÉ ESTO: 100vh = altura completa de la ventana
+        'height' => '100vh' 
     ), $atts);
     
-    // ID único para cada formulario
     $form_id = 'pos-billing-form-' . wp_rand(1000, 9999);
     
     return '
@@ -75,7 +74,7 @@ add_shortcode('pos_billing_button', 'pos_billing_button_shortcode');
 // Shortcode del módulo completo (sin cambios)
 function pos_billing_module_shortcode($atts) {
     return '<div style="background: white; padding: 20px; border-radius: 8px; text-align: center;">
-        <h2>📄 Módulo de Facturación</h2>
+        <h2> Módulo de Facturación</h2>
         <p>Plugin funcionando correctamente</p>
     </div>';
 }
