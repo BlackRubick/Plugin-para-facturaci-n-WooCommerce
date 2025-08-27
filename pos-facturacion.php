@@ -538,3 +538,78 @@ add_action('wp_ajax_pos_billing_get_clients', function() {
     
     wp_send_json_success($clients);
 });
+// Agregar acción AJAX para buscar pedidos
+add_action('wp_ajax_pos_billing_search_order', 'pos_billing_search_order_callback');
+add_action('wp_ajax_nopriv_pos_billing_search_order', 'pos_billing_search_order_callback');
+
+function pos_billing_search_order_callback() {
+    // Verificar permisos
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error('Sin permisos');
+        return;
+    }
+    
+    // Verificar nonce si es necesario
+    $order_number = sanitize_text_field($_POST['order_number']);
+    
+    if (empty($order_number)) {
+        wp_send_json_error('Número de pedido requerido');
+        return;
+    }
+    
+    // Buscar el pedido en WooCommerce
+    $orders = wc_get_orders(array(
+        'meta_query' => array(
+            array(
+                'key' => '_order_number',
+                'value' => $order_number,
+                'compare' => 'LIKE'
+            )
+        ),
+        'limit' => 1
+    ));
+    
+    // También buscar por ID si no encuentra por número
+    if (empty($orders) && is_numeric($order_number)) {
+        $order = wc_get_order($order_number);
+        if ($order) {
+            $orders = array($order);
+        }
+    }
+    
+    if (!empty($orders)) {
+        $order = $orders[0];
+        $order_data = array(
+            'numero' => $order->get_order_number(),
+            'cliente' => array(
+                'nombre' => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
+                'rfc' => $order->get_meta('_billing_rfc') ?: 'XAXX010101000',
+                'uid' => '67a93f71cdddb' // Tu UID por defecto - ajustar según necesites
+            ),
+            'productos' => array(),
+            'total' => floatval($order->get_total()),
+            'fecha' => $order->get_date_created()->format('Y-m-d')
+        );
+        
+        // Obtener productos del pedido
+        foreach ($order->get_items() as $item) {
+            $product = $item->get_product();
+            $F_Unidad = $product ? $product->get_attribute('F_Unidad') : '';
+            
+            $order_data['productos'][] = array(
+                'descripcion' => $item->get_name(),
+                'claveProdServ' => $product && $product->get_sku() ? $product->get_sku() : '43232408',
+                'cantidad' => $item->get_quantity(),
+                'precioUnitario' => floatval($item->get_total() / $item->get_quantity()),
+                'claveUnidad' => !empty($F_Unidad) ? $F_Unidad : 'H87',
+                'unidad' => !empty($F_Unidad) ? $F_Unidad : 'Pieza'
+            );
+        }
+        
+        wp_send_json_success($order_data);
+    } else {
+        wp_send_json_error('Pedido no encontrado');
+    }
+    
+    wp_die();
+}va

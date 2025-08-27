@@ -68,7 +68,7 @@ function abrirModuloFacturacion() {
   const popup = window.open(
     "",
     "facturacion",
-    "width=2000,height=800,scrollbars=yes,resizable=yes"
+    "width=1200,height=800,scrollbars=yes,resizable=yes"
   );
 
   if (popup) {
@@ -277,85 +277,40 @@ function abrirModuloFacturacion() {
                     </div>
                 </div>
             </div>
-            <div style="background: red; color: white; padding: 20px; margin: 20px 0; text-align: center; font-size: 20px; font-weight: bold;">
-    🔴 TEST: Si ves esto, el HTML funciona. El problema son los estilos CSS.
-</div>
-            <!-- NUEVA SECCIÓN PARA IMPORTAR PEDIDO -->
-<!-- REEMPLAZA toda la sección import-order-section con esto: -->
-<div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #2196f3;">
-    <h3 style="color: #1976d2; margin: 0 0 15px 0; font-size: 18px;">📦 Importar Pedido</h3>
-    <p style="margin: 0 0 15px 0; color: #666;">Importa los datos de un pedido existente para agilizar la creación de la factura.</p>
-    
-    <button type="button" 
-            onclick="
-                const input = document.getElementById('importOrderInput'); 
-                const btn = this;
-                if (input.style.display === 'none' || input.style.display === '') { 
-                    input.style.display = 'block'; 
-                    btn.textContent = '📥 Ocultar Importar'; 
-                    console.log('MOSTRADO'); 
-                } else { 
-                    input.style.display = 'none'; 
-                    btn.textContent = '📥 Importar Pedido'; 
-                    console.log('OCULTADO'); 
-                }
-            "
-            style="background: #2196f3; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
-        📥 Importar Pedido
-    </button>
-    
-    <div id="importOrderInput" style="display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Número de Pedido</label>
-            <input type="text" id="numeroPedido" placeholder="Ingresa el número de pedido (ej: PED-2024-001)" 
-                   style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box;">
-        </div>
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button type="button" 
-                    onclick="
-                        const num = document.getElementById('numeroPedido').value.trim();
-                        if (!num) { alert('❌ Ingresa un número de pedido'); return; }
-                        console.log('🔍 Buscando:', num);
-                        alert('🔍 Buscando pedido: ' + num + '\\n\\n(Aquí integrarías con tu API real)');
-                        
-                        // Simular pedido encontrado
-                        setTimeout(() => {
-                            const info = document.getElementById('pedidoInfo');
-                            if (num.toUpperCase() === 'PED-2024-001') {
-                                info.innerHTML = '<div style=\"background: #d4edda; padding: 15px; border-radius: 5px; margin-top: 10px;\"><strong>✅ Pedido Encontrado:</strong><br>Cliente: ACME Corp<br>Total: $5,800.00<br><button onclick=\"alert(\\\"✅ Datos aplicados al formulario!\\\"); document.getElementById(\\\"importOrderInput\\\").style.display=\\\"none\\\";\\\" style=\\\"background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-top: 10px;\\\">✅ Aplicar Datos</button></div>';
-                            } else {
-                                info.innerHTML = '<div style=\"background: #f8d7da; padding: 15px; border-radius: 5px; margin-top: 10px; color: #721c24;\"><strong>❌ Pedido no encontrado</strong><br>Verifica el número e intenta nuevamente.</div>';
-                                setTimeout(() => info.innerHTML = '', 3000);
-                            }
-                        }, 1000);
-                    "
-                    style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-                🔍 Buscar Pedido
-            </button>
             
-            <button type="button" 
-                    onclick="
-                        document.getElementById('numeroPedido').value = '';
-                        document.getElementById('pedidoInfo').innerHTML = '';
-                        document.getElementById('importOrderInput').style.display = 'none';
-                        console.log('❌ Importación cancelada');
-                    "
-                    style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-                ❌ Cancelar
-            </button>
-        </div>
-        
-        <div id="pedidoInfo"></div>
-        
-        <div style="font-size: 12px; color: #666; margin-top: 10px;">
-            💡 <strong>Tip:</strong> Prueba con "PED-2024-001" para ver un pedido de ejemplo
-        </div>
-    </div>
-</div>
-            <div style="background: red; color: white; padding: 20px; margin: 20px 0; text-align: center; font-size: 20px; font-weight: bold;">
-    🔴 TEST: Si ves esto, el HTML funciona. El problema son los estilos CSS.
-</div>
+            <!-- NUEVA SECCIÓN PARA IMPORTAR PEDIDO -->
+            <div class="import-order-section">
+                <h3>📦 Importar Pedido</h3>
+                <p style="margin: 0 0 15px 0; color: #666;">Importa los datos de un pedido existente para agilizar la creación de la factura.</p>
+                <button type="button" id="toggleImportOrder" class="btn-import">
+                    📥 Importar Pedido
+                </button>
+                <div id="importOrderInput" class="import-order-input">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Número de Pedido</label>
+                            <input type="text" id="numeroPedido" placeholder="Ingresa el número de pedido">
+                            <div class="help-text">Ejemplo: PED-2024-001, ORD-123456, etc.</div>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: end; gap: 10px;">
+                            <button type="button" id="buscarPedido" class="btn btn-add" style="margin: 0;">
+                                🔍 Buscar Pedido
+                            </button>
+                            <button type="button" id="cancelarImport" class="btn btn-cancel" style="margin: 0;">
+                                ❌ Cancelar
+                            </button>
+                        </div>
+                    </div>
+                    <div id="pedidoInfo" style="display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <h4 style="margin: 0 0 10px 0; color: #28a745;">✅ Pedido Encontrado</h4>
+                        <div id="pedidoDetalles"></div>
+                        <button type="button" id="aplicarPedido" class="btn" style="margin-top: 10px;">
+                            ✅ Aplicar Datos del Pedido
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <div class="section">
                 <h3> Conceptos/Productos</h3>
                 <div id="conceptos">
@@ -989,64 +944,89 @@ function enviarCFDI(datos) {
 /**
  * 📦 FUNCIÓN PARA MANEJAR LA FUNCIONALIDAD DE IMPORTAR PEDIDO
  */
-function configurarImportarPedido() {
-    console.log('📦 Configurando funcionalidad de importar pedido...');
-    
-    const toggleBtn = document.getElementById('toggleImportOrder');
-    const importInput = document.getElementById('importOrderInput');
-    const buscarBtn = document.getElementById('buscarPedido');
-    const cancelarBtn = document.getElementById('cancelarImport');
-    const aplicarBtn = document.getElementById('aplicarPedido');
-    
-    // Mostrar/ocultar input de importar pedido
-    if (toggleBtn && importInput) {
-        toggleBtn.addEventListener('click', function() {
-            if (importInput.classList.contains('show')) {
-                importInput.classList.remove('show');
-                toggleBtn.textContent = '📥 Importar Pedido';
-            } else {
-                importInput.classList.add('show');
-                toggleBtn.textContent = '📥 Ocultar Importar';
-                // Enfocar el campo de número de pedido
-                const numeroPedido = document.getElementById('numeroPedido');
-                if (numeroPedido) {
-                    numeroPedido.focus();
-                }
-            }
-        });
+function configurarImportarPedido(targetDivId) {
+    if (!targetDivId) {
+        targetDivId = '';
     }
     
-    // Buscar pedido
+    console.log('📦 Configurando funcionalidad de importar pedido para:', targetDivId || 'popup');
+    
+    // Agregar sufijo si es formulario embebido
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    
+    var toggleBtn = document.getElementById('toggleImportOrder' + suffix);
+    var importInput = document.getElementById('importOrderInput' + suffix);
+    var buscarBtn = document.getElementById('buscarPedido' + suffix);
+    var cancelarBtn = document.getElementById('cancelarImport' + suffix);
+    var aplicarBtn = document.getElementById('aplicarPedido' + suffix);
+    
+    console.log('toggleBtn encontrado:', !!toggleBtn);
+    console.log('importInput encontrado:', !!importInput);
+    
+    if (!toggleBtn || !importInput) {
+        console.log('⏳ Elementos no encontrados, reintentando en 300ms...');
+        setTimeout(function() {
+            configurarImportarPedido(targetDivId);
+        }, 300);
+        return;
+    }
+    
+    console.log('✅ Configurando eventos para formulario', targetDivId ? 'embebido' : 'popup');
+    
+    toggleBtn.addEventListener('click', function() {
+        console.log('🖱️ CLICK DETECTADO en toggleImportOrder');
+        
+        if (importInput.classList.contains('show')) {
+            importInput.classList.remove('show');
+                    importInput.style.display = 'none';  
+            toggleBtn.textContent = '📥 Importar Pedido';
+            console.log('➖ Sección ocultada');
+        } else {
+            importInput.classList.add('show');
+        importInput.style.display = 'block';
+            toggleBtn.textContent = '📥 Ocultar Importar';
+            console.log('➕ Sección mostrada');
+            
+            var numeroPedido = document.getElementById('numeroPedido' + suffix);
+            if (numeroPedido) {
+                numeroPedido.focus();
+            }
+        }
+    });
+    
     if (buscarBtn) {
         buscarBtn.addEventListener('click', function() {
-            buscarPedidoPorNumero();
+            console.log('🔍 Botón buscar pedido clickeado');
+            buscarPedidoPorNumero(targetDivId);
         });
     }
     
-    // Cancelar importación
     if (cancelarBtn) {
         cancelarBtn.addEventListener('click', function() {
-            cancelarImportacion();
+            console.log('❌ Botón cancelar clickeado');
+            cancelarImportacion(targetDivId);
         });
     }
     
-    // Aplicar datos del pedido
     if (aplicarBtn) {
         aplicarBtn.addEventListener('click', function() {
-            aplicarDatosPedido();
+            console.log('✅ Botón aplicar clickeado');
+            aplicarDatosPedido(targetDivId);
         });
     }
     
-    // Permitir buscar con Enter
-    const numeroPedido = document.getElementById('numeroPedido');
+    var numeroPedido = document.getElementById('numeroPedido' + suffix);
     if (numeroPedido) {
         numeroPedido.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                buscarPedidoPorNumero();
+                console.log('⌨️ Enter presionado');
+                buscarPedidoPorNumero(targetDivId);
             }
         });
     }
+    
+    console.log('🎉 Configuración completada');
 }
 
 /**
@@ -1077,9 +1057,9 @@ function buscarPedidoPorNumero() {
         buscarBtn.textContent = originalText;
         
         if (pedidoEjemplo) {
-            mostrarPedidoEncontrado(pedidoEjemplo);
+            mostrarPedidoEncontrado(pedidoEjemplo, targetDivId);
         } else {
-            mostrarPedidoNoEncontrado();
+            mostrarPedidoNoEncontrado(targetDivId);
         }
     }, 1500); // Simular delay de API
 }
@@ -1146,32 +1126,31 @@ function simularBusquedaPedido(numeroPedido) {
 /**
  * ✅ FUNCIÓN PARA MOSTRAR PEDIDO ENCONTRADO
  */
-function mostrarPedidoEncontrado(pedido) {
-    console.log('✅ Pedido encontrado:', pedido);
+function mostrarPedidoEncontrado(pedido, targetDivId) {
+    console.log('Pedido encontrado:', pedido);
     
-    const pedidoInfo = document.getElementById('pedidoInfo');
-    const pedidoDetalles = document.getElementById('pedidoDetalles');
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    var pedidoInfo = document.getElementById('pedidoInfo' + suffix);
+    var pedidoDetalles = document.getElementById('pedidoDetalles' + suffix);
     
     if (!pedidoInfo || !pedidoDetalles) return;
     
-    // Guardar datos del pedido para uso posterior
     window.pedidoActual = pedido;
     
-    // Mostrar detalles
-    let html = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">';
-    html += '<div><strong>📋 Número:</strong> ' + pedido.numero + '</div>';
-    html += '<div><strong>👤 Cliente:</strong> ' + pedido.cliente.nombre + '</div>';
-    html += '<div><strong>🏢 RFC:</strong> ' + pedido.cliente.rfc + '</div>';
-    html += '<div><strong>💰 Total:</strong>  + pedido.total.toFixed(2) + '</div>';
+    var html = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">';
+    html += '<div><strong>Número:</strong> ' + pedido.numero + '</div>';
+    html += '<div><strong>Cliente:</strong> ' + pedido.cliente.nombre + '</div>';
+    html += '<div><strong>RFC:</strong> ' + pedido.cliente.rfc + '</div>';
+    html += '<div><strong>Total:</strong> $' + pedido.total.toFixed(2) + '</div>';
     html += '</div>';
     
-    html += '<div style="margin-top: 15px;"><strong>📦 Productos:</strong></div>';
+    html += '<div style="margin-top: 15px;"><strong>Productos:</strong></div>';
     html += '<div style="max-height: 150px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 5px;">';
     
-    pedido.productos.forEach((producto, index) => {
+    pedido.productos.forEach(function(producto, index) {
         html += '<div style="padding: 8px; border-bottom: 1px solid #ddd;">';
         html += '<strong>' + (index + 1) + '.</strong> ' + producto.descripcion;
-        html += '<br><small>Cantidad: ' + producto.cantidad + ' | Precio:  + producto.precioUnitario.toFixed(2) + '</small>';
+        html += '<br><small>Cantidad: ' + producto.cantidad + ' | Precio: $' + producto.precioUnitario.toFixed(2) + '</small>';
         html += '</div>';
     });
     
@@ -1184,25 +1163,25 @@ function mostrarPedidoEncontrado(pedido) {
 /**
  * ❌ FUNCIÓN PARA MOSTRAR PEDIDO NO ENCONTRADO
  */
-function mostrarPedidoNoEncontrado() {
-    console.log('❌ Pedido no encontrado');
+function mostrarPedidoNoEncontrado(targetDivId) {
+    console.log('Pedido no encontrado');
     
-    const pedidoInfo = document.getElementById('pedidoInfo');
-    const pedidoDetalles = document.getElementById('pedidoDetalles');
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    var pedidoInfo = document.getElementById('pedidoInfo' + suffix);
+    var pedidoDetalles = document.getElementById('pedidoDetalles' + suffix);
     
     if (!pedidoInfo || !pedidoDetalles) return;
     
     pedidoDetalles.innerHTML = 
         '<div style="text-align: center; padding: 20px; color: #dc3545;">' +
-        '<h4 style="margin: 0 0 10px 0;">❌ Pedido No Encontrado</h4>' +
+        '<h4 style="margin: 0 0 10px 0;">Pedido No Encontrado</h4>' +
         '<p style="margin: 0;">El número de pedido ingresado no existe en el sistema.</p>' +
         '<p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Verifica el número e intenta nuevamente.</p>' +
         '</div>';
     
     pedidoInfo.style.display = 'block';
     
-    // Ocultar automáticamente después de 3 segundos
-    setTimeout(() => {
+    setTimeout(function() {
         if (pedidoInfo) {
             pedidoInfo.style.display = 'none';
         }
@@ -1415,96 +1394,6 @@ function agregarNuevoConcepto() {
  * ✅ EVENTO LOAD PRINCIPAL
  */
 window.addEventListener('load', function() {
-
-
-setTimeout(function() {
-    console.log('=== DIAGNÓSTICO IMPORTAR PEDIDO ===');
-    
-    // Verificar si los elementos existen
-    const elementos = [
-        'toggleImportOrder',
-        'importOrderInput', 
-        'numeroPedido',
-        'buscarPedido',
-        'cancelarImport',
-        'aplicarPedido'
-    ];
-    
-    elementos.forEach(id => {
-        const el = document.getElementById(id);
-        console.log(id + ':', el ? 'EXISTE' : 'NO EXISTE');
-        if (el) {
-            console.log('  - Tipo:', el.tagName);
-            console.log('  - Clases:', el.className);
-            console.log('  - Visible:', el.offsetWidth > 0 && el.offsetHeight > 0);
-        }
-    });
-    
-    // Verificar si la sección completa existe
-    const section = document.querySelector('.import-order-section');
-    console.log('Sección completa:', section ? 'EXISTE' : 'NO EXISTE');
-    
-    // Si existe, configurar DIRECTAMENTE sin depender de otras funciones
-    if (document.getElementById('toggleImportOrder')) {
-        console.log('CONFIGURANDO DIRECTAMENTE...');
-        
-        const toggle = document.getElementById('toggleImportOrder');
-        const input = document.getElementById('importOrderInput');
-        
-        // Configurar evento simple
-        toggle.addEventListener('click', function() {
-            console.log('CLICK DETECTADO EN TOGGLE');
-            
-            if (input.style.display === 'none' || input.style.display === '') {
-                input.style.display = 'block';
-                toggle.textContent = '📥 Ocultar Importar';
-                console.log('MOSTRADO');
-            } else {
-                input.style.display = 'none';
-                toggle.textContent = '📥 Importar Pedido';
-                console.log('OCULTADO');
-            }
-        });
-        
-        console.log('EVENTO CONFIGURADO EXITOSAMENTE');
-        
-        // Test inmediato
-        setTimeout(() => {
-            console.log('EJECUTANDO TEST...');
-            toggle.click();
-            setTimeout(() => {
-                toggle.click();
-            }, 1000);
-        }, 500);
-    } else {
-        console.log('EL ELEMENTO toggleImportOrder NO EXISTE');
-        
-        // Mostrar todo el HTML para debug
-        const body = document.body.innerHTML;
-        const hasImportSection = body.includes('import-order-section');
-        const hasToggleButton = body.includes('toggleImportOrder');
-        
-        console.log('HTML contiene import-order-section:', hasImportSection);
-        console.log('HTML contiene toggleImportOrder:', hasToggleButton);
-        
-        if (hasImportSection && !hasToggleButton) {
-            console.log('PROBLEMA: La sección existe pero el ID no');
-        }
-        
-        // Buscar elementos por clase en lugar de ID
-        const byClass = document.querySelector('.import-order-section');
-        if (byClass) {
-            console.log('ENCONTRADO POR CLASE');
-            const button = byClass.querySelector('button');
-            if (button) {
-                console.log('BOTÓN ENCONTRADO:', button.id, button.textContent);
-            }
-        }
-    }
-    
-    console.log('=== FIN DIAGNÓSTICO ===');
-}, 3000); // Esperar 3 segundos completos
-
     console.log('🚀 EVENTO LOAD DISPARADO - PASO 3 (clientes + totales + crear CFDI + importar pedido)');
     
     const testElement = document.getElementById('receptorUID');
@@ -1512,10 +1401,9 @@ setTimeout(function() {
     
     // ✅ CARGAR CLIENTES
     cargarClientes();
-    configurarImportarPedido();  // ← ESTA LÍNEA NO ESTÁ EN TU CÓDIGO
-
+    
     // ✅ CONFIGURAR FUNCIONALIDAD DE IMPORTAR PEDIDO
-    setTimeout(configurarImportarPedido, 2000);
+    configurarImportarPedido();
     
     // ✅ CONFIGURAR EVENT LISTENERS PARA CONCEPTOS INICIALES
     const conceptoInicial = document.querySelector('.producto-row');
@@ -1560,7 +1448,7 @@ setTimeout(function() {
     setTimeout(calcularTotales, 100);
     
     console.log('✅ PASO 3 - Todo configurado: clientes + totales + crear CFDI + importar pedido');
-});
+}),100;
 
 console.log('✅ PASO 3 completado - Script cargado con funcionalidad crear CFDI e importar pedido');
     </script>
@@ -1569,83 +1457,6 @@ console.log('✅ PASO 3 completado - Script cargado con funcionalidad crear CFDI
     
     popup.document.write(htmlContent);
     popup.document.close();
-    // Forzar configuración después de que el popup esté completamente cargado
-popup.addEventListener('load', function() {
-    setTimeout(function() {
-        console.log('🔧 Forzando configuración de importar pedido...');
-        
-        // Buscar los elementos en el popup
-        const toggleBtn = popup.document.getElementById('toggleImportOrder');
-        const importInput = popup.document.getElementById('importOrderInput');
-        
-        if (toggleBtn && importInput) {
-            console.log('✅ Elementos encontrados, configurando eventos manualmente...');
-            
-            // Configurar evento click del botón toggle DIRECTAMENTE
-            toggleBtn.onclick = function() {
-                console.log('🔄 Toggle clicked (manual)');
-                if (importInput.classList.contains('show')) {
-                    importInput.classList.remove('show');
-                    toggleBtn.textContent = '📥 Importar Pedido';
-                } else {
-                    importInput.classList.add('show');
-                    toggleBtn.textContent = '📥 Ocultar Importar';
-                    const numeroPedido = popup.document.getElementById('numeroPedido');
-                    if (numeroPedido) {
-                        numeroPedido.focus();
-                    }
-                }
-            };
-            
-            // Configurar otros botones
-            const buscarBtn = popup.document.getElementById('buscarPedido');
-            if (buscarBtn) {
-                buscarBtn.onclick = function() {
-                    console.log('🔍 Buscar clicked (manual)');
-                    // Llamar a la función desde el contexto del popup
-                    popup.buscarPedidoPorNumero();
-                };
-            }
-            
-            const cancelarBtn = popup.document.getElementById('cancelarImport');
-            if (cancelarBtn) {
-                cancelarBtn.onclick = function() {
-                    console.log('❌ Cancelar clicked (manual)');
-                    popup.cancelarImportacion();
-                };
-            }
-            
-            const aplicarBtn = popup.document.getElementById('aplicarPedido');
-            if (aplicarBtn) {
-                aplicarBtn.onclick = function() {
-                    console.log('✅ Aplicar clicked (manual)');
-                    popup.aplicarDatosPedido();
-                };
-            }
-            
-            // Configurar Enter en campo número de pedido
-            const numeroPedido = popup.document.getElementById('numeroPedido');
-            if (numeroPedido) {
-                numeroPedido.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        popup.buscarPedidoPorNumero();
-                    }
-                });
-            }
-            
-            console.log('✅ Configuración manual de importar pedido completada');
-        } else {
-            console.error('❌ No se pudieron encontrar los elementos:', {
-                toggleBtn: !!toggleBtn,
-                importInput: !!importInput
-            });
-            
-            // Debug adicional - mostrar todo el contenido del popup
-            console.log('📋 Contenido del popup HTML:', popup.document.body.innerHTML.substring(0, 1000) + '...');
-        }
-    }, 1000); // Aumentar timeout a 1 segundo
-});
     popup.focus();
   } else {
     alert("Por favor, permita ventanas emergentes para usar el módulo de facturación");
@@ -1669,18 +1480,13 @@ function abrirModuloFacturacionEmbebido(targetDivId) {
   const htmlContent = `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; background: #f5f5f5; padding: 20px; height: 100%; box-sizing: border-box; overflow-y: auto;">
     <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 1100px; margin: 0 auto;">
-        <!-- AQUÍ VA TODO EL HTML DE TU FORMULARIO EXISTENTE -->
         <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 20px;">
             <h1 style="color: #333; margin: 0; font-size: 28px;"> Sistema de Facturación CFDI 4.0</h1>
             <p style="color: #666; margin: 10px 0 0 0; font-size: 16px;">Integración con Factura.com - Generar nueva factura</p>
         </div>
         
-
-        
         <form id="cfdiformulario-${targetDivId}">
-            <!-- Resto del formulario igual que en tu código original -->
-            <!-- Solo cambio los IDs para que sean únicos agregando el sufijo del div -->
-            
+            <!-- Datos del Receptor -->
             <div style="margin-bottom: 35px; padding-bottom: 25px; border-bottom: 2px solid #eee;">
                 <h3 style="color: #333; margin-bottom: 20px; font-size: 20px;"> Datos del Receptor</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -1705,7 +1511,6 @@ function abrirModuloFacturacionEmbebido(targetDivId) {
                     </div>
                 </div>
                 
-                <!-- Información del cliente -->
                 <div id="clienteInfo-${targetDivId}" style="display: none; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 20px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px;"> Información del Cliente Seleccionado</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px;">
@@ -1779,6 +1584,44 @@ function abrirModuloFacturacionEmbebido(targetDivId) {
                         <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Número de Orden</label>
                         <input type="text" id="numOrder-${targetDivId}" placeholder="Se genera automáticamente"
                                style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SECCIÓN PARA IMPORTAR PEDIDO -->
+            <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #2196f3;">
+                <h3 style="color: #1976d2; margin: 0 0 15px 0; font-size: 18px;">📦 Importar Pedido</h3>
+                <p style="margin: 0 0 15px 0; color: #666;">Importa los datos de un pedido existente para agilizar la creación de la factura.</p>
+                <button type="button" id="toggleImportOrder-${targetDivId}" 
+                        style="background: #2196f3; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                    📥 Importar Pedido
+                </button>
+                <div id="importOrderInput-${targetDivId}" style="display: none; margin-top: 15px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Número de Pedido</label>
+                            <input type="text" id="numeroPedido-${targetDivId}" placeholder="Ingresa el número de pedido"
+                                   style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                            <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">Ejemplo: PED-2024-001, ORD-123456, etc.</div>
+                        </div>
+                        <div style="display: flex; align-items: end; gap: 10px; margin-bottom: 20px;">
+                            <button type="button" id="buscarPedido-${targetDivId}" 
+                                    style="padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 0; font-size: 16px; font-weight: 600;">
+                                🔍 Buscar Pedido
+                            </button>
+                            <button type="button" id="cancelarImport-${targetDivId}" 
+                                    style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 0; font-size: 16px; font-weight: 600;">
+                                ❌ Cancelar
+                            </button>
+                        </div>
+                    </div>
+                    <div id="pedidoInfo-${targetDivId}" style="display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <h4 style="margin: 0 0 10px 0; color: #28a745;">✅ Pedido Encontrado</h4>
+                        <div id="pedidoDetalles-${targetDivId}"></div>
+                        <button type="button" id="aplicarPedido-${targetDivId}" 
+                                style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; font-size: 16px; font-weight: 600;">
+                            ✅ Aplicar Datos del Pedido
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1921,6 +1764,7 @@ function abrirModuloFacturacionEmbebido(targetDivId) {
     </div>
 </div>`;
 
+
   // Insertar el HTML en el div
   targetDiv.innerHTML = htmlContent;
   
@@ -1936,7 +1780,8 @@ function configurarFormularioEmbebido(targetDivId) {
   
   // Cargar clientes
   cargarClientesEmbebido(targetDivId);
-  
+    configurarImportarPedido(targetDivId);
+
   // Configurar event listeners para calcular totales
   const conceptos = document.querySelectorAll(`.producto-row-${targetDivId}`);
   conceptos.forEach(concepto => {
@@ -2391,6 +2236,9 @@ function enviarCFDIConDatos(datos, targetDivId) {
     document.getElementById(`loading-${targetDivId}`).style.display = 'none';
     document.getElementById(`submitBtn-${targetDivId}`).disabled = false;
     alert('❌ Error de conexión: ' + error.message);
+
+
+
   });
 }
 
@@ -2419,7 +2267,7 @@ function limpiarFormularioEmbebido(targetDivId) {
     
     // Recargar clientes
     cargarClientesEmbebido(targetDivId);
-    
+    configurarImportarPedido(targetDivId);
     console.log('🧹 Formulario embebido limpiado');
   }
 }
@@ -2432,4 +2280,459 @@ function cerrarFormularioEmbebido(targetDivId) {
   if (targetDiv) {
     targetDiv.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">Formulario cerrado. <a href="#" onclick="abrirModuloFacturacionEmbebido(\'' + targetDivId + '\')">Volver a abrir</a></p>';
   }
+}
+
+// =============== FUNCIONES PARA IMPORTAR PEDIDO ===============
+
+function configurarImportarPedido(targetDivId) {
+    if (!targetDivId) {
+        targetDivId = '';
+    }
+    
+    console.log('Configurando funcionalidad de importar pedido para:', targetDivId || 'popup');
+    
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    
+    var toggleBtn = document.getElementById('toggleImportOrder' + suffix);
+    var importInput = document.getElementById('importOrderInput' + suffix);
+    var buscarBtn = document.getElementById('buscarPedido' + suffix);
+    var cancelarBtn = document.getElementById('cancelarImport' + suffix);
+    var aplicarBtn = document.getElementById('aplicarPedido' + suffix);
+    
+    console.log('toggleBtn encontrado:', !!toggleBtn);
+    console.log('importInput encontrado:', !!importInput);
+    
+    if (!toggleBtn || !importInput) {
+        console.log('Elementos no encontrados, reintentando en 300ms...');
+        setTimeout(function() {
+            configurarImportarPedido(targetDivId);
+        }, 300);
+        return;
+    }
+    
+    console.log('Configurando eventos para formulario', targetDivId ? 'embebido' : 'popup');
+    
+    toggleBtn.addEventListener('click', function() {
+        console.log('CLICK DETECTADO en toggleImportOrder');
+        
+        if (importInput.style.display === 'block') {
+            importInput.classList.remove('show');
+            importInput.style.display = 'none';
+            toggleBtn.textContent = 'Importar Pedido';
+            console.log('Sección ocultada');
+        } else {
+            importInput.classList.add('show');
+            importInput.style.display = 'block';
+            toggleBtn.textContent = 'Ocultar Importar';
+            console.log('Sección mostrada');
+            
+            var numeroPedido = document.getElementById('numeroPedido' + suffix);
+            if (numeroPedido) {
+                numeroPedido.focus();
+            }
+        }
+    });
+    
+    if (buscarBtn) {
+        buscarBtn.addEventListener('click', function() {
+            console.log('Botón buscar pedido clickeado');
+            buscarPedidoPorNumero(targetDivId);
+        });
+    }
+    
+    if (cancelarBtn) {
+        cancelarBtn.addEventListener('click', function() {
+            console.log('Botón cancelar clickeado');
+            cancelarImportacion(targetDivId);
+        });
+    }
+    
+    if (aplicarBtn) {
+        aplicarBtn.addEventListener('click', function() {
+            console.log('Botón aplicar clickeado');
+            aplicarDatosPedido(targetDivId);
+        });
+    }
+    
+    var numeroPedido = document.getElementById('numeroPedido' + suffix);
+    if (numeroPedido) {
+        numeroPedido.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                console.log('Enter presionado');
+                buscarPedidoPorNumero(targetDivId);
+            }
+        });
+    }
+    
+    console.log('Configuración completada');
+}
+function buscarPedidoPorNumero(targetDivId) {
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    var numeroPedido = document.getElementById('numeroPedido' + suffix);
+    
+    if (!numeroPedido || !numeroPedido.value.trim()) {
+        alert('Por favor, ingresa un número de pedido');
+        return;
+    }
+    
+    console.log('Buscando pedido:', numeroPedido.value.trim());
+    
+    var buscarBtn = document.getElementById('buscarPedido' + suffix);
+    if (buscarBtn) {
+        var originalText = buscarBtn.textContent;
+        buscarBtn.disabled = true;
+        buscarBtn.textContent = 'Buscando...';
+    }
+    
+    // Llamada AJAX real
+    var formData = new FormData();
+    formData.append('action', 'pos_billing_search_order');
+    formData.append('order_number', numeroPedido.value.trim());
+    
+    fetch('/wp-admin/admin-ajax.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (buscarBtn) {
+            buscarBtn.disabled = false;
+            buscarBtn.textContent = originalText;
+        }
+        
+        if (data.success) {
+            mostrarPedidoEncontrado(data.data, targetDivId);
+        } else {
+            mostrarPedidoNoEncontrado(targetDivId);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        if (buscarBtn) {
+            buscarBtn.disabled = false;
+            buscarBtn.textContent = originalText;
+        }
+        alert('Error al buscar el pedido');
+    });
+}
+
+function cancelarImportacion(targetDivId) {
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    
+    var numeroPedido = document.getElementById('numeroPedido' + suffix);
+    if (numeroPedido) {
+        numeroPedido.value = '';
+    }
+    
+    var importInput = document.getElementById('importOrderInput' + suffix);
+    var toggleBtn = document.getElementById('toggleImportOrder' + suffix);
+    
+    if (importInput && toggleBtn) {
+        importInput.style.display = 'none';
+        toggleBtn.textContent = 'Importar Pedido';
+    }
+    
+    console.log('Importación cancelada');
+}
+
+function aplicarDatosPedido(targetDivId) {
+    alert('Función aplicar datos en desarrollo');
+    console.log('Aplicando datos del pedido para:', targetDivId);
+}
+
+/**
+ * FUNCIONES FALTANTES PARA IMPORTAR PEDIDOS
+ * Agrega estas funciones al final de tu archivo pos-billing.js
+ */
+
+/**
+ * Mostrar pedido encontrado
+ */
+function mostrarPedidoEncontrado(pedido, targetDivId) {
+    console.log('Pedido encontrado:', pedido);
+    
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    var pedidoInfo = document.getElementById('pedidoInfo' + suffix);
+    var pedidoDetalles = document.getElementById('pedidoDetalles' + suffix);
+    
+    if (!pedidoInfo || !pedidoDetalles) {
+        console.error('No se encontraron elementos pedidoInfo o pedidoDetalles');
+        return;
+    }
+    
+    // Guardar datos del pedido globalmente
+    if (targetDivId) {
+        window['pedidoActual_' + targetDivId] = pedido;
+    } else {
+        window.pedidoActual = pedido;
+    }
+    
+    var html = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">';
+    html += '<div><strong>Número:</strong> ' + pedido.numero + '</div>';
+    html += '<div><strong>Cliente:</strong> ' + pedido.cliente.nombre + '</div>';
+    html += '<div><strong>RFC:</strong> ' + pedido.cliente.rfc + '</div>';
+    html += '<div><strong>Total:</strong> $' + pedido.total.toFixed(2) + '</div>';
+    html += '</div>';
+    
+    if (pedido.productos && pedido.productos.length > 0) {
+        html += '<div style="margin-top: 15px;"><strong>Productos:</strong></div>';
+        html += '<div style="max-height: 150px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 5px;">';
+        
+        pedido.productos.forEach(function(producto, index) {
+            html += '<div style="padding: 8px; border-bottom: 1px solid #ddd;">';
+            html += '<strong>' + (index + 1) + '.</strong> ' + producto.descripcion;
+            html += '<br><small>Cantidad: ' + producto.cantidad + ' | Precio: $' + producto.precioUnitario.toFixed(2) + '</small>';
+            html += '</div>';
+        });
+        
+        html += '</div>';
+    }
+    
+    pedidoDetalles.innerHTML = html;
+    pedidoInfo.style.display = 'block';
+    
+    console.log('Información del pedido mostrada correctamente');
+}
+
+/**
+ * Mostrar pedido no encontrado
+ */
+function mostrarPedidoNoEncontrado(targetDivId) {
+    console.log('Pedido no encontrado');
+    
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    var pedidoInfo = document.getElementById('pedidoInfo' + suffix);
+    var pedidoDetalles = document.getElementById('pedidoDetalles' + suffix);
+    
+    if (!pedidoInfo || !pedidoDetalles) {
+        console.error('No se encontraron elementos pedidoInfo o pedidoDetalles');
+        return;
+    }
+    
+    pedidoDetalles.innerHTML = 
+        '<div style="text-align: center; padding: 20px; color: #dc3545;">' +
+        '<h4 style="margin: 0 0 10px 0;">❌ Pedido No Encontrado</h4>' +
+        '<p style="margin: 0;">El número de pedido ingresado no existe en el sistema.</p>' +
+        '<p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Verifica el número e intenta nuevamente.</p>' +
+        '</div>';
+    
+    pedidoInfo.style.display = 'block';
+    
+    // Ocultar automáticamente después de 4 segundos
+    setTimeout(function() {
+        if (pedidoInfo) {
+            pedidoInfo.style.display = 'none';
+        }
+    }, 4000);
+}
+
+/**
+ * Aplicar datos del pedido al formulario
+ */
+function aplicarDatosPedido(targetDivId) {
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    var pedidoActual;
+    
+    if (targetDivId) {
+        pedidoActual = window['pedidoActual_' + targetDivId];
+    } else {
+        pedidoActual = window.pedidoActual;
+    }
+    
+    if (!pedidoActual) {
+        alert('❌ No hay datos de pedido para aplicar');
+        return;
+    }
+    
+    console.log('✅ Aplicando datos del pedido al formulario...');
+    
+    try {
+        // 1. Seleccionar cliente si existe
+        if (pedidoActual.cliente && pedidoActual.cliente.uid) {
+            var clienteSelect = document.getElementById('receptorUID' + suffix);
+            if (clienteSelect) {
+                var options = clienteSelect.options;
+                for (var i = 0; i < options.length; i++) {
+                    if (options[i].value === pedidoActual.cliente.uid) {
+                        clienteSelect.selectedIndex = i;
+                        // Disparar evento change para mostrar info del cliente
+                        clienteSelect.dispatchEvent(new Event('change'));
+                        console.log('Cliente seleccionado:', pedidoActual.cliente.nombre);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // 2. Limpiar conceptos existentes (excepto el primero)
+        limpiarConceptosExistentes(targetDivId);
+        
+        // 3. Aplicar productos del pedido
+        if (pedidoActual.productos && pedidoActual.productos.length > 0) {
+            pedidoActual.productos.forEach(function(producto, index) {
+                if (index === 0) {
+                    // Usar el primer concepto existente
+                    aplicarProductoAConcepto(producto, 0, targetDivId);
+                } else {
+                    // Agregar nuevos conceptos
+                    agregarNuevoConcepto(targetDivId);
+                    aplicarProductoAConcepto(producto, index, targetDivId);
+                }
+            });
+        }
+        
+        // 4. Actualizar número de orden con referencia al pedido
+        var numOrderField = document.getElementById('numOrder' + suffix);
+        if (numOrderField) {
+            numOrderField.value = 'REF-' + pedidoActual.numero + '-' + Date.now();
+        }
+        
+        // 5. Agregar comentario con referencia al pedido
+        var comentariosField = document.getElementById('comentarios' + suffix);
+        if (comentariosField) {
+            comentariosField.value = 'Factura generada a partir del pedido: ' + pedidoActual.numero;
+        }
+        
+        // 6. Recalcular totales
+        if (targetDivId) {
+            calcularTotalesEmbebido(targetDivId);
+        } else {
+            calcularTotales();
+        }
+        
+        // 7. Mostrar confirmación
+        alert('✅ Datos del pedido aplicados correctamente\n\n' +
+              '📋 Pedido: ' + pedidoActual.numero + '\n' +
+              '👤 Cliente: ' + pedidoActual.cliente.nombre + '\n' +
+              '📦 Productos: ' + pedidoActual.productos.length + '\n' +
+              '💰 Total: $' + pedidoActual.total.toFixed(2));
+        
+        // 8. Cerrar sección de importar
+        cancelarImportacion(targetDivId);
+        
+        console.log('✅ Datos del pedido aplicados exitosamente');
+        
+    } catch (error) {
+        console.error('❌ Error aplicando datos del pedido:', error);
+        alert('❌ Error al aplicar los datos del pedido: ' + error.message);
+    }
+}
+
+/**
+ * Limpiar conceptos existentes (excepto el primero)
+ */
+function limpiarConceptosExistentes(targetDivId) {
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    var selectorConcepto = targetDivId ? '.producto-row-' + targetDivId : '.producto-row';
+    var selectorSecundario = targetDivId ? '.producto-row-secondary-' + targetDivId : '.producto-row-secondary';
+    
+    var conceptos = document.querySelectorAll(selectorConcepto);
+    
+    // Eliminar todos los conceptos excepto el primero
+    for (var i = conceptos.length - 1; i > 0; i--) {
+        var concepto = conceptos[i];
+        var filaSecundaria = concepto.nextElementSibling;
+        
+        if (filaSecundaria && filaSecundaria.classList.contains(selectorSecundario.substring(1))) {
+            filaSecundaria.remove();
+        }
+        concepto.remove();
+    }
+    
+    // Limpiar el primer concepto
+    var primerConcepto = document.querySelector(selectorConcepto);
+    if (primerConcepto) {
+        limpiarCamposConcepto(primerConcepto, targetDivId);
+    }
+}
+
+/**
+ * Limpiar campos de un concepto
+ */
+function limpiarCamposConcepto(conceptoRow, targetDivId) {
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    
+    var descripcion = conceptoRow.querySelector('.descripcion' + suffix);
+    var claveProdServ = conceptoRow.querySelector('.claveProdServ' + suffix);
+    var cantidad = conceptoRow.querySelector('.cantidad' + suffix);
+    var precioUnitario = conceptoRow.querySelector('.precioUnitario' + suffix);
+    var totalConcepto = conceptoRow.querySelector('.totalConcepto' + suffix);
+    
+    if (descripcion) descripcion.value = '';
+    if (claveProdServ) claveProdServ.value = '';
+    if (cantidad) cantidad.value = '1';
+    if (precioUnitario) precioUnitario.value = '';
+    if (totalConcepto) totalConcepto.value = '';
+    
+    // Limpiar fila secundaria
+    var filaSecundaria = conceptoRow.nextElementSibling;
+    var selectorSecundario = targetDivId ? 'producto-row-secondary-' + targetDivId : 'producto-row-secondary';
+    
+    if (filaSecundaria && filaSecundaria.classList.contains(selectorSecundario)) {
+        var claveUnidad = filaSecundaria.querySelector('.claveUnidad' + suffix);
+        var unidad = filaSecundaria.querySelector('.unidad' + suffix);
+        var descuento = filaSecundaria.querySelector('.descuento' + suffix);
+        var objetoImp = filaSecundaria.querySelector('.objetoImp' + suffix);
+        
+        if (claveUnidad) claveUnidad.value = 'E48';
+        if (unidad) unidad.value = 'Unidad de servicio';
+        if (descuento) descuento.value = '0';
+        if (objetoImp) objetoImp.value = '02';
+    }
+}
+
+/**
+ * Aplicar producto a un concepto específico
+ */
+function aplicarProductoAConcepto(producto, index, targetDivId) {
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    var selectorConcepto = targetDivId ? '.producto-row-' + targetDivId : '.producto-row';
+    
+    var conceptos = document.querySelectorAll(selectorConcepto);
+    var concepto = conceptos[index];
+    
+    if (!concepto) {
+        console.error('❌ No se encontró el concepto en el índice:', index);
+        return;
+    }
+    
+    // Aplicar datos principales
+    var descripcion = concepto.querySelector('.descripcion' + suffix);
+    var claveProdServ = concepto.querySelector('.claveProdServ' + suffix);
+    var cantidad = concepto.querySelector('.cantidad' + suffix);
+    var precioUnitario = concepto.querySelector('.precioUnitario' + suffix);
+    
+    if (descripcion) descripcion.value = producto.descripcion;
+    if (claveProdServ) claveProdServ.value = producto.claveProdServ;
+    if (cantidad) cantidad.value = producto.cantidad;
+    if (precioUnitario) precioUnitario.value = producto.precioUnitario;
+    
+    // Aplicar datos secundarios
+    var filaSecundaria = concepto.nextElementSibling;
+    var selectorSecundario = targetDivId ? 'producto-row-secondary-' + targetDivId : 'producto-row-secondary';
+    
+    if (filaSecundaria && filaSecundaria.classList.contains(selectorSecundario)) {
+        var claveUnidad = filaSecundaria.querySelector('.claveUnidad' + suffix);
+        var unidad = filaSecundaria.querySelector('.unidad' + suffix);
+        
+        if (claveUnidad && producto.claveUnidad) claveUnidad.value = producto.claveUnidad;
+        if (unidad && producto.unidad) unidad.value = producto.unidad;
+    }
+    
+    console.log('Producto aplicado al concepto', index, ':', producto.descripcion);
+}
+
+/**
+ * Agregar nuevo concepto
+ */
+function agregarNuevoConcepto(targetDivId) {
+    var suffix = targetDivId ? '-' + targetDivId : '';
+    var agregarBtn = document.getElementById('agregarConcepto' + suffix);
+    
+    if (agregarBtn) {
+        agregarBtn.click();
+    } else {
+        console.error('❌ No se encontró el botón agregarConcepto' + suffix);
+    }
 }
