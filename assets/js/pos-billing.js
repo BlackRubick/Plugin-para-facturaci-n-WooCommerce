@@ -68,7 +68,7 @@ function abrirModuloFacturacion() {
   const popup = window.open(
     "",
     "facturacion",
-    "width=1200,height=800,scrollbars=yes,resizable=yes"
+    "width=2000,height=800,scrollbars=yes,resizable=yes"
   );
 
   if (popup) {
@@ -277,40 +277,85 @@ function abrirModuloFacturacion() {
                     </div>
                 </div>
             </div>
-            
+            <div style="background: red; color: white; padding: 20px; margin: 20px 0; text-align: center; font-size: 20px; font-weight: bold;">
+    🔴 TEST: Si ves esto, el HTML funciona. El problema son los estilos CSS.
+</div>
             <!-- NUEVA SECCIÓN PARA IMPORTAR PEDIDO -->
-            <div class="import-order-section">
-                <h3>📦 Importar Pedido</h3>
-                <p style="margin: 0 0 15px 0; color: #666;">Importa los datos de un pedido existente para agilizar la creación de la factura.</p>
-                <button type="button" id="toggleImportOrder" class="btn-import">
-                    📥 Importar Pedido
-                </button>
-                <div id="importOrderInput" class="import-order-input">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Número de Pedido</label>
-                            <input type="text" id="numeroPedido" placeholder="Ingresa el número de pedido">
-                            <div class="help-text">Ejemplo: PED-2024-001, ORD-123456, etc.</div>
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: end; gap: 10px;">
-                            <button type="button" id="buscarPedido" class="btn btn-add" style="margin: 0;">
-                                🔍 Buscar Pedido
-                            </button>
-                            <button type="button" id="cancelarImport" class="btn btn-cancel" style="margin: 0;">
-                                ❌ Cancelar
-                            </button>
-                        </div>
-                    </div>
-                    <div id="pedidoInfo" style="display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
-                        <h4 style="margin: 0 0 10px 0; color: #28a745;">✅ Pedido Encontrado</h4>
-                        <div id="pedidoDetalles"></div>
-                        <button type="button" id="aplicarPedido" class="btn" style="margin-top: 10px;">
-                            ✅ Aplicar Datos del Pedido
-                        </button>
-                    </div>
-                </div>
-            </div>
+<!-- REEMPLAZA toda la sección import-order-section con esto: -->
+<div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #2196f3;">
+    <h3 style="color: #1976d2; margin: 0 0 15px 0; font-size: 18px;">📦 Importar Pedido</h3>
+    <p style="margin: 0 0 15px 0; color: #666;">Importa los datos de un pedido existente para agilizar la creación de la factura.</p>
+    
+    <button type="button" 
+            onclick="
+                const input = document.getElementById('importOrderInput'); 
+                const btn = this;
+                if (input.style.display === 'none' || input.style.display === '') { 
+                    input.style.display = 'block'; 
+                    btn.textContent = '📥 Ocultar Importar'; 
+                    console.log('MOSTRADO'); 
+                } else { 
+                    input.style.display = 'none'; 
+                    btn.textContent = '📥 Importar Pedido'; 
+                    console.log('OCULTADO'); 
+                }
+            "
+            style="background: #2196f3; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
+        📥 Importar Pedido
+    </button>
+    
+    <div id="importOrderInput" style="display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Número de Pedido</label>
+            <input type="text" id="numeroPedido" placeholder="Ingresa el número de pedido (ej: PED-2024-001)" 
+                   style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box;">
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button type="button" 
+                    onclick="
+                        const num = document.getElementById('numeroPedido').value.trim();
+                        if (!num) { alert('❌ Ingresa un número de pedido'); return; }
+                        console.log('🔍 Buscando:', num);
+                        alert('🔍 Buscando pedido: ' + num + '\\n\\n(Aquí integrarías con tu API real)');
+                        
+                        // Simular pedido encontrado
+                        setTimeout(() => {
+                            const info = document.getElementById('pedidoInfo');
+                            if (num.toUpperCase() === 'PED-2024-001') {
+                                info.innerHTML = '<div style=\"background: #d4edda; padding: 15px; border-radius: 5px; margin-top: 10px;\"><strong>✅ Pedido Encontrado:</strong><br>Cliente: ACME Corp<br>Total: $5,800.00<br><button onclick=\"alert(\\\"✅ Datos aplicados al formulario!\\\"); document.getElementById(\\\"importOrderInput\\\").style.display=\\\"none\\\";\\\" style=\\\"background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-top: 10px;\\\">✅ Aplicar Datos</button></div>';
+                            } else {
+                                info.innerHTML = '<div style=\"background: #f8d7da; padding: 15px; border-radius: 5px; margin-top: 10px; color: #721c24;\"><strong>❌ Pedido no encontrado</strong><br>Verifica el número e intenta nuevamente.</div>';
+                                setTimeout(() => info.innerHTML = '', 3000);
+                            }
+                        }, 1000);
+                    "
+                    style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                🔍 Buscar Pedido
+            </button>
             
+            <button type="button" 
+                    onclick="
+                        document.getElementById('numeroPedido').value = '';
+                        document.getElementById('pedidoInfo').innerHTML = '';
+                        document.getElementById('importOrderInput').style.display = 'none';
+                        console.log('❌ Importación cancelada');
+                    "
+                    style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                ❌ Cancelar
+            </button>
+        </div>
+        
+        <div id="pedidoInfo"></div>
+        
+        <div style="font-size: 12px; color: #666; margin-top: 10px;">
+            💡 <strong>Tip:</strong> Prueba con "PED-2024-001" para ver un pedido de ejemplo
+        </div>
+    </div>
+</div>
+            <div style="background: red; color: white; padding: 20px; margin: 20px 0; text-align: center; font-size: 20px; font-weight: bold;">
+    🔴 TEST: Si ves esto, el HTML funciona. El problema son los estilos CSS.
+</div>
             <div class="section">
                 <h3> Conceptos/Productos</h3>
                 <div id="conceptos">
@@ -1370,6 +1415,96 @@ function agregarNuevoConcepto() {
  * ✅ EVENTO LOAD PRINCIPAL
  */
 window.addEventListener('load', function() {
+
+
+setTimeout(function() {
+    console.log('=== DIAGNÓSTICO IMPORTAR PEDIDO ===');
+    
+    // Verificar si los elementos existen
+    const elementos = [
+        'toggleImportOrder',
+        'importOrderInput', 
+        'numeroPedido',
+        'buscarPedido',
+        'cancelarImport',
+        'aplicarPedido'
+    ];
+    
+    elementos.forEach(id => {
+        const el = document.getElementById(id);
+        console.log(id + ':', el ? 'EXISTE' : 'NO EXISTE');
+        if (el) {
+            console.log('  - Tipo:', el.tagName);
+            console.log('  - Clases:', el.className);
+            console.log('  - Visible:', el.offsetWidth > 0 && el.offsetHeight > 0);
+        }
+    });
+    
+    // Verificar si la sección completa existe
+    const section = document.querySelector('.import-order-section');
+    console.log('Sección completa:', section ? 'EXISTE' : 'NO EXISTE');
+    
+    // Si existe, configurar DIRECTAMENTE sin depender de otras funciones
+    if (document.getElementById('toggleImportOrder')) {
+        console.log('CONFIGURANDO DIRECTAMENTE...');
+        
+        const toggle = document.getElementById('toggleImportOrder');
+        const input = document.getElementById('importOrderInput');
+        
+        // Configurar evento simple
+        toggle.addEventListener('click', function() {
+            console.log('CLICK DETECTADO EN TOGGLE');
+            
+            if (input.style.display === 'none' || input.style.display === '') {
+                input.style.display = 'block';
+                toggle.textContent = '📥 Ocultar Importar';
+                console.log('MOSTRADO');
+            } else {
+                input.style.display = 'none';
+                toggle.textContent = '📥 Importar Pedido';
+                console.log('OCULTADO');
+            }
+        });
+        
+        console.log('EVENTO CONFIGURADO EXITOSAMENTE');
+        
+        // Test inmediato
+        setTimeout(() => {
+            console.log('EJECUTANDO TEST...');
+            toggle.click();
+            setTimeout(() => {
+                toggle.click();
+            }, 1000);
+        }, 500);
+    } else {
+        console.log('EL ELEMENTO toggleImportOrder NO EXISTE');
+        
+        // Mostrar todo el HTML para debug
+        const body = document.body.innerHTML;
+        const hasImportSection = body.includes('import-order-section');
+        const hasToggleButton = body.includes('toggleImportOrder');
+        
+        console.log('HTML contiene import-order-section:', hasImportSection);
+        console.log('HTML contiene toggleImportOrder:', hasToggleButton);
+        
+        if (hasImportSection && !hasToggleButton) {
+            console.log('PROBLEMA: La sección existe pero el ID no');
+        }
+        
+        // Buscar elementos por clase en lugar de ID
+        const byClass = document.querySelector('.import-order-section');
+        if (byClass) {
+            console.log('ENCONTRADO POR CLASE');
+            const button = byClass.querySelector('button');
+            if (button) {
+                console.log('BOTÓN ENCONTRADO:', button.id, button.textContent);
+            }
+        }
+    }
+    
+    console.log('=== FIN DIAGNÓSTICO ===');
+}, 3000); // Esperar 3 segundos completos
+
     console.log('🚀 EVENTO LOAD DISPARADO - PASO 3 (clientes + totales + crear CFDI + importar pedido)');
     
     const testElement = document.getElementById('receptorUID');
@@ -1377,9 +1512,10 @@ window.addEventListener('load', function() {
     
     // ✅ CARGAR CLIENTES
     cargarClientes();
-    
+    configurarImportarPedido();  // ← ESTA LÍNEA NO ESTÁ EN TU CÓDIGO
+
     // ✅ CONFIGURAR FUNCIONALIDAD DE IMPORTAR PEDIDO
-    configurarImportarPedido();
+    setTimeout(configurarImportarPedido, 2000);
     
     // ✅ CONFIGURAR EVENT LISTENERS PARA CONCEPTOS INICIALES
     const conceptoInicial = document.querySelector('.producto-row');
@@ -1433,6 +1569,83 @@ console.log('✅ PASO 3 completado - Script cargado con funcionalidad crear CFDI
     
     popup.document.write(htmlContent);
     popup.document.close();
+    // Forzar configuración después de que el popup esté completamente cargado
+popup.addEventListener('load', function() {
+    setTimeout(function() {
+        console.log('🔧 Forzando configuración de importar pedido...');
+        
+        // Buscar los elementos en el popup
+        const toggleBtn = popup.document.getElementById('toggleImportOrder');
+        const importInput = popup.document.getElementById('importOrderInput');
+        
+        if (toggleBtn && importInput) {
+            console.log('✅ Elementos encontrados, configurando eventos manualmente...');
+            
+            // Configurar evento click del botón toggle DIRECTAMENTE
+            toggleBtn.onclick = function() {
+                console.log('🔄 Toggle clicked (manual)');
+                if (importInput.classList.contains('show')) {
+                    importInput.classList.remove('show');
+                    toggleBtn.textContent = '📥 Importar Pedido';
+                } else {
+                    importInput.classList.add('show');
+                    toggleBtn.textContent = '📥 Ocultar Importar';
+                    const numeroPedido = popup.document.getElementById('numeroPedido');
+                    if (numeroPedido) {
+                        numeroPedido.focus();
+                    }
+                }
+            };
+            
+            // Configurar otros botones
+            const buscarBtn = popup.document.getElementById('buscarPedido');
+            if (buscarBtn) {
+                buscarBtn.onclick = function() {
+                    console.log('🔍 Buscar clicked (manual)');
+                    // Llamar a la función desde el contexto del popup
+                    popup.buscarPedidoPorNumero();
+                };
+            }
+            
+            const cancelarBtn = popup.document.getElementById('cancelarImport');
+            if (cancelarBtn) {
+                cancelarBtn.onclick = function() {
+                    console.log('❌ Cancelar clicked (manual)');
+                    popup.cancelarImportacion();
+                };
+            }
+            
+            const aplicarBtn = popup.document.getElementById('aplicarPedido');
+            if (aplicarBtn) {
+                aplicarBtn.onclick = function() {
+                    console.log('✅ Aplicar clicked (manual)');
+                    popup.aplicarDatosPedido();
+                };
+            }
+            
+            // Configurar Enter en campo número de pedido
+            const numeroPedido = popup.document.getElementById('numeroPedido');
+            if (numeroPedido) {
+                numeroPedido.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        popup.buscarPedidoPorNumero();
+                    }
+                });
+            }
+            
+            console.log('✅ Configuración manual de importar pedido completada');
+        } else {
+            console.error('❌ No se pudieron encontrar los elementos:', {
+                toggleBtn: !!toggleBtn,
+                importInput: !!importInput
+            });
+            
+            // Debug adicional - mostrar todo el contenido del popup
+            console.log('📋 Contenido del popup HTML:', popup.document.body.innerHTML.substring(0, 1000) + '...');
+        }
+    }, 1000); // Aumentar timeout a 1 segundo
+});
     popup.focus();
   } else {
     alert("Por favor, permita ventanas emergentes para usar el módulo de facturación");
