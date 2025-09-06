@@ -592,10 +592,10 @@ function calcularTotales() {
     const ivaEl = document.getElementById('iva');
     const totalEl = document.getElementById('total');
     
-    if (subtotalEl) subtotalEl.textContent = ' + subtotal.toFixed(2);
-    if (totalDescuentosEl) totalDescuentosEl.textContent = ' + totalDescuentos.toFixed(2);
-    if (ivaEl) ivaEl.textContent = ' + iva.toFixed(2);
-    if (totalEl) totalEl.textContent = ' + total.toFixed(2);
+if (subtotalEl) subtotalEl.textContent = '$' + subtotal.toFixed(2);
+if (totalDescuentosEl) totalDescuentosEl.textContent = '$' + totalDescuentos.toFixed(2);
+if (ivaEl) ivaEl.textContent = '$' + iva.toFixed(2);
+if (totalEl) totalEl.textContent = '$' + total.toFixed(2);
 }
 
 /**
@@ -847,7 +847,7 @@ function enviarCFDI(datos) {
                 '<div style="background: white; padding: 15px; border-radius: 5px;">' +
                     '<p><strong>UUID:</strong> ' + (data.data.uuid || 'N/A') + '</p>' +
                     '<p><strong>Folio:</strong> ' + (data.data.folio || 'N/A') + '</p>' +
-                    '<p><strong>Total:</strong>  + (data.data.total || '0.00') + '</p>' +
+'<p><strong>Total:</strong> $' + (data.data.total || '0.00') + '</p>' +
                 '</div>' +
                 '<div style="margin-top: 20px; text-align: center;">' +
                     '<button onclick="window.location.reload()" class="btn">🔄 Nueva Factura</button>' +
@@ -1082,7 +1082,7 @@ function aplicarDatosPedido() {
           '📋 Pedido: ' + pedido.numero + '\n' +
           '👤 Cliente: ' + pedido.cliente.nombre + '\n' +
           '📦 Productos: ' + pedido.productos.length + '\n' +
-          '💰 Total:  + pedido.total.toFixed(2));
+'💰 Total: $' + pedido.total.toFixed(2));
     
     // 8. Cerrar sección de importar
     cancelarImportacion();
@@ -1247,7 +1247,7 @@ window.addEventListener('load', function() {
     setTimeout(calcularTotales, 100);
     
     console.log('✅ PASO 3 - Todo configurado: clientes + totales + crear CFDI + importar pedido');
-}),100;
+});
 
 console.log('✅ PASO 3 completado - Script cargado con funcionalidad crear CFDI e importar pedido');
     </script>
@@ -1790,11 +1790,11 @@ function calcularTotalesEmbebido(targetDivId) {
   const ivaEl = document.getElementById(`iva-${targetDivId}`);
   const totalEl = document.getElementById(`total-${targetDivId}`);
 
-  if (subtotalEl) subtotalEl.textContent = " + subtotal.toFixed(2)";
+  if (subtotalEl) subtotalEl.textContent = "$" + subtotal.toFixed(2);
   if (totalDescuentosEl)
-    totalDescuentosEl.textContent = " + totalDescuentos.toFixed(2)";
-  if (ivaEl) ivaEl.textContent = " + iva.toFixed(2)";
-  if (totalEl) totalEl.textContent = " + total.toFixed(2)";
+    totalDescuentosEl.textContent = "$" + totalDescuentos.toFixed(2);
+  if (ivaEl) ivaEl.textContent = "$" + iva.toFixed(2);
+  if (totalEl) totalEl.textContent = "$" + total.toFixed(2);
 }
 
 /**

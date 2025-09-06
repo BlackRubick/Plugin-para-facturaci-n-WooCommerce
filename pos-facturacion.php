@@ -612,4 +612,4 @@ function pos_billing_search_order_callback() {
     }
     
     wp_die();
-}va
+}
