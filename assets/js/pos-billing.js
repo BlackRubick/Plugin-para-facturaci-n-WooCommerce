@@ -1,47 +1,52 @@
 function mostrarAyudaDetallada() {
-    const helpWindow = window.open('', 'ayuda_detallada', 'width=800,height=600,scrollbars=yes,resizable=yes');
-    
-    const helpContent = '<!DOCTYPE html>' +
-        '<html><head><title>Ayuda - Error "No puedes facturar 2"</title>' +
-        '<style>' +
-        'body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }' +
-        '.container { max-width: 700px; margin: 0 auto; }' +
-        '.step { background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 5px; border-left: 4px solid #007cba; }' +
-        '.warning { background: #fff3cd; padding: 10px; border-radius: 5px; color: #856404; }' +
-        '.success { background: #d4edda; padding: 10px; border-radius: 5px; color: #155724; }' +
-        '</style></head><body>' +
-        '<div class="container">' +
-        '<h1> Solución para "No puedes facturar 2"</h1>' +
-        '<div class="warning">' +
-        '<strong> Este error indica que tu cuenta de Factura.com no está completamente configurada.</strong>' +
-        '</div>' +
-        '<div class="step">' +
-        '<h3> Verificar Certificados SAT</h3>' +
-        '<p>Ve a <a href="https://sandbox.factura.com" target="_blank">Factura.com</a> → Configuración → Certificados</p>' +
-        '<ul><li>Debe aparecer tu certificado .cer</li><li>Debe aparecer tu llave .key</li><li>Estado: "Válido"</li></ul>' +
-        '</div>' +
-        '<div class="step">' +
-        '<h3> Verificar Series</h3>' +
-        '<p>Ve a Configuración → Series</p>' +
-        '<ul><li>Debe existir la serie ID: 1212</li><li>Estado: "Activa"</li><li>Tipo: "Factura"</li></ul>' +
-        '</div>' +
-        '<div class="step">' +
-        '<h3> Verificar Receptor</h3>' +
-        '<p>Ve a Receptores → Buscar</p>' +
-        '<ul><li>Busca UID: 67a93f71cdddb</li><li>Debe existir y estar activo</li></ul>' +
-        '</div>' +
-        '<div class="success">' +
-        '<strong> Si todo está configurado y sigue fallando:</strong><br>' +
-        'Contacta al soporte de Factura.com con esta información específica.' +
-        '</div>' +
-        '<p style="text-align: center; margin-top: 30px;">' +
-        '<button onclick="window.close()" style="background: #007cba; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Cerrar</button>' +
-        '</p>' +
-        '</div></body></html>';
-    
-    helpWindow.document.write(helpContent);
-    helpWindow.document.close();
-    helpWindow.focus();
+  const helpWindow = window.open(
+    "",
+    "ayuda_detallada",
+    "width=800,height=600,scrollbars=yes,resizable=yes"
+  );
+
+  const helpContent =
+    "<!DOCTYPE html>" +
+    '<html><head><title>Ayuda - Error "No puedes facturar 2"</title>' +
+    "<style>" +
+    "body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }" +
+    ".container { max-width: 700px; margin: 0 auto; }" +
+    ".step { background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 5px; border-left: 4px solid #007cba; }" +
+    ".warning { background: #fff3cd; padding: 10px; border-radius: 5px; color: #856404; }" +
+    ".success { background: #d4edda; padding: 10px; border-radius: 5px; color: #155724; }" +
+    "</style></head><body>" +
+    '<div class="container">' +
+    '<h1> Solución para "No puedes facturar 2"</h1>' +
+    '<div class="warning">' +
+    "<strong> Este error indica que tu cuenta de Factura.com no está completamente configurada.</strong>" +
+    "</div>" +
+    '<div class="step">' +
+    "<h3> Verificar Certificados SAT</h3>" +
+    '<p>Ve a <a href="https://sandbox.factura.com" target="_blank">Factura.com</a> → Configuración → Certificados</p>' +
+    '<ul><li>Debe aparecer tu certificado .cer</li><li>Debe aparecer tu llave .key</li><li>Estado: "Válido"</li></ul>' +
+    "</div>" +
+    '<div class="step">' +
+    "<h3> Verificar Series</h3>" +
+    "<p>Ve a Configuración → Series</p>" +
+    '<ul><li>Debe existir la serie ID: 1212</li><li>Estado: "Activa"</li><li>Tipo: "Factura"</li></ul>' +
+    "</div>" +
+    '<div class="step">' +
+    "<h3> Verificar Receptor</h3>" +
+    "<p>Ve a Receptores → Buscar</p>" +
+    "<ul><li>Busca UID: 67a93f71cdddb</li><li>Debe existir y estar activo</li></ul>" +
+    "</div>" +
+    '<div class="success">' +
+    "<strong> Si todo está configurado y sigue fallando:</strong><br>" +
+    "Contacta al soporte de Factura.com con esta información específica." +
+    "</div>" +
+    '<p style="text-align: center; margin-top: 30px;">' +
+    '<button onclick="window.close()" style="background: #007cba; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Cerrar</button>' +
+    "</p>" +
+    "</div></body></html>";
+
+  helpWindow.document.write(helpContent);
+  helpWindow.document.close();
+  helpWindow.focus();
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -72,8 +77,7 @@ function abrirModuloFacturacion() {
   );
 
   if (popup) {
-    const htmlContent = 
-`<!DOCTYPE html>
+    const htmlContent = `<!DOCTYPE html>
 <html>
 <head>
     <title>Sistema de Facturación CFDI 4.0</title>
@@ -123,41 +127,7 @@ function abrirModuloFacturacion() {
         .btn-reload { background: #17a2b8; font-size: 12px; padding: 8px 12px; margin-left: 10px; }
         .btn-reload:hover { background: #138496; }
         
-        /* NUEVOS ESTILOS PARA IMPORTAR PEDIDO */
-        .import-order-section { 
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-bottom: 25px; 
-            border-left: 4px solid #2196f3; 
-        }
-        .import-order-section h3 { 
-            color: #1976d2; 
-            margin: 0 0 15px 0; 
-            font-size: 18px; 
-        }
-        .btn-import { 
-            background: #2196f3; 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 14px; 
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .btn-import:hover { 
-            background: #1976d2; 
-            transform: translateY(-1px); 
-        }
-        .import-order-input { 
-            display: none; 
-            margin-top: 15px; 
-        }
-        .import-order-input.show { 
-            display: block; 
-        }
+
     </style>
 </head>
 <body>
@@ -278,38 +248,7 @@ function abrirModuloFacturacion() {
                 </div>
             </div>
             
-            <!-- NUEVA SECCIÓN PARA IMPORTAR PEDIDO -->
-            <div class="import-order-section">
-                <h3>📦 Importar Pedido</h3>
-                <p style="margin: 0 0 15px 0; color: #666;">Importa los datos de un pedido existente para agilizar la creación de la factura.</p>
-                <button type="button" id="toggleImportOrder" class="btn-import">
-                    📥 Importar Pedido
-                </button>
-                <div id="importOrderInput" class="import-order-input">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Número de Pedido</label>
-                            <input type="text" id="numeroPedido" placeholder="Ingresa el número de pedido">
-                            <div class="help-text">Ejemplo: PED-2024-001, ORD-123456, etc.</div>
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: end; gap: 10px;">
-                            <button type="button" id="buscarPedido" class="btn btn-add" style="margin: 0;">
-                                🔍 Buscar Pedido
-                            </button>
-                            <button type="button" id="cancelarImport" class="btn btn-cancel" style="margin: 0;">
-                                ❌ Cancelar
-                            </button>
-                        </div>
-                    </div>
-                    <div id="pedidoInfo" style="display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
-                        <h4 style="margin: 0 0 10px 0; color: #28a745;">✅ Pedido Encontrado</h4>
-                        <div id="pedidoDetalles"></div>
-                        <button type="button" id="aplicarPedido" class="btn" style="margin-top: 10px;">
-                            ✅ Aplicar Datos del Pedido
-                        </button>
-                    </div>
-                </div>
-            </div>
+
             
             <div class="section">
                 <h3> Conceptos/Productos</h3>
@@ -944,90 +883,7 @@ function enviarCFDI(datos) {
 /**
  * 📦 FUNCIÓN PARA MANEJAR LA FUNCIONALIDAD DE IMPORTAR PEDIDO
  */
-function configurarImportarPedido(targetDivId) {
-    if (!targetDivId) {
-        targetDivId = '';
-    }
-    
-    console.log('📦 Configurando funcionalidad de importar pedido para:', targetDivId || 'popup');
-    
-    // Agregar sufijo si es formulario embebido
-    var suffix = targetDivId ? '-' + targetDivId : '';
-    
-    var toggleBtn = document.getElementById('toggleImportOrder' + suffix);
-    var importInput = document.getElementById('importOrderInput' + suffix);
-    var buscarBtn = document.getElementById('buscarPedido' + suffix);
-    var cancelarBtn = document.getElementById('cancelarImport' + suffix);
-    var aplicarBtn = document.getElementById('aplicarPedido' + suffix);
-    
-    console.log('toggleBtn encontrado:', !!toggleBtn);
-    console.log('importInput encontrado:', !!importInput);
-    
-    if (!toggleBtn || !importInput) {
-        console.log('⏳ Elementos no encontrados, reintentando en 300ms...');
-        setTimeout(function() {
-            configurarImportarPedido(targetDivId);
-        }, 300);
-        return;
-    }
-    
-    console.log('✅ Configurando eventos para formulario', targetDivId ? 'embebido' : 'popup');
-    
-    toggleBtn.addEventListener('click', function() {
-        console.log('🖱️ CLICK DETECTADO en toggleImportOrder');
-        
-        if (importInput.classList.contains('show')) {
-            importInput.classList.remove('show');
-                    importInput.style.display = 'none';  
-            toggleBtn.textContent = '📥 Importar Pedido';
-            console.log('➖ Sección ocultada');
-        } else {
-            importInput.classList.add('show');
-        importInput.style.display = 'block';
-            toggleBtn.textContent = '📥 Ocultar Importar';
-            console.log('➕ Sección mostrada');
-            
-            var numeroPedido = document.getElementById('numeroPedido' + suffix);
-            if (numeroPedido) {
-                numeroPedido.focus();
-            }
-        }
-    });
-    
-    if (buscarBtn) {
-        buscarBtn.addEventListener('click', function() {
-            console.log('🔍 Botón buscar pedido clickeado');
-            buscarPedidoPorNumero(targetDivId);
-        });
-    }
-    
-    if (cancelarBtn) {
-        cancelarBtn.addEventListener('click', function() {
-            console.log('❌ Botón cancelar clickeado');
-            cancelarImportacion(targetDivId);
-        });
-    }
-    
-    if (aplicarBtn) {
-        aplicarBtn.addEventListener('click', function() {
-            console.log('✅ Botón aplicar clickeado');
-            aplicarDatosPedido(targetDivId);
-        });
-    }
-    
-    var numeroPedido = document.getElementById('numeroPedido' + suffix);
-    if (numeroPedido) {
-        numeroPedido.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                console.log('⌨️ Enter presionado');
-                buscarPedidoPorNumero(targetDivId);
-            }
-        });
-    }
-    
-    console.log('🎉 Configuración completada');
-}
+
 
 /**
  * 🔍 FUNCIÓN PARA BUSCAR PEDIDO POR NÚMERO
@@ -1064,64 +920,8 @@ function buscarPedidoPorNumero() {
     }, 1500); // Simular delay de API
 }
 
-/**
- * 🎭 FUNCIÓN PARA SIMULAR BÚSQUEDA DE PEDIDO (reemplaza con tu lógica real)
- */
-function simularBusquedaPedido(numeroPedido) {
-    // Simulación de datos - en tu implementación real, aquí harías una llamada a tu API
-    const pedidosEjemplo = {
-        'PED-2024-001': {
-            numero: 'PED-2024-001',
-            cliente: {
-                nombre: 'ACME Corporation',
-                rfc: 'ACM123456789',
-                uid: '67a93f71cdddb' // Usar UID existente en tu sistema
-            },
-            productos: [
-                {
-                    descripcion: 'Disco Duro SSD 1TB',
-                    claveProdServ: '43201830',
-                    cantidad: 2,
-                    precioUnitario: 1500.00,
-                    claveUnidad: 'H87',
-                    unidad: 'Pieza'
-                },
-                {
-                    descripcion: 'Memoria RAM 16GB',
-                    claveProdServ: '43201604',
-                    cantidad: 1,
-                    precioUnitario: 2800.00,
-                    claveUnidad: 'H87',
-                    unidad: 'Pieza'
-                }
-            ],
-            total: 5800.00,
-            fecha: '2024-01-15'
-        },
-        'ORD-123456': {
-            numero: 'ORD-123456',
-            cliente: {
-                nombre: 'Tech Solutions SA',
-                rfc: 'TSO987654321',
-                uid: '67a93f71cdddb'
-            },
-            productos: [
-                {
-                    descripcion: 'Laptop Business',
-                    claveProdServ: '43211507',
-                    cantidad: 1,
-                    precioUnitario: 15000.00,
-                    claveUnidad: 'H87',
-                    unidad: 'Pieza'
-                }
-            ],
-            total: 15000.00,
-            fecha: '2024-01-20'
-        }
-    };
-    
-    return pedidosEjemplo[numeroPedido.toUpperCase()] || null;
-}
+
+
 
 /**
  * ✅ FUNCIÓN PARA MOSTRAR PEDIDO ENCONTRADO
@@ -1402,8 +1202,7 @@ window.addEventListener('load', function() {
     // ✅ CARGAR CLIENTES
     cargarClientes();
     
-    // ✅ CONFIGURAR FUNCIONALIDAD DE IMPORTAR PEDIDO
-    configurarImportarPedido();
+
     
     // ✅ CONFIGURAR EVENT LISTENERS PARA CONCEPTOS INICIALES
     const conceptoInicial = document.querySelector('.producto-row');
@@ -1454,12 +1253,14 @@ console.log('✅ PASO 3 completado - Script cargado con funcionalidad crear CFDI
     </script>
 </body>
 </html>`;
-    
+
     popup.document.write(htmlContent);
     popup.document.close();
     popup.focus();
   } else {
-    alert("Por favor, permita ventanas emergentes para usar el módulo de facturación");
+    alert(
+      "Por favor, permita ventanas emergentes para usar el módulo de facturación"
+    );
   }
 }
 
@@ -1470,9 +1271,9 @@ console.log('✅ PASO 3 completado - Script cargado con funcionalidad crear CFDI
  */
 function abrirModuloFacturacionEmbebido(targetDivId) {
   const targetDiv = document.getElementById(targetDivId);
-  
+
   if (!targetDiv) {
-    console.error('❌ No se encontró el div objetivo:', targetDivId);
+    console.error("❌ No se encontró el div objetivo:", targetDivId);
     return;
   }
 
@@ -1586,46 +1387,7 @@ function abrirModuloFacturacionEmbebido(targetDivId) {
                                style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
                     </div>
                 </div>
-            </div>
-            
-            <!-- SECCIÓN PARA IMPORTAR PEDIDO -->
-            <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #2196f3;">
-                <h3 style="color: #1976d2; margin: 0 0 15px 0; font-size: 18px;">📦 Importar Pedido</h3>
-                <p style="margin: 0 0 15px 0; color: #666;">Importa los datos de un pedido existente para agilizar la creación de la factura.</p>
-                <button type="button" id="toggleImportOrder-${targetDivId}" 
-                        style="background: #2196f3; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
-                    📥 Importar Pedido
-                </button>
-                <div id="importOrderInput-${targetDivId}" style="display: none; margin-top: 15px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">Número de Pedido</label>
-                            <input type="text" id="numeroPedido-${targetDivId}" placeholder="Ingresa el número de pedido"
-                                   style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
-                            <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">Ejemplo: PED-2024-001, ORD-123456, etc.</div>
-                        </div>
-                        <div style="display: flex; align-items: end; gap: 10px; margin-bottom: 20px;">
-                            <button type="button" id="buscarPedido-${targetDivId}" 
-                                    style="padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 0; font-size: 16px; font-weight: 600;">
-                                🔍 Buscar Pedido
-                            </button>
-                            <button type="button" id="cancelarImport-${targetDivId}" 
-                                    style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 0; font-size: 16px; font-weight: 600;">
-                                ❌ Cancelar
-                            </button>
-                        </div>
-                    </div>
-                    <div id="pedidoInfo-${targetDivId}" style="display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
-                        <h4 style="margin: 0 0 10px 0; color: #28a745;">✅ Pedido Encontrado</h4>
-                        <div id="pedidoDetalles-${targetDivId}"></div>
-                        <button type="button" id="aplicarPedido-${targetDivId}" 
-                                style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; font-size: 16px; font-weight: 600;">
-                            ✅ Aplicar Datos del Pedido
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
+            </div>            
             <!-- Conceptos/Productos -->
             <div style="margin-bottom: 35px; padding-bottom: 25px; border-bottom: 2px solid #eee;">
                 <h3 style="color: #333; margin-bottom: 20px; font-size: 20px;"> Conceptos/Productos</h3>
@@ -1764,10 +1526,9 @@ function abrirModuloFacturacionEmbebido(targetDivId) {
     </div>
 </div>`;
 
-
   // Insertar el HTML en el div
   targetDiv.innerHTML = htmlContent;
-  
+
   // Configurar todas las funcionalidades (exactamente igual que en tu código original)
   configurarFormularioEmbebido(targetDivId);
 }
@@ -1776,43 +1537,43 @@ function abrirModuloFacturacionEmbebido(targetDivId) {
  * Configurar funcionalidades del formulario embebido
  */
 function configurarFormularioEmbebido(targetDivId) {
-  console.log('🔧 Configurando formulario embebido:', targetDivId);
-  
+  console.log("🔧 Configurando formulario embebido:", targetDivId);
+
   // Cargar clientes
   cargarClientesEmbebido(targetDivId);
-    configurarImportarPedido(targetDivId);
+  configurarImportarPedido(targetDivId);
 
   // Configurar event listeners para calcular totales
   const conceptos = document.querySelectorAll(`.producto-row-${targetDivId}`);
-  conceptos.forEach(concepto => {
+  conceptos.forEach((concepto) => {
     agregarEventListenersEmbebido(concepto, targetDivId);
   });
-  
+
   // Configurar formulario
   const formulario = document.getElementById(`cfdiformulario-${targetDivId}`);
   if (formulario) {
-    formulario.addEventListener('submit', function(e) {
+    formulario.addEventListener("submit", function (e) {
       e.preventDefault();
       enviarCFDIEmbebido(targetDivId);
     });
   }
-  
+
   // Configurar botón agregar concepto
   const agregarBtn = document.getElementById(`agregarConcepto-${targetDivId}`);
   if (agregarBtn) {
-    agregarBtn.addEventListener('click', function() {
+    agregarBtn.addEventListener("click", function () {
       agregarConceptoEmbebido(targetDivId);
     });
   }
-  
+
   // Generar número de orden automático
   const timestamp = Date.now();
   const random = Math.floor(Math.random() * 1000);
   const numOrderEl = document.getElementById(`numOrder-${targetDivId}`);
   if (numOrderEl) {
-    numOrderEl.value = 'ORD-' + timestamp + '-' + random;
+    numOrderEl.value = "ORD-" + timestamp + "-" + random;
   }
-  
+
   // Calcular totales inicial
   setTimeout(() => calcularTotalesEmbebido(targetDivId), 100);
 }
@@ -1822,25 +1583,29 @@ function configurarFormularioEmbebido(targetDivId) {
  */
 function cargarClientesEmbebido(targetDivId) {
   // Reutilizar exactamente la misma lógica pero con IDs únicos
-  console.log('🔄 Cargando clientes para formulario embebido...');
-  
+  console.log("🔄 Cargando clientes para formulario embebido...");
+
   const selectElement = document.getElementById(`receptorUID-${targetDivId}`);
   if (!selectElement) {
-    console.error('❌ No se encontró el elemento receptorUID para:', targetDivId);
+    console.error(
+      "❌ No se encontró el elemento receptorUID para:",
+      targetDivId
+    );
     return;
   }
-  
-  selectElement.innerHTML = '<option value="" disabled>⏳ Cargando clientes...</option>';
+
+  selectElement.innerHTML =
+    '<option value="" disabled>⏳ Cargando clientes...</option>';
   selectElement.disabled = true;
-  
+
   // Usar las mismas URLs que tu función original
   const urls = [
-    '/wp-admin/admin-ajax.php',
-    '/pos-dashboard/wp-admin/admin-ajax.php',
-    window.location.origin + '/wp-admin/admin-ajax.php',
-    window.location.origin + '/pos-dashboard/wp-admin/admin-ajax.php'
+    "/wp-admin/admin-ajax.php",
+    "/pos-dashboard/wp-admin/admin-ajax.php",
+    window.location.origin + "/wp-admin/admin-ajax.php",
+    window.location.origin + "/pos-dashboard/wp-admin/admin-ajax.php",
   ];
-  
+
   probarURLsClientesEmbebido(urls, selectElement, targetDivId);
 }
 
@@ -1850,58 +1615,62 @@ function cargarClientesEmbebido(targetDivId) {
 async function probarURLsClientesEmbebido(urls, selectElement, targetDivId) {
   for (let i = 0; i < urls.length; i++) {
     const url = urls[i];
-    console.log('🧪 Probando URL ' + (i + 1) + ' para embebido: ' + url);
-    
+    console.log("🧪 Probando URL " + (i + 1) + " para embebido: " + url);
+
     try {
       const response = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: 'action=pos_billing_get_clients'
+        body: "action=pos_billing_get_clients",
       });
-      
+
       if (response.status === 200) {
         const data = await response.json();
-        console.log('✅ ¡FUNCIONA! URL correcta para embebido: ' + url);
-        
+        console.log("✅ ¡FUNCIONA! URL correcta para embebido: " + url);
+
         if (data.success && data.data && Array.isArray(data.data)) {
-          selectElement.innerHTML = '<option value="">Seleccionar cliente...</option>';
-          
+          selectElement.innerHTML =
+            '<option value="">Seleccionar cliente...</option>';
+
           data.data.forEach((client) => {
-            const option = document.createElement('option');
+            const option = document.createElement("option");
             option.value = client.uid;
             option.textContent = client.display_name;
-            
-            option.setAttribute('data-rfc', client.rfc || '');
-            option.setAttribute('data-email', client.email || '');
-            option.setAttribute('data-uso-cfdi', client.uso_cfdi || 'G01');
-            option.setAttribute('data-ciudad', client.ciudad || '');
-            option.setAttribute('data-razon-social', client.razon_social || '');
-            
+
+            option.setAttribute("data-rfc", client.rfc || "");
+            option.setAttribute("data-email", client.email || "");
+            option.setAttribute("data-uso-cfdi", client.uso_cfdi || "G01");
+            option.setAttribute("data-ciudad", client.ciudad || "");
+            option.setAttribute("data-razon-social", client.razon_social || "");
+
             selectElement.appendChild(option);
           });
-          
+
           selectElement.disabled = false;
-          console.log('🎉 ¡Clientes cargados exitosamente en formulario embebido!');
-          
+          console.log(
+            "🎉 ¡Clientes cargados exitosamente en formulario embebido!"
+          );
+
           // Configurar evento de selección de cliente
           configurarEventoClienteEmbebido(selectElement, targetDivId);
-          
+
           return;
         } else {
-          console.log('⚠️ Respuesta exitosa pero sin clientes válidos');
-          selectElement.innerHTML = '<option value="">❌ No hay clientes</option>';
+          console.log("⚠️ Respuesta exitosa pero sin clientes válidos");
+          selectElement.innerHTML =
+            '<option value="">❌ No hay clientes</option>';
           selectElement.disabled = false;
           return;
         }
       }
     } catch (error) {
-      console.log('❌ Error: ' + error.message);
+      console.log("❌ Error: " + error.message);
     }
   }
-  
-  console.error('❌ No se pudo conectar con ninguna URL');
+
+  console.error("❌ No se pudo conectar con ninguna URL");
   selectElement.innerHTML = '<option value="">❌ Error de conexión</option>';
   selectElement.disabled = false;
 }
@@ -1910,18 +1679,18 @@ async function probarURLsClientesEmbebido(urls, selectElement, targetDivId) {
  * Configurar evento cuando se selecciona un cliente (versión embebida)
  */
 function configurarEventoClienteEmbebido(selectElement, targetDivId) {
-  selectElement.addEventListener('change', function() {
+  selectElement.addEventListener("change", function () {
     const selectedOption = this.options[this.selectedIndex];
     if (selectedOption.value) {
       // Auto-completar uso CFDI si está disponible
-      const usoCfdi = selectedOption.getAttribute('data-uso-cfdi');
+      const usoCfdi = selectedOption.getAttribute("data-uso-cfdi");
       if (usoCfdi) {
         const usoCfdiSelect = document.getElementById(`usoCFDI-${targetDivId}`);
         if (usoCfdiSelect) {
           usoCfdiSelect.value = usoCfdi;
         }
       }
-      
+
       // Mostrar información del cliente
       mostrarInfoClienteEmbebido(selectedOption, targetDivId);
     } else {
@@ -1935,30 +1704,31 @@ function configurarEventoClienteEmbebido(selectElement, targetDivId) {
  */
 function mostrarInfoClienteEmbebido(option, targetDivId) {
   const infoDiv = document.getElementById(`clienteInfo-${targetDivId}`);
-  
-  if (!option || !option.value || option.value === '') {
+
+  if (!option || !option.value || option.value === "") {
     if (infoDiv) {
-      infoDiv.style.display = 'none';
+      infoDiv.style.display = "none";
     }
     return;
   }
-  
+
   const elementos = {
-    [`clienteRFC-${targetDivId}`]: option.getAttribute('data-rfc') || '-',
-    [`clienteEmail-${targetDivId}`]: option.getAttribute('data-email') || '-',
-    [`clienteUsoCFDI-${targetDivId}`]: option.getAttribute('data-uso-cfdi') || '-',
-    [`clienteCiudad-${targetDivId}`]: option.getAttribute('data-ciudad') || '-'
+    [`clienteRFC-${targetDivId}`]: option.getAttribute("data-rfc") || "-",
+    [`clienteEmail-${targetDivId}`]: option.getAttribute("data-email") || "-",
+    [`clienteUsoCFDI-${targetDivId}`]:
+      option.getAttribute("data-uso-cfdi") || "-",
+    [`clienteCiudad-${targetDivId}`]: option.getAttribute("data-ciudad") || "-",
   };
-  
-  Object.keys(elementos).forEach(id => {
+
+  Object.keys(elementos).forEach((id) => {
     const elemento = document.getElementById(id);
     if (elemento) {
       elemento.textContent = elementos[id];
     }
   });
-  
+
   if (infoDiv) {
-    infoDiv.style.display = 'block';
+    infoDiv.style.display = "block";
   }
 }
 
@@ -1966,7 +1736,7 @@ function mostrarInfoClienteEmbebido(option, targetDivId) {
  * Recargar clientes para formulario embebido
  */
 function recargarClientesEmbebido(targetDivId) {
-  console.log('🔄 Recargando lista de clientes para formulario embebido...');
+  console.log("🔄 Recargando lista de clientes para formulario embebido...");
   cargarClientesEmbebido(targetDivId);
 }
 
@@ -1974,64 +1744,80 @@ function recargarClientesEmbebido(targetDivId) {
  * Calcular totales para formulario embebido
  */
 function calcularTotalesEmbebido(targetDivId) {
-  console.log('🧮 Calculando totales para formulario embebido...');
-  
+  console.log("🧮 Calculando totales para formulario embebido...");
+
   let subtotal = 0;
   let totalDescuentos = 0;
-  
+
   const conceptos = document.querySelectorAll(`.producto-row-${targetDivId}`);
-  
-  conceptos.forEach(function(concepto) {
-    const cantidad = parseFloat(concepto.querySelector(`.cantidad-${targetDivId}`).value) || 0;
-    const precio = parseFloat(concepto.querySelector(`.precioUnitario-${targetDivId}`).value) || 0;
+
+  conceptos.forEach(function (concepto) {
+    const cantidad =
+      parseFloat(concepto.querySelector(`.cantidad-${targetDivId}`).value) || 0;
+    const precio =
+      parseFloat(
+        concepto.querySelector(`.precioUnitario-${targetDivId}`).value
+      ) || 0;
     const filaSecundaria = concepto.nextElementSibling;
-    const descuento = filaSecundaria && filaSecundaria.classList.contains(`producto-row-secondary-${targetDivId}`) ? 
-      parseFloat(filaSecundaria.querySelector(`.descuento-${targetDivId}`).value) || 0 : 0;
-    
+    const descuento =
+      filaSecundaria &&
+      filaSecundaria.classList.contains(`producto-row-secondary-${targetDivId}`)
+        ? parseFloat(
+            filaSecundaria.querySelector(`.descuento-${targetDivId}`).value
+          ) || 0
+        : 0;
+
     const importeConcepto = cantidad * precio;
     const totalConcepto = importeConcepto - descuento;
-    
+
     const campoTotal = concepto.querySelector(`.totalConcepto-${targetDivId}`);
     if (campoTotal) {
       campoTotal.value = totalConcepto.toFixed(2);
     }
-    
+
     subtotal += importeConcepto;
     totalDescuentos += descuento;
   });
-  
+
   const subtotalFinal = subtotal - totalDescuentos;
   const iva = subtotalFinal * 0.16;
   const total = subtotalFinal + iva;
-  
+
   const subtotalEl = document.getElementById(`subtotal-${targetDivId}`);
-  const totalDescuentosEl = document.getElementById(`totalDescuentos-${targetDivId}`);
+  const totalDescuentosEl = document.getElementById(
+    `totalDescuentos-${targetDivId}`
+  );
   const ivaEl = document.getElementById(`iva-${targetDivId}`);
   const totalEl = document.getElementById(`total-${targetDivId}`);
-  
-  if (subtotalEl) subtotalEl.textContent = ' + subtotal.toFixed(2)';
-  if (totalDescuentosEl) totalDescuentosEl.textContent = ' + totalDescuentos.toFixed(2)';
-  if (ivaEl) ivaEl.textContent = ' + iva.toFixed(2)';
-  if (totalEl) totalEl.textContent = ' + total.toFixed(2)';
+
+  if (subtotalEl) subtotalEl.textContent = " + subtotal.toFixed(2)";
+  if (totalDescuentosEl)
+    totalDescuentosEl.textContent = " + totalDescuentos.toFixed(2)";
+  if (ivaEl) ivaEl.textContent = " + iva.toFixed(2)";
+  if (totalEl) totalEl.textContent = " + total.toFixed(2)";
 }
 
 /**
  * Agregar event listeners para formulario embebido
  */
 function agregarEventListenersEmbebido(elemento, targetDivId) {
-  const campos = elemento.querySelectorAll(`.cantidad-${targetDivId}, .precioUnitario-${targetDivId}, .descuento-${targetDivId}`);
-  campos.forEach(function(campo) {
-    campo.addEventListener('input', () => calcularTotalesEmbebido(targetDivId));
-    campo.addEventListener('change', () => calcularTotalesEmbebido(targetDivId));
+  const campos = elemento.querySelectorAll(
+    `.cantidad-${targetDivId}, .precioUnitario-${targetDivId}, .descuento-${targetDivId}`
+  );
+  campos.forEach(function (campo) {
+    campo.addEventListener("input", () => calcularTotalesEmbebido(targetDivId));
+    campo.addEventListener("change", () =>
+      calcularTotalesEmbebido(targetDivId)
+    );
   });
-  
+
   const claveUnidad = elemento.querySelector(`.claveUnidad-${targetDivId}`);
   if (claveUnidad) {
-    claveUnidad.addEventListener('change', function() {
+    claveUnidad.addEventListener("change", function () {
       const unidadInput = elemento.querySelector(`.unidad-${targetDivId}`);
-      if (this.value === 'E48') unidadInput.value = 'Unidad de servicio';
-      else if (this.value === 'H87') unidadInput.value = 'Pieza';
-      else if (this.value === 'KGM') unidadInput.value = 'Kilogramo';
+      if (this.value === "E48") unidadInput.value = "Unidad de servicio";
+      else if (this.value === "H87") unidadInput.value = "Pieza";
+      else if (this.value === "KGM") unidadInput.value = "Kilogramo";
     });
   }
 }
@@ -2041,7 +1827,7 @@ function agregarEventListenersEmbebido(elemento, targetDivId) {
  */
 function agregarConceptoEmbebido(targetDivId) {
   // Lógica similar a tu función original pero adaptada para IDs únicos
-  console.log('➕ Agregando concepto para formulario embebido...');
+  console.log("➕ Agregando concepto para formulario embebido...");
   // Implementar según necesites
 }
 
@@ -2049,11 +1835,11 @@ function agregarConceptoEmbebido(targetDivId) {
  * Enviar CFDI para formulario embebido
  */
 function enviarCFDIEmbebido(targetDivId) {
-  console.log('📤 Enviando CFDI para formulario embebido...');
-  
+  console.log("📤 Enviando CFDI para formulario embebido...");
+
   // Recopilar datos del formulario embebido
   const datos = recopilarDatosEmbebido(targetDivId);
-  
+
   if (validarDatosEmbebido(datos, targetDivId)) {
     // Usar la misma lógica de envío pero adaptada
     enviarCFDIConDatos(datos, targetDivId);
@@ -2066,67 +1852,94 @@ function enviarCFDIEmbebido(targetDivId) {
 function recopilarDatosEmbebido(targetDivId) {
   // Similar a tu función original pero con IDs únicos
   const conceptos = [];
-  const filasConceptos = document.querySelectorAll(`.producto-row-${targetDivId}`);
-  
-  filasConceptos.forEach(function(fila) {
+  const filasConceptos = document.querySelectorAll(
+    `.producto-row-${targetDivId}`
+  );
+
+  filasConceptos.forEach(function (fila) {
     const filaSecundaria = fila.nextElementSibling;
-    
-    const cantidad = parseFloat(fila.querySelector(`.cantidad-${targetDivId}`).value);
-    const precioUnitario = parseFloat(fila.querySelector(`.precioUnitario-${targetDivId}`).value);
-    const descuento = filaSecundaria ? parseFloat(filaSecundaria.querySelector(`.descuento-${targetDivId}`).value) || 0 : 0;
+
+    const cantidad = parseFloat(
+      fila.querySelector(`.cantidad-${targetDivId}`).value
+    );
+    const precioUnitario = parseFloat(
+      fila.querySelector(`.precioUnitario-${targetDivId}`).value
+    );
+    const descuento = filaSecundaria
+      ? parseFloat(
+          filaSecundaria.querySelector(`.descuento-${targetDivId}`).value
+        ) || 0
+      : 0;
     const importe = cantidad * precioUnitario;
-    
+
     const concepto = {
-      ClaveProdServ: fila.querySelector(`.claveProdServ-${targetDivId}`).value.trim(),
-      ClaveUnidad: filaSecundaria ? filaSecundaria.querySelector(`.claveUnidad-${targetDivId}`).value : 'E48',
-      Unidad: filaSecundaria ? filaSecundaria.querySelector(`.unidad-${targetDivId}`).value : 'Unidad de servicio',
-      Descripcion: fila.querySelector(`.descripcion-${targetDivId}`).value.trim(),
-      ObjetoImp: filaSecundaria ? filaSecundaria.querySelector(`.objetoImp-${targetDivId}`).value : '02',
+      ClaveProdServ: fila
+        .querySelector(`.claveProdServ-${targetDivId}`)
+        .value.trim(),
+      ClaveUnidad: filaSecundaria
+        ? filaSecundaria.querySelector(`.claveUnidad-${targetDivId}`).value
+        : "E48",
+      Unidad: filaSecundaria
+        ? filaSecundaria.querySelector(`.unidad-${targetDivId}`).value
+        : "Unidad de servicio",
+      Descripcion: fila
+        .querySelector(`.descripcion-${targetDivId}`)
+        .value.trim(),
+      ObjetoImp: filaSecundaria
+        ? filaSecundaria.querySelector(`.objetoImp-${targetDivId}`).value
+        : "02",
       Cantidad: cantidad,
       ValorUnitario: precioUnitario,
       Importe: importe,
-      Descuento: descuento
+      Descuento: descuento,
     };
-    
-    if (concepto.ObjetoImp === '02') {
+
+    if (concepto.ObjetoImp === "02") {
       const baseGravable = importe - descuento;
       const ivaImporte = baseGravable * 0.16;
-      
+
       concepto.Impuestos = {
-        Traslados: [{
-          Base: baseGravable,
-          Impuesto: '002',
-          TipoFactor: 'Tasa',
-          TasaOCuota: 0.16,
-          Importe: ivaImporte
-        }]
+        Traslados: [
+          {
+            Base: baseGravable,
+            Impuesto: "002",
+            TipoFactor: "Tasa",
+            TasaOCuota: 0.16,
+            Importe: ivaImporte,
+          },
+        ],
       };
     }
-    
+
     conceptos.push(concepto);
   });
-  
+
   const datosBasicos = {
     Receptor: {
-      UID: document.getElementById(`receptorUID-${targetDivId}`).value.trim()
+      UID: document.getElementById(`receptorUID-${targetDivId}`).value.trim(),
     },
-    TipoDocumento: document.getElementById(`tipoDocumento-${targetDivId}`).value,
+    TipoDocumento: document.getElementById(`tipoDocumento-${targetDivId}`)
+      .value,
     Conceptos: conceptos,
     UsoCFDI: document.getElementById(`usoCFDI-${targetDivId}`).value,
     Serie: document.getElementById(`serie-${targetDivId}`).value,
     FormaPago: document.getElementById(`formaPago-${targetDivId}`).value,
     MetodoPago: document.getElementById(`metodoPago-${targetDivId}`).value,
     Moneda: document.getElementById(`moneda-${targetDivId}`).value,
-    EnviarCorreo: document.getElementById(`enviarCorreo-${targetDivId}`).checked,
+    EnviarCorreo: document.getElementById(`enviarCorreo-${targetDivId}`)
+      .checked,
     NumOrder: document.getElementById(`numOrder-${targetDivId}`).value || null,
-    Comentarios: document.getElementById(`comentarios-${targetDivId}`).value || null
+    Comentarios:
+      document.getElementById(`comentarios-${targetDivId}`).value || null,
   };
-  
-  const residenciaFiscal = document.getElementById(`residenciaFiscal-${targetDivId}`).value.trim();
+
+  const residenciaFiscal = document
+    .getElementById(`residenciaFiscal-${targetDivId}`)
+    .value.trim();
   if (residenciaFiscal) {
     datosBasicos.Receptor.ResidenciaFiscal = residenciaFiscal;
   }
-  
+
   return formatearDatosParaAPI(datosBasicos);
 }
 
@@ -2136,34 +1949,40 @@ function recopilarDatosEmbebido(targetDivId) {
 function validarDatosEmbebido(datos, targetDivId) {
   // Usar la misma lógica de validación que tu función original
   if (!datos.Receptor.UID) {
-    alert('❌ El UID del receptor es obligatorio');
+    alert("❌ El UID del receptor es obligatorio");
     return false;
   }
   if (!datos.Serie) {
-    alert('❌ La serie es obligatoria');
+    alert("❌ La serie es obligatoria");
     return false;
   }
   if (datos.Conceptos.length === 0) {
-    alert('❌ Debe agregar al menos un concepto');
+    alert("❌ Debe agregar al menos un concepto");
     return false;
   }
-  
+
   for (let i = 0; i < datos.Conceptos.length; i++) {
     const concepto = datos.Conceptos[i];
     if (!concepto.ClaveProdServ || !concepto.Descripcion) {
-      alert('❌ El concepto ' + (i + 1) + ' debe tener descripción y clave de producto/servicio');
+      alert(
+        "❌ El concepto " +
+          (i + 1) +
+          " debe tener descripción y clave de producto/servicio"
+      );
       return false;
     }
     if (concepto.Cantidad <= 0) {
-      alert('❌ El concepto ' + (i + 1) + ' debe tener cantidad mayor a 0');
+      alert("❌ El concepto " + (i + 1) + " debe tener cantidad mayor a 0");
       return false;
     }
     if (concepto.ValorUnitario <= 0) {
-      alert('❌ El concepto ' + (i + 1) + ' debe tener precio unitario mayor a 0');
+      alert(
+        "❌ El concepto " + (i + 1) + " debe tener precio unitario mayor a 0"
+      );
       return false;
     }
   }
-  
+
   return true;
 }
 
@@ -2171,75 +1990,86 @@ function validarDatosEmbebido(datos, targetDivId) {
  * Enviar CFDI con datos específicos
  */
 function enviarCFDIConDatos(datos, targetDivId) {
-  console.log('📡 Enviando CFDI con datos para formulario embebido...');
-  
-  document.getElementById(`loading-${targetDivId}`).style.display = 'block';
+  console.log("📡 Enviando CFDI con datos para formulario embebido...");
+
+  document.getElementById(`loading-${targetDivId}`).style.display = "block";
   document.getElementById(`submitBtn-${targetDivId}`).disabled = true;
-  
-  let ajaxUrl = window.urlAjaxFuncional || '/wp-admin/admin-ajax.php';
-  let nonce = '';
-  
+
+  let ajaxUrl = window.urlAjaxFuncional || "/wp-admin/admin-ajax.php";
+  let nonce = "";
+
   if (window.pos_billing_ajax) {
     ajaxUrl = window.pos_billing_ajax.ajax_url || ajaxUrl;
-    nonce = window.pos_billing_ajax.nonce || '';
+    nonce = window.pos_billing_ajax.nonce || "";
   }
-  
+
   const formData = new FormData();
-  formData.append('action', 'pos_billing_create_cfdi');
+  formData.append("action", "pos_billing_create_cfdi");
   if (nonce) {
-    formData.append('nonce', nonce);
+    formData.append("nonce", nonce);
   }
-  formData.append('cfdi_data', JSON.stringify(datos));
-  
+  formData.append("cfdi_data", JSON.stringify(datos));
+
   fetch(ajaxUrl, {
-    method: 'POST',
-    body: formData
+    method: "POST",
+    body: formData,
   })
-  .then(response => response.json())
-  .then(data => {
-    console.log('📨 Respuesta del servidor para formulario embebido:', data);
-    
-    document.getElementById(`loading-${targetDivId}`).style.display = 'none';
-    document.getElementById(`submitBtn-${targetDivId}`).disabled = false;
-    
-    if (data.success) {
-      console.log('✅ CFDI creado exitosamente en formulario embebido');
-      document.getElementById(`result-container-${targetDivId}`).className = 'result-container result-success';
-      document.getElementById(`result-content-${targetDivId}`).innerHTML = 
-        '<div style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #28a745;">' +
-          '✅ CFDI Generado Exitosamente' +
-        '</div>' +
-        '<div style="background: white; padding: 15px; border-radius: 5px;">' +
-          '<p><strong>UUID:</strong> ' + (data.data.uuid || 'N/A') + '</p>' +
-          '<p><strong>Folio:</strong> ' + (data.data.folio || 'N/A') + '</p>' +
-          '<p><strong>Total:</strong> ' + (data.data.total || '0.00') + '</p>' +
-        '</div>' +
-        '<div style="margin-top: 20px; text-align: center;">' +
-          '<button onclick="limpiarFormularioEmbebido(\'' + targetDivId + '\')" style="padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 5px;">🔄 Nueva Factura</button>' +
-        '</div>';
-      document.getElementById(`result-container-${targetDivId}`).style.display = 'block';
-    } else {
-      console.error('❌ Error creando CFDI en formulario embebido:', data);
-      let errorMsg = data.data || data.message || 'Error desconocido';
-      if (typeof errorMsg === 'object') {
-        if (errorMsg.specific_analysis) {
-          errorMsg = errorMsg.specific_analysis.error_type + ': ' + (errorMsg.message || 'Error en la API');
-        } else {
-          errorMsg = JSON.stringify(errorMsg);
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("📨 Respuesta del servidor para formulario embebido:", data);
+
+      document.getElementById(`loading-${targetDivId}`).style.display = "none";
+      document.getElementById(`submitBtn-${targetDivId}`).disabled = false;
+
+      if (data.success) {
+        console.log("✅ CFDI creado exitosamente en formulario embebido");
+        document.getElementById(`result-container-${targetDivId}`).className =
+          "result-container result-success";
+        document.getElementById(`result-content-${targetDivId}`).innerHTML =
+          '<div style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #28a745;">' +
+          "✅ CFDI Generado Exitosamente" +
+          "</div>" +
+          '<div style="background: white; padding: 15px; border-radius: 5px;">' +
+          "<p><strong>UUID:</strong> " +
+          (data.data.uuid || "N/A") +
+          "</p>" +
+          "<p><strong>Folio:</strong> " +
+          (data.data.folio || "N/A") +
+          "</p>" +
+          "<p><strong>Total:</strong> " +
+          (data.data.total || "0.00") +
+          "</p>" +
+          "</div>" +
+          '<div style="margin-top: 20px; text-align: center;">' +
+          "<button onclick=\"limpiarFormularioEmbebido('" +
+          targetDivId +
+          '\')" style="padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 5px;">🔄 Nueva Factura</button>' +
+          "</div>";
+        document.getElementById(
+          `result-container-${targetDivId}`
+        ).style.display = "block";
+      } else {
+        console.error("❌ Error creando CFDI en formulario embebido:", data);
+        let errorMsg = data.data || data.message || "Error desconocido";
+        if (typeof errorMsg === "object") {
+          if (errorMsg.specific_analysis) {
+            errorMsg =
+              errorMsg.specific_analysis.error_type +
+              ": " +
+              (errorMsg.message || "Error en la API");
+          } else {
+            errorMsg = JSON.stringify(errorMsg);
+          }
         }
+        alert("❌ Error: " + errorMsg);
       }
-      alert('❌ Error: ' + errorMsg);
-    }
-  })
-  .catch(error => {
-    console.error('❌ Error de conexión en formulario embebido:', error);
-    document.getElementById(`loading-${targetDivId}`).style.display = 'none';
-    document.getElementById(`submitBtn-${targetDivId}`).disabled = false;
-    alert('❌ Error de conexión: ' + error.message);
-
-
-
-  });
+    })
+    .catch((error) => {
+      console.error("❌ Error de conexión en formulario embebido:", error);
+      document.getElementById(`loading-${targetDivId}`).style.display = "none";
+      document.getElementById(`submitBtn-${targetDivId}`).disabled = false;
+      alert("❌ Error de conexión: " + error.message);
+    });
 }
 
 /**
@@ -2249,26 +2079,28 @@ function limpiarFormularioEmbebido(targetDivId) {
   const formulario = document.getElementById(`cfdiformulario-${targetDivId}`);
   if (formulario) {
     formulario.reset();
-    
+
     // Limpiar información del cliente
     const clienteInfo = document.getElementById(`clienteInfo-${targetDivId}`);
     if (clienteInfo) {
-      clienteInfo.style.display = 'none';
+      clienteInfo.style.display = "none";
     }
-    
+
     // Limpiar resultados
-    const resultContainer = document.getElementById(`result-container-${targetDivId}`);
+    const resultContainer = document.getElementById(
+      `result-container-${targetDivId}`
+    );
     if (resultContainer) {
-      resultContainer.style.display = 'none';
+      resultContainer.style.display = "none";
     }
-    
+
     // Recalcular totales
     calcularTotalesEmbebido(targetDivId);
-    
+
     // Recargar clientes
     cargarClientesEmbebido(targetDivId);
     configurarImportarPedido(targetDivId);
-    console.log('🧹 Formulario embebido limpiado');
+    console.log("🧹 Formulario embebido limpiado");
   }
 }
 
@@ -2278,461 +2110,106 @@ function limpiarFormularioEmbebido(targetDivId) {
 function cerrarFormularioEmbebido(targetDivId) {
   const targetDiv = document.getElementById(targetDivId);
   if (targetDiv) {
-    targetDiv.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">Formulario cerrado. <a href="#" onclick="abrirModuloFacturacionEmbebido(\'' + targetDivId + '\')">Volver a abrir</a></p>';
+    targetDiv.innerHTML =
+      '<p style="text-align: center; padding: 40px; color: #666;">Formulario cerrado. <a href="#" onclick="abrirModuloFacturacionEmbebido(\'' +
+      targetDivId +
+      "')\">Volver a abrir</a></p>";
   }
 }
 
 // =============== FUNCIONES PARA IMPORTAR PEDIDO ===============
 
 function configurarImportarPedido(targetDivId) {
-    if (!targetDivId) {
-        targetDivId = '';
-    }
-    
-    console.log('Configurando funcionalidad de importar pedido para:', targetDivId || 'popup');
-    
-    var suffix = targetDivId ? '-' + targetDivId : '';
-    
-    var toggleBtn = document.getElementById('toggleImportOrder' + suffix);
-    var importInput = document.getElementById('importOrderInput' + suffix);
-    var buscarBtn = document.getElementById('buscarPedido' + suffix);
-    var cancelarBtn = document.getElementById('cancelarImport' + suffix);
-    var aplicarBtn = document.getElementById('aplicarPedido' + suffix);
-    
-    console.log('toggleBtn encontrado:', !!toggleBtn);
-    console.log('importInput encontrado:', !!importInput);
-    
-    if (!toggleBtn || !importInput) {
-        console.log('Elementos no encontrados, reintentando en 300ms...');
-        setTimeout(function() {
-            configurarImportarPedido(targetDivId);
-        }, 300);
-        return;
-    }
-    
-    console.log('Configurando eventos para formulario', targetDivId ? 'embebido' : 'popup');
-    
-    toggleBtn.addEventListener('click', function() {
-        console.log('CLICK DETECTADO en toggleImportOrder');
-        
-        if (importInput.style.display === 'block') {
-            importInput.classList.remove('show');
-            importInput.style.display = 'none';
-            toggleBtn.textContent = 'Importar Pedido';
-            console.log('Sección ocultada');
-        } else {
-            importInput.classList.add('show');
-            importInput.style.display = 'block';
-            toggleBtn.textContent = 'Ocultar Importar';
-            console.log('Sección mostrada');
-            
-            var numeroPedido = document.getElementById('numeroPedido' + suffix);
-            if (numeroPedido) {
-                numeroPedido.focus();
-            }
-        }
-    });
-    
-    if (buscarBtn) {
-        buscarBtn.addEventListener('click', function() {
-            console.log('Botón buscar pedido clickeado');
-            buscarPedidoPorNumero(targetDivId);
-        });
-    }
-    
-    if (cancelarBtn) {
-        cancelarBtn.addEventListener('click', function() {
-            console.log('Botón cancelar clickeado');
-            cancelarImportacion(targetDivId);
-        });
-    }
-    
-    if (aplicarBtn) {
-        aplicarBtn.addEventListener('click', function() {
-            console.log('Botón aplicar clickeado');
-            aplicarDatosPedido(targetDivId);
-        });
-    }
-    
-    var numeroPedido = document.getElementById('numeroPedido' + suffix);
-    if (numeroPedido) {
-        numeroPedido.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                console.log('Enter presionado');
-                buscarPedidoPorNumero(targetDivId);
-            }
-        });
-    }
-    
-    console.log('Configuración completada');
-}
-function buscarPedidoPorNumero(targetDivId) {
-    var suffix = targetDivId ? '-' + targetDivId : '';
-    var numeroPedido = document.getElementById('numeroPedido' + suffix);
-    
-    if (!numeroPedido || !numeroPedido.value.trim()) {
-        alert('Por favor, ingresa un número de pedido');
-        return;
-    }
-    
-    console.log('Buscando pedido:', numeroPedido.value.trim());
-    
-    var buscarBtn = document.getElementById('buscarPedido' + suffix);
-    if (buscarBtn) {
-        var originalText = buscarBtn.textContent;
-        buscarBtn.disabled = true;
-        buscarBtn.textContent = 'Buscando...';
-    }
-    
-    // Llamada AJAX real
-    var formData = new FormData();
-    formData.append('action', 'pos_billing_search_order');
-    formData.append('order_number', numeroPedido.value.trim());
-    
-    fetch('/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (buscarBtn) {
-            buscarBtn.disabled = false;
-            buscarBtn.textContent = originalText;
-        }
-        
-        if (data.success) {
-            mostrarPedidoEncontrado(data.data, targetDivId);
-        } else {
-            mostrarPedidoNoEncontrado(targetDivId);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        if (buscarBtn) {
-            buscarBtn.disabled = false;
-            buscarBtn.textContent = originalText;
-        }
-        alert('Error al buscar el pedido');
-    });
-}
+  if (!targetDivId) {
+    targetDivId = "";
+  }
 
-function cancelarImportacion(targetDivId) {
-    var suffix = targetDivId ? '-' + targetDivId : '';
-    
-    var numeroPedido = document.getElementById('numeroPedido' + suffix);
-    if (numeroPedido) {
-        numeroPedido.value = '';
+  console.log(
+    "Configurando funcionalidad de importar pedido para:",
+    targetDivId || "popup"
+  );
+
+  var suffix = targetDivId ? "-" + targetDivId : "";
+
+  var toggleBtn = document.getElementById("toggleImportOrder" + suffix);
+  var importInput = document.getElementById("importOrderInput" + suffix);
+  var buscarBtn = document.getElementById("buscarPedido" + suffix);
+  var cancelarBtn = document.getElementById("cancelarImport" + suffix);
+  var aplicarBtn = document.getElementById("aplicarPedido" + suffix);
+
+  console.log("toggleBtn encontrado:", !!toggleBtn);
+  console.log("importInput encontrado:", !!importInput);
+
+  if (!toggleBtn || !importInput) {
+    console.log("Elementos no encontrados, reintentando en 300ms...");
+    setTimeout(function () {
+      configurarImportarPedido(targetDivId);
+    }, 300);
+    return;
+  }
+
+  console.log(
+    "Configurando eventos para formulario",
+    targetDivId ? "embebido" : "popup"
+  );
+
+  toggleBtn.addEventListener("click", function () {
+    console.log("CLICK DETECTADO en toggleImportOrder");
+
+    if (importInput.style.display === "block") {
+      importInput.classList.remove("show");
+      importInput.style.display = "none";
+      toggleBtn.textContent = "Importar Pedido";
+      console.log("Sección ocultada");
+    } else {
+      importInput.classList.add("show");
+      importInput.style.display = "block";
+      toggleBtn.textContent = "Ocultar Importar";
+      console.log("Sección mostrada");
+
+      var numeroPedido = document.getElementById("numeroPedido" + suffix);
+      if (numeroPedido) {
+        numeroPedido.focus();
+      }
     }
-    
-    var importInput = document.getElementById('importOrderInput' + suffix);
-    var toggleBtn = document.getElementById('toggleImportOrder' + suffix);
-    
-    if (importInput && toggleBtn) {
-        importInput.style.display = 'none';
-        toggleBtn.textContent = 'Importar Pedido';
-    }
-    
-    console.log('Importación cancelada');
+  });
+
+  if (buscarBtn) {
+    buscarBtn.addEventListener("click", function () {
+      console.log("Botón buscar pedido clickeado");
+      buscarPedidoPorNumero(targetDivId);
+    });
+  }
+
+  if (cancelarBtn) {
+    cancelarBtn.addEventListener("click", function () {
+      console.log("Botón cancelar clickeado");
+      cancelarImportacion(targetDivId);
+    });
+  }
+
+  if (aplicarBtn) {
+    aplicarBtn.addEventListener("click", function () {
+      console.log("Botón aplicar clickeado");
+      aplicarDatosPedido(targetDivId);
+    });
+  }
+
+  var numeroPedido = document.getElementById("numeroPedido" + suffix);
+  if (numeroPedido) {
+    numeroPedido.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        console.log("Enter presionado");
+        buscarPedidoPorNumero(targetDivId);
+      }
+    });
+  }
+
+  console.log("Configuración completada");
 }
 
 function aplicarDatosPedido(targetDivId) {
-    alert('Función aplicar datos en desarrollo');
-    console.log('Aplicando datos del pedido para:', targetDivId);
-}
-
-/**
- * FUNCIONES FALTANTES PARA IMPORTAR PEDIDOS
- * Agrega estas funciones al final de tu archivo pos-billing.js
- */
-
-/**
- * Mostrar pedido encontrado
- */
-function mostrarPedidoEncontrado(pedido, targetDivId) {
-    console.log('Pedido encontrado:', pedido);
-    
-    var suffix = targetDivId ? '-' + targetDivId : '';
-    var pedidoInfo = document.getElementById('pedidoInfo' + suffix);
-    var pedidoDetalles = document.getElementById('pedidoDetalles' + suffix);
-    
-    if (!pedidoInfo || !pedidoDetalles) {
-        console.error('No se encontraron elementos pedidoInfo o pedidoDetalles');
-        return;
-    }
-    
-    // Guardar datos del pedido globalmente
-    if (targetDivId) {
-        window['pedidoActual_' + targetDivId] = pedido;
-    } else {
-        window.pedidoActual = pedido;
-    }
-    
-    var html = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">';
-    html += '<div><strong>Número:</strong> ' + pedido.numero + '</div>';
-    html += '<div><strong>Cliente:</strong> ' + pedido.cliente.nombre + '</div>';
-    html += '<div><strong>RFC:</strong> ' + pedido.cliente.rfc + '</div>';
-    html += '<div><strong>Total:</strong> $' + pedido.total.toFixed(2) + '</div>';
-    html += '</div>';
-    
-    if (pedido.productos && pedido.productos.length > 0) {
-        html += '<div style="margin-top: 15px;"><strong>Productos:</strong></div>';
-        html += '<div style="max-height: 150px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 5px;">';
-        
-        pedido.productos.forEach(function(producto, index) {
-            html += '<div style="padding: 8px; border-bottom: 1px solid #ddd;">';
-            html += '<strong>' + (index + 1) + '.</strong> ' + producto.descripcion;
-            html += '<br><small>Cantidad: ' + producto.cantidad + ' | Precio: $' + producto.precioUnitario.toFixed(2) + '</small>';
-            html += '</div>';
-        });
-        
-        html += '</div>';
-    }
-    
-    pedidoDetalles.innerHTML = html;
-    pedidoInfo.style.display = 'block';
-    
-    console.log('Información del pedido mostrada correctamente');
-}
-
-/**
- * Mostrar pedido no encontrado
- */
-function mostrarPedidoNoEncontrado(targetDivId) {
-    console.log('Pedido no encontrado');
-    
-    var suffix = targetDivId ? '-' + targetDivId : '';
-    var pedidoInfo = document.getElementById('pedidoInfo' + suffix);
-    var pedidoDetalles = document.getElementById('pedidoDetalles' + suffix);
-    
-    if (!pedidoInfo || !pedidoDetalles) {
-        console.error('No se encontraron elementos pedidoInfo o pedidoDetalles');
-        return;
-    }
-    
-    pedidoDetalles.innerHTML = 
-        '<div style="text-align: center; padding: 20px; color: #dc3545;">' +
-        '<h4 style="margin: 0 0 10px 0;">❌ Pedido No Encontrado</h4>' +
-        '<p style="margin: 0;">El número de pedido ingresado no existe en el sistema.</p>' +
-        '<p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Verifica el número e intenta nuevamente.</p>' +
-        '</div>';
-    
-    pedidoInfo.style.display = 'block';
-    
-    // Ocultar automáticamente después de 4 segundos
-    setTimeout(function() {
-        if (pedidoInfo) {
-            pedidoInfo.style.display = 'none';
-        }
-    }, 4000);
-}
-
-/**
- * Aplicar datos del pedido al formulario
- */
-function aplicarDatosPedido(targetDivId) {
-    var suffix = targetDivId ? '-' + targetDivId : '';
-    var pedidoActual;
-    
-    if (targetDivId) {
-        pedidoActual = window['pedidoActual_' + targetDivId];
-    } else {
-        pedidoActual = window.pedidoActual;
-    }
-    
-    if (!pedidoActual) {
-        alert('❌ No hay datos de pedido para aplicar');
-        return;
-    }
-    
-    console.log('✅ Aplicando datos del pedido al formulario...');
-    
-    try {
-        // 1. Seleccionar cliente si existe
-        if (pedidoActual.cliente && pedidoActual.cliente.uid) {
-            var clienteSelect = document.getElementById('receptorUID' + suffix);
-            if (clienteSelect) {
-                var options = clienteSelect.options;
-                for (var i = 0; i < options.length; i++) {
-                    if (options[i].value === pedidoActual.cliente.uid) {
-                        clienteSelect.selectedIndex = i;
-                        // Disparar evento change para mostrar info del cliente
-                        clienteSelect.dispatchEvent(new Event('change'));
-                        console.log('Cliente seleccionado:', pedidoActual.cliente.nombre);
-                        break;
-                    }
-                }
-            }
-        }
-        
-        // 2. Limpiar conceptos existentes (excepto el primero)
-        limpiarConceptosExistentes(targetDivId);
-        
-        // 3. Aplicar productos del pedido
-        if (pedidoActual.productos && pedidoActual.productos.length > 0) {
-            pedidoActual.productos.forEach(function(producto, index) {
-                if (index === 0) {
-                    // Usar el primer concepto existente
-                    aplicarProductoAConcepto(producto, 0, targetDivId);
-                } else {
-                    // Agregar nuevos conceptos
-                    agregarNuevoConcepto(targetDivId);
-                    aplicarProductoAConcepto(producto, index, targetDivId);
-                }
-            });
-        }
-        
-        // 4. Actualizar número de orden con referencia al pedido
-        var numOrderField = document.getElementById('numOrder' + suffix);
-        if (numOrderField) {
-            numOrderField.value = 'REF-' + pedidoActual.numero + '-' + Date.now();
-        }
-        
-        // 5. Agregar comentario con referencia al pedido
-        var comentariosField = document.getElementById('comentarios' + suffix);
-        if (comentariosField) {
-            comentariosField.value = 'Factura generada a partir del pedido: ' + pedidoActual.numero;
-        }
-        
-        // 6. Recalcular totales
-        if (targetDivId) {
-            calcularTotalesEmbebido(targetDivId);
-        } else {
-            calcularTotales();
-        }
-        
-        // 7. Mostrar confirmación
-        alert('✅ Datos del pedido aplicados correctamente\n\n' +
-              '📋 Pedido: ' + pedidoActual.numero + '\n' +
-              '👤 Cliente: ' + pedidoActual.cliente.nombre + '\n' +
-              '📦 Productos: ' + pedidoActual.productos.length + '\n' +
-              '💰 Total: $' + pedidoActual.total.toFixed(2));
-        
-        // 8. Cerrar sección de importar
-        cancelarImportacion(targetDivId);
-        
-        console.log('✅ Datos del pedido aplicados exitosamente');
-        
-    } catch (error) {
-        console.error('❌ Error aplicando datos del pedido:', error);
-        alert('❌ Error al aplicar los datos del pedido: ' + error.message);
-    }
-}
-
-/**
- * Limpiar conceptos existentes (excepto el primero)
- */
-function limpiarConceptosExistentes(targetDivId) {
-    var suffix = targetDivId ? '-' + targetDivId : '';
-    var selectorConcepto = targetDivId ? '.producto-row-' + targetDivId : '.producto-row';
-    var selectorSecundario = targetDivId ? '.producto-row-secondary-' + targetDivId : '.producto-row-secondary';
-    
-    var conceptos = document.querySelectorAll(selectorConcepto);
-    
-    // Eliminar todos los conceptos excepto el primero
-    for (var i = conceptos.length - 1; i > 0; i--) {
-        var concepto = conceptos[i];
-        var filaSecundaria = concepto.nextElementSibling;
-        
-        if (filaSecundaria && filaSecundaria.classList.contains(selectorSecundario.substring(1))) {
-            filaSecundaria.remove();
-        }
-        concepto.remove();
-    }
-    
-    // Limpiar el primer concepto
-    var primerConcepto = document.querySelector(selectorConcepto);
-    if (primerConcepto) {
-        limpiarCamposConcepto(primerConcepto, targetDivId);
-    }
-}
-
-/**
- * Limpiar campos de un concepto
- */
-function limpiarCamposConcepto(conceptoRow, targetDivId) {
-    var suffix = targetDivId ? '-' + targetDivId : '';
-    
-    var descripcion = conceptoRow.querySelector('.descripcion' + suffix);
-    var claveProdServ = conceptoRow.querySelector('.claveProdServ' + suffix);
-    var cantidad = conceptoRow.querySelector('.cantidad' + suffix);
-    var precioUnitario = conceptoRow.querySelector('.precioUnitario' + suffix);
-    var totalConcepto = conceptoRow.querySelector('.totalConcepto' + suffix);
-    
-    if (descripcion) descripcion.value = '';
-    if (claveProdServ) claveProdServ.value = '';
-    if (cantidad) cantidad.value = '1';
-    if (precioUnitario) precioUnitario.value = '';
-    if (totalConcepto) totalConcepto.value = '';
-    
-    // Limpiar fila secundaria
-    var filaSecundaria = conceptoRow.nextElementSibling;
-    var selectorSecundario = targetDivId ? 'producto-row-secondary-' + targetDivId : 'producto-row-secondary';
-    
-    if (filaSecundaria && filaSecundaria.classList.contains(selectorSecundario)) {
-        var claveUnidad = filaSecundaria.querySelector('.claveUnidad' + suffix);
-        var unidad = filaSecundaria.querySelector('.unidad' + suffix);
-        var descuento = filaSecundaria.querySelector('.descuento' + suffix);
-        var objetoImp = filaSecundaria.querySelector('.objetoImp' + suffix);
-        
-        if (claveUnidad) claveUnidad.value = 'E48';
-        if (unidad) unidad.value = 'Unidad de servicio';
-        if (descuento) descuento.value = '0';
-        if (objetoImp) objetoImp.value = '02';
-    }
-}
-
-/**
- * Aplicar producto a un concepto específico
- */
-function aplicarProductoAConcepto(producto, index, targetDivId) {
-    var suffix = targetDivId ? '-' + targetDivId : '';
-    var selectorConcepto = targetDivId ? '.producto-row-' + targetDivId : '.producto-row';
-    
-    var conceptos = document.querySelectorAll(selectorConcepto);
-    var concepto = conceptos[index];
-    
-    if (!concepto) {
-        console.error('❌ No se encontró el concepto en el índice:', index);
-        return;
-    }
-    
-    // Aplicar datos principales
-    var descripcion = concepto.querySelector('.descripcion' + suffix);
-    var claveProdServ = concepto.querySelector('.claveProdServ' + suffix);
-    var cantidad = concepto.querySelector('.cantidad' + suffix);
-    var precioUnitario = concepto.querySelector('.precioUnitario' + suffix);
-    
-    if (descripcion) descripcion.value = producto.descripcion;
-    if (claveProdServ) claveProdServ.value = producto.claveProdServ;
-    if (cantidad) cantidad.value = producto.cantidad;
-    if (precioUnitario) precioUnitario.value = producto.precioUnitario;
-    
-    // Aplicar datos secundarios
-    var filaSecundaria = concepto.nextElementSibling;
-    var selectorSecundario = targetDivId ? 'producto-row-secondary-' + targetDivId : 'producto-row-secondary';
-    
-    if (filaSecundaria && filaSecundaria.classList.contains(selectorSecundario)) {
-        var claveUnidad = filaSecundaria.querySelector('.claveUnidad' + suffix);
-        var unidad = filaSecundaria.querySelector('.unidad' + suffix);
-        
-        if (claveUnidad && producto.claveUnidad) claveUnidad.value = producto.claveUnidad;
-        if (unidad && producto.unidad) unidad.value = producto.unidad;
-    }
-    
-    console.log('Producto aplicado al concepto', index, ':', producto.descripcion);
-}
-
-/**
- * Agregar nuevo concepto
- */
-function agregarNuevoConcepto(targetDivId) {
-    var suffix = targetDivId ? '-' + targetDivId : '';
-    var agregarBtn = document.getElementById('agregarConcepto' + suffix);
-    
-    if (agregarBtn) {
-        agregarBtn.click();
-    } else {
-        console.error('❌ No se encontró el botón agregarConcepto' + suffix);
-    }
+  alert("Función aplicar datos en desarrollo");
+  console.log("Aplicando datos del pedido para:", targetDivId);
 }
